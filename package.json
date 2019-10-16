@@ -1,13 +1,16 @@
 {
-  "name": "jsonschema",
-  "version": "1.0.0",
-  "description": "",
-  "main": "src/components/Form.vue",
+  "name": "vjsf",
+  "version": "0.1.0",
+  "description": "Vue-component capable of building HTML forms out of a JSON schema. A port of react-jsonschema-form",
+  "main": "dist/vjsf.umd.js",
   "scripts": {
     "eslint": "eslint --fix --ext .vue,.js src",
     "storybook": "NODE_PATH=./node_modules start-storybook -p 6007",
     "build-storybook": "build-storybook -c .storybook -o .out",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "vue-cli-service build --target lib --name vjsf ./src/components/Form.vue",
+    "prepare": "npm run build",
+    "publish-to-npm": "npm run build && npm publish"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +20,7 @@
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "@storybook/vue": "^5.2.3",
+    "@vue/cli-service": "^4.0.0",
     "babel-loader": "^8.0.6",
     "babel-preset-vue": "^2.0.2",
     "eslint": "^6.5.1",
@@ -31,7 +35,6 @@
     "lodash.isempty": "^4.4.0",
     "lodash.pick": "^4.4.0",
     "lodash.topath": "^4.5.2",
-    "shortid": "^2.2.15",
-    "vue": "^2.6.10"
+    "shortid": "^2.2.15"
   }
 }
