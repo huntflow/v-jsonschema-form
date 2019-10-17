@@ -6,9 +6,6 @@
         disabled:{ type: Boolean, default: false, },
         readonly: { type: Boolean, default: false, },
         autofocus: { type: Boolean, default: false, },
-        onBlur: Function,
-        onFocus: Function,
-        onChange: Function,
         id: String,
     };
 
@@ -33,9 +30,9 @@
             const makeRadio = ({ index, option, }) => h('span', {}, [
                 h('input', {
                     on: {
-                        change: () => {
-                            onChange(option.value);
-                        },
+                        focus: (event) => this.$emit('focus', event),
+                        blur: (event) => this.$emit('blur', event),
+                        change: () => this.$emit('change', option.value),
                     },
                     attrs: {
                         type: 'radio',

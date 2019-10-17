@@ -6,10 +6,9 @@
         :readonly="readonly"
         :required="required"
         :value="value"
-
-        @blur="handleBlur"
         @change="handleChange"
-        @focus="handleFocus"
+        @focus="$emit('focus', $event)"
+        @blur="$emit('blur', $event)"
     >
 </template>
 
@@ -22,28 +21,19 @@
         disabled: { type: Boolean, default: false, },
         readonly: { type: Boolean, default: false, },
         required: { type: Boolean, default: false, },
-        onBlur: Function,
-        onChange: Function,
-        onFocus: Function,
     };
 
     export default {
         props: PROPS,
         inheritAttrs: false,
         methods: {
-            handleFocus(event) {
-                this.onFocus(event);
-            },
             handleChange(event) {
                 const value = event.target.value;
-                this.onChange(
-                    value === ''
-                        ? (this.options && this.options.emptyValue)
-                        : value
-                );
-            },
-            handleBlur(event) {
-                this.onBlur(event);
+                const inputValue = value === ''
+                   ? (this.options && this.options.emptyValue)
+                   : value;
+
+                this.$emit('change', inputValue);
             },
         },
     };

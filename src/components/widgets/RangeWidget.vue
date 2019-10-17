@@ -3,6 +3,9 @@
         <base-input
             type="range"
             v-bind="componentProps"
+            @blur="$emit('blur', $event)"
+            @change="$emit('change', $event)"
+            @focus="$emit('focus', $event)"
         />
         <span className="range-view">{{ value }}</span>
     </div>
@@ -18,9 +21,6 @@
         readonly: { type: Boolean, default: false, },
         required: { type: Boolean, default: false, },
         value: [String, Number,],
-        onBlur: Function,
-        onChange: Function,
-        onFocus: Function,
         options: Object,
         schema: Object,
     };

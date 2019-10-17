@@ -33,11 +33,7 @@
         readonly: { type: Boolean, default: false, },
         label: String,
         autofocus: {},
-        onBlur: Function,
-        onFocus: Function,
-        onChange: Function,
     };
-
 
     export default {
         components: {
@@ -61,17 +57,13 @@
         },
         methods: {
             handleFocus() {
-            // noop
-            // TODO
-            // onFocus={onFocus && (event => onFocus(id, event.target.checked))}
+                this.$emit('focus', event.target.checked);
             },
             handleChange(event) {
-                this.onChange(event.target.checked);
+                this.$emit('change', event.target.checked);
             },
             handleBlur() {
-            // noop
-            // TODO
-            // onBlur={onBlur && (event => onBlur(id, event.target.checked))}
+                this.$emit('blur', event.target.checked);
             },
         },
     };

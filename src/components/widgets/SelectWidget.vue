@@ -83,9 +83,6 @@
         readonly: { type: Boolean, default: false, },
         multiple: { type: Boolean, default: false, },
         autofocus: { type: Boolean, default: false, },
-        onChange: Function,
-        onBlur: Function,
-        onFocus: Function,
         placeholder: String,
         options: { type: Object, default: () => ({}), },
     };
@@ -111,21 +108,13 @@
                 return this.enumDisabled.indexOf(value) != -1;
             },
             handleBlur(event) {
-                if (!this.onBlur) {
-                    return;
-                }
-                this.onBlur(this.id, this.getProcessedValue(event));
+                this.$emit('blur', this.id, this.getProcessedValue(event));
             },
             handleChange(event) {
-                this.onChange(
-                    this.getProcessedValue(event)
-                );
+                this.$emit('change', this.getProcessedValue(event));
             },
             handleFocus(event) {
-                if (!this.onFocus) {
-                    return;
-                }
-                this.onFocus(this.id, this.getProcessedValue(event));
+                this.$emit('focus', this.id, this.getProcessedValue(event));
             },
             getProcessedValue(event) {
                 const newValue = getValue(event, this.multiple);

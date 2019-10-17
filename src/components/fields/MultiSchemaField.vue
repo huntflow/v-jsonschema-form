@@ -5,12 +5,12 @@
                 :is="widgetWithOptions.widget"
                 :id="idSchema.$id + '_anyof_select'"
                 :schema="{ type: 'number', default: 0 }"
-                :on-change="handleOptionChange"
-                :on-blur="onBlur"
-                :on-focus="onFocus"
                 :value="selectedOption"
                 :options="{ enumOptions }"
                 v-bind="widgetWithOptions.options"
+                @change="handleOptionChange"
+                @focus="onFocus"
+                @blur="onBlur"
             />
         </div>
 
@@ -23,11 +23,11 @@
             :id-schema="idSchema"
             :id-prefix="idPrefix"
             :form-data="formData"
-            :on-change="onChange"
-            :on-blur="onBlur"
-            :on-focus="onFocus"
             :registry="registry"
             :disabled="disabled"
+            @change="onChange"
+            @focus="onFocus"
+            @blur="onBlur"
         />
     </div>
 </template>
@@ -53,9 +53,9 @@
         options: Array,
         registry: Object,
         uiSchema: Object,
-        onBlur: Function,
         onChange: Function,
         onFocus: Function,
+        onBlur: Function,
     };
 
     export default {
@@ -160,6 +160,7 @@
                 }
                 // Call getDefaultFormState to make sure defaults are populated on change.
                 onChange(
+                    'change',
                     getDefaultFormState(options[selectedOption], newFormData, definitions)
                 );
 

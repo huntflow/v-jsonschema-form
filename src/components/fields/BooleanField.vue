@@ -12,9 +12,9 @@
         :autofocus="autofocus"
         :registry="registry"
         :raw-errors="rawErrors"
-        :on-change="onChange"
-        :on-blur="onBlur"
-        :on-focus="onFocus"
+        @change="onChange"
+        @focus="onFocus"
+        @blur="onBlur"
     />
 </template>
 

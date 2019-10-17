@@ -27,9 +27,6 @@
         disabled: { type: Boolean, default: false, },
         readonly: { type: Boolean, default: false, },
         autofocus: { default: false, },
-        onChange: Function,
-        onBlur: Function,
-        onFocus: Function,
     };
 
     export default {
@@ -37,13 +34,16 @@
         props: PROPS,
         methods: {
             handleBlur(event) {
-                this.onBlur && this.onBlur(this.id, event.target.value);
+                this.$emit('blur', this.id, event.target.value);
             },
             handleFocus(event) {
-                this.onFocus && this.onFocus(this.id, event.target.value);
+                this.$emit('focus', this.id, event.target.value);
             },
             handleChange({ target: { value, }, }) {
-                return this.onChange(value === '' ? this.options.emptyValue : value);
+                const emitValue = value === ''
+                    ? this.options.emptyValue
+                    : value;
+                this.$emit('change', emitValue);
             },
         },
     };

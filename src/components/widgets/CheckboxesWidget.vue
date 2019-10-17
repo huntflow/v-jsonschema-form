@@ -18,9 +18,6 @@
         autofocus: { default: false, },
         options: { default: () => ({ inline: false, }), },
         value: Array,
-        onChange: Function,
-        onBlur: Function,
-        onFocus: Function,
     };
 
     export default {
@@ -45,11 +42,11 @@
                     on: {
                         change: event => {
                             const all = enumOptions.map(({ value, }) => value);
-                            if (event.target.checked) {
-                                onChange(selectValue(option.value, value, all));
-                            } else {
-                                onChange(deselectValue(option.value, value));
-                            }
+                            const changeValue = event.target.checked
+                                ? selectValue(option.value, value, all)
+                                : deselectValue(option.value, value);
+
+                            this.$emit('change', changeValue);
                         },
                     },
                     attrs: {

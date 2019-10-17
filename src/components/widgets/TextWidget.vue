@@ -7,9 +7,9 @@
         :readonly="readonly"
         :required="required"
         :value="value"
-        :on-blur="onBlur"
-        :on-change="onChange"
-        :on-focus="onFocus"
+        @blur="$emit('blur', $event)"
+        @change="$emit('change', $event)"
+        @focus="$emit('focus', $event)"
     />
 </template>
 
@@ -23,9 +23,6 @@
         disabled: { type: Boolean, default: false, },
         readonly: { type: Boolean, default: false, },
         required: { type: Boolean, default: false, },
-        onBlur: Function,
-        onChange: Function,
-        onFocus: Function,
     };
 
     export default {
