@@ -17,6 +17,9 @@
         :placeholder="placeholder"
         :autofocus="autofocus"
         :raw-errors="rawErrors"
+        @change="onChange"
+        @blur="onBlur"
+        @focus="onFocus"
     />
 </template>
 

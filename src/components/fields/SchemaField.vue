@@ -13,7 +13,7 @@
         :schema="retrivedSchema"
     >
         <template
-            v-if="errors.length > 0"
+            v-if="errors.length > 0 && 'TODO: ошибки отображаются в компонентах' && false"
             v-slot:errors
         >
             <div>
@@ -140,6 +140,8 @@
         props: PROPS,
         computed: {
             cssClass() {
+                return {}; // TODO: классы ошибки навяливаются внутри компонент
+
                 const hasErrors = this.errors && this.errors.length > 0;
                 return {
                     [this.uiSchema.classNames]: Boolean(this.uiSchema.classNames),
@@ -187,7 +189,7 @@
             },
             shouldDisplayLabel() {
                 const uiOptions = getUiOptions(this.uiSchema);
-                let { label: displayLabel = true, } = uiOptions;
+                let { label: displayLabel } = uiOptions;
                 if (this.retrivedSchema.type === 'array') {
                     displayLabel =
                         isMultiSelect(this.retrivedSchema, this.registry.definitions) ||
