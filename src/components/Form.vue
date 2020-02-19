@@ -125,6 +125,11 @@ export default {
             },
             immediate: true,
         },
+        formDataState: {
+            handler(state) {
+                this.$emit('change', state);
+            }
+        }
     },
     methods: {
         handleSubmit(event) {
