@@ -12,7 +12,7 @@
                 name="label"
             >
                 <label
-                    class="form-group__label"
+                    class="form-group__label scheme-form__label"
                     :for="id"
                 >
                     {{ label }}
