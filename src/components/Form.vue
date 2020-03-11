@@ -1,5 +1,6 @@
 <template>
     <form
+        ref="form"
         :id="id"
         :acceptcharset="acceptcharset"
         :action="action"
@@ -132,9 +133,16 @@ export default {
         }
     },
     methods: {
+        submit() {
+            this.$refs.form.requestSubmit();
+        },
         handleSubmit(event) {
             event.preventDefault();
-            if (event.target !== event.currentTarget) {
+            if (
+                event.target !== event.currentTarget &&
+                // при вызове метода requestSubmit в сurrentTarget - null
+                event.currentTarget
+            ) {
                 return;
             }
 
@@ -178,21 +186,21 @@ export default {
             this.errorSchemaState = {};
 
 
+            const submitPayload = {
+                schema: this.schemaState,
+                uiSchema: this.uiSchemaState,
+                idSchema: this.idSchemaState,
+                formData: this.formDataState,
+                edit: this.editState,
+                errors: this.errorsState,
+                errorSchema: this.errorSchemaState,
+                additionalMetaSchemas: this.additionalMetaSchemasState,
+                status: 'submitted',
+            };
+
+            this.$emit('submit', submitPayload, event);
             if (this.onSubmit) {
-                this.onSubmit(
-                    {
-                        schema: this.schemaState,
-                        uiSchema: this.uiSchemaState,
-                        idSchema: this.idSchemaState,
-                        formData: this.formDataState,
-                        edit: this.editState,
-                        errors: this.errorsState,
-                        errorSchema: this.errorSchemaState,
-                        additionalMetaSchemas: this.additionalMetaSchemasState,
-                        status: 'submitted',
-                    },
-                    event
-                );
+                this.onSubmit(submitPayload, event);
             }
         },
         handleFocus() {
