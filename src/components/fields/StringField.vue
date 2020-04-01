@@ -13,7 +13,7 @@
         :registry="registry"
         :placeholder="placeholder"
         :raw-errors="rawErrors"
-
+        :raw-error-infos="rawErrorInfos"
         @change="onChange"
         @blur="onBlur"
         @focus="onFocus"
@@ -38,6 +38,7 @@
         formData: [String, Number,],
         registry: {type: Object, default: () => getDefaultRegistry(), },
         rawErrors: { type: Array, },
+        rawErrorInfos: { type: Array, },
         required: { type: Boolean, default: false, },
         disabled: { type: Boolean, default: false, },
         readonly: { type: Boolean, default: false, },

@@ -48,6 +48,7 @@
             :id-prefix="idPrefix"
             :id-schema="mergedIdSchema"
             :raw-errors="errorSchema.__errors"
+            :raw-error-infos="errorSchema.__errorInfos"
             :readonly="isReadOnly"
             :registry="registry"
             :required="required"

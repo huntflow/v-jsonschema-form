@@ -15,6 +15,7 @@
         :autofocus="autofocus"
         :registry="registry"
         :raw-errors="rawErrors"
+        :raw-error-infos="rawErrorsInfos"
         :on-blur="onBlur"
         :on-focus="onFocus"
         :on-change-for-index="handleChangeForIndex"
@@ -83,6 +84,7 @@
         name: String,
         idPrefix: String,
         rawErrors: Array,
+        rawErrorInfos: Array,
         uiSchema: { type: Object, default: () => ({}), },
         formData: { type: Array, default: () => [], },
         idSchema: { type: Object, default: () => ({}), },

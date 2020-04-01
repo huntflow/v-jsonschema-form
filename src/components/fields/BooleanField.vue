@@ -12,6 +12,7 @@
         :autofocus="autofocus"
         :registry="registry"
         :raw-errors="rawErrors"
+        :raw-error-infos="rawErrorInfos"
         @change="onChange"
         @focus="onFocus"
         @blur="onBlur"
@@ -33,6 +34,7 @@
         idSchema: Object,
         formData: Boolean,
         rawErrors: Array,
+        rawErrorInfos: Array,
         registry: { type: Object, default: () => getDefaultRegistry(), },
         required: { type: Boolean, default: false, },
         disabled: { type: Boolean, default: false, },

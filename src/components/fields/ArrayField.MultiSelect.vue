@@ -17,6 +17,7 @@
         :placeholder="placeholder"
         :autofocus="autofocus"
         :raw-errors="rawErrors"
+        :raw-error-infos="rawErrorInfos"
         @change="onChange"
         @blur="onBlur"
         @focus="onFocus"
@@ -41,6 +42,7 @@
         formData: Array,
         registry: { default: () => getDefaultRegistry(), },
         rawErrors: Array,
+        rawErrorInfos: Array,
         disabled: { type: Boolean, default: false },
         readonly: { type: Boolean, default: false },
         required: { type: Boolean, default: false },

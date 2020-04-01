@@ -15,6 +15,7 @@
         :on-focus="onFocus"
         :registry="registry"
         :raw-errors="rawErrors"
+        :raw-error-infos="rawErrorInfos"
     />
 </template>
 
@@ -39,6 +40,7 @@
         onFocus: Function,
         registry: {type: Object, default: getDefaultRegistry(), },
         rawErrors: { type: Array, },
+        rawErrorInfos: { type: Array, },
     };
 
     export default {

@@ -28,6 +28,7 @@
             :readonly="readonly"
             :autofocus="autofocus"
             :raw-errors="rawErrors"
+            :raw-error-infos="rawErrorInfos"
         />
     </default-array-item>
 </template>
@@ -46,6 +47,7 @@
         itemIdSchema: Object,
         itemErrorSchema: Object,
         rawErrors: { type: Array, },
+        rawErrorInfos: { type: Array, },
         uiSchema: { type: Object, },
         registry: { type: Object, required: true, },
         autofocus: { type: Boolean, default: false, },

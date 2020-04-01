@@ -13,6 +13,7 @@
         :schema="schema"
         :form-data="formData"
         :raw-errors="rawErrors"
+        :raw-error-infos="rawErrorInfos"
         :registry="registry"
     >
         <component
@@ -76,6 +77,7 @@
         errorSchema: Object,
         idSchema: Object,
         rawErrors: Array,
+        rawErrorInfos: Array,
         registry: { type: Object, default: () => getDefaultRegistry(), },
         autofocus: { type: Boolean, default: false, },
         required: { type: Boolean, default: false, },

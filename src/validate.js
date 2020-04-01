@@ -71,9 +71,11 @@ function toErrorSchema(errors) {
       // to avoid name collision with a possible sub schema field named
       // "errors" (see `validate.createErrorHandler`).
       parent.__errors = parent.__errors.concat(message);
+      parent.__errorInfos = parent.__errorInfos.concat(error);
     } else {
       if (message) {
         parent.__errors = [message,];
+        parent.__errorInfos = [error,];
       }
     }
     return errorSchema;
