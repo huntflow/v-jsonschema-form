@@ -16,10 +16,6 @@
                     :for="id"
                 >
                     {{ label }}
-                    <span
-                        v-if="required"
-                        class="required"
-                    >*</span>
                 </label>
             </slot>
         </template>

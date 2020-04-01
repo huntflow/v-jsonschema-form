@@ -1,10 +1,6 @@
 <template>
     <legend :id="id">
         {{ title }}
-        <span
-            v-if="required"
-            class="required"
-        >*</span>
     </legend>
 </template>
 
@@ -12,7 +8,6 @@
     const PROPS = {
         id: String,
         title: String,
-        required: { type: Boolean, default: false, },
     };
 
     export default {
