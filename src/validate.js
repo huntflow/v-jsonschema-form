@@ -17,6 +17,24 @@ function createAjvInstance() {
     unknownFormats: 'ignore',
   });
 
+  ajv.addKeyword('isNotEmpty', {
+    errors: true,
+    validate: function isNotEmpty(value, data) {
+      if (Array.isArray(isNotEmpty.errors) === false) {
+        isNotEmpty.errors = [];
+      }
+      const isValid = (typeof data === 'string' && data !== '') || (Array.isArray(data) && data.length > 0);
+      !isValid && isNotEmpty.errors.push({
+        keyword: 'isNotEmpty',
+        message: 'should NOT be empty',
+        params: {
+          keyword: 'isNotEmpty'
+        }
+      });
+      return isValid;
+    }
+  });
+
   // add custom formats
   ajv.addFormat(
     'data-url',
