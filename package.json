@@ -1,6 +1,6 @@
 {
   "name": "vjsf",
-  "version": "0.2.5",
+  "version": "0.3.5",
   "description": "Vue-component capable of building HTML forms out of a JSON schema. A port of react-jsonschema-form",
   "main": "dist/vjsf.umd.js",
   "scripts": {

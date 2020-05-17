@@ -189,6 +189,8 @@
                 return this.disabled || this.uiSchema['ui:disabled'];
             },
             shouldDisplayLabel() {
+                return false;
+                // TODO: check if it works & remove unused stuff
                 const uiOptions = getUiOptions(this.uiSchema);
                 let { label: displayLabel } = uiOptions;
                 if (this.retrivedSchema.type === 'array') {
