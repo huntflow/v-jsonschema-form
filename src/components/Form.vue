@@ -52,6 +52,8 @@ import {
     isObject,
 } from '../utils';
 
+export { removeEmptySchemaFields } from '../remove-empty-schema-fields';
+
 const PROPS = {
     id: String,
     idPrefix: String,
