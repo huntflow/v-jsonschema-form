@@ -51,8 +51,7 @@ import {
     toPathSchema,
     isObject,
 } from '../utils';
-
-export { removeEmptySchemaFields } from '../remove-empty-schema-fields';
+import { removeEmptySchemaFields } from '../remove-empty-schema-fields';
 
 const PROPS = {
     id: String,
@@ -78,7 +77,8 @@ const PROPS = {
     widgets: { type: Object, default: () => ({}) },
     arrayFieldTemplate: { type: Object, default: undefined },
     objectFieldTemplate: { type: Object, default: undefined },
-    fieldTemplate: { type: Object, default: undefined }
+    fieldTemplate: { type: Object, default: undefined },
+    omitMissingFields: { type: Boolean, default: false }
 };
 
 export default {
@@ -107,8 +107,12 @@ export default {
     watch: {
         formData: {
             handler(formData) {
+                const schema = this.omitMissingFields
+                    ? removeEmptySchemaFields(this.schema, formData)
+                    : this.schema;
+
                 const newState = this.getStateFromProps({
-                    schema: this.schema,
+                    schema,
                     uiSchema: this.uiSchema,
                     liveValidate: this.liveValidate,
                     noValidate: this.noValidate,
@@ -265,7 +269,10 @@ export default {
             };
         },
         getStateFromProps(props, inputFormData) {
-            const schema = props.schema;
+            const schema = this.omitMissingFields
+                ? removeEmptySchemaFields(props.schema, formData)
+                : props.schema;
+
             const uiSchema = props.uiSchema;
             const edit = typeof inputFormData !== 'undefined';
             const liveValidate = props.liveValidate;
