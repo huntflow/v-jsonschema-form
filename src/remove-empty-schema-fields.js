@@ -2,7 +2,7 @@ import cloneDeep from 'lodash.clonedeep';
 import jsonSchemaTraverse from 'json-schema-traverse';
 import jsonPointer from 'json-pointer';
 
-export function removeEmptySchemaFields(schema, data) {
+export function removeEmptySchemaFields(schema, formData) {
     // Вот эта машинерия нужна для того, чтобы не выводить поля,
     // которые пользователь не заполнил.
     // Для этого из оригинальной схемы удаляются части, для которых нет данных.
@@ -29,13 +29,13 @@ export function removeEmptySchemaFields(schema, data) {
                     .parse(currentJsonPointer)
                     .filter(part => part !== 'properties')
             );
-            const hasData = jsonPointer.has(data, dataPointer);
+            const hasData = jsonPointer.has(formData, dataPointer);
             if (hasData === false) {
                 emptyPointers.push(currentJsonPointer);
             }
 
             if (hasData) {
-                const data = jsonPointer.get(data, dataPointer);
+                const data = jsonPointer.get(formData, dataPointer);
                 const isEmptyData =
                     // скрываем поля, значением которых является пустой массив
                     // (например если все чекбоксы выключены)

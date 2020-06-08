@@ -270,7 +270,7 @@ export default {
         },
         getStateFromProps(props, inputFormData) {
             const schema = this.omitMissingFields
-                ? removeEmptySchemaFields(props.schema, formData)
+                ? removeEmptySchemaFields(props.schema, inputFormData)
                 : props.schema;
 
             const uiSchema = props.uiSchema;
