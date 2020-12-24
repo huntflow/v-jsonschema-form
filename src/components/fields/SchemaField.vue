@@ -168,7 +168,6 @@
                     toIdSchema(
                         this.retrivedSchema,
                         null,
-                        this.registry.definitions,
                         this.formData,
                         this.idPrefix
                     ),
@@ -178,7 +177,6 @@
             retrivedSchema() {
                 return retrieveSchema(
                     this.schema,
-                    this.registry.definitions,
                     this.formData
                 );
             },
@@ -195,8 +193,8 @@
                 let { label: displayLabel } = uiOptions;
                 if (this.retrivedSchema.type === 'array') {
                     displayLabel =
-                        isMultiSelect(this.retrivedSchema, this.registry.definitions) ||
-                        isFilesArray(this.retrivedSchema, this.uiSchema, this.registry.definitions);
+                        isMultiSelect(this.retrivedSchema) ||
+                        isFilesArray(this.retrivedSchema, this.uiSchema);
                 }
                 if (this.retrivedSchema.type === 'object') {
                     displayLabel = false;

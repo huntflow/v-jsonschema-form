@@ -65,7 +65,6 @@
             widgetWithOptions() {
                 const itemsSchema = retrieveSchema(
                     this.schema.items,
-                    this.registry.definitions,
                     this.formData
                 );
                 const enumOptions = optionsList(itemsSchema);

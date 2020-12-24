@@ -123,7 +123,6 @@
             isMultiSelectArray() {
                 return isMultiSelect(
                     this.schema,
-                    this.registry.definitions
                 );
             },
         },
@@ -159,7 +158,7 @@
                 if (isFixedItems(this.schema) && allowAdditionalItems(this.schema)) {
                     itemSchema = this.schema.additionalItems;
                 }
-                return getDefaultFormState(itemSchema, undefined, this.registry.definitions);
+                return getDefaultFormState(itemSchema, undefined);
             },
 
             handleAddClick(event) {

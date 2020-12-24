@@ -81,7 +81,6 @@
             retrivedSchema() {
                 return retrieveSchema(
                     this.schema,
-                    this.registry.definitions,
                     this.formData
                 );
             },
@@ -134,16 +133,6 @@
                 return () => {
                     let type = schema.additionalProperties.type;
                     const newFormData = { ...this.formData, };
-
-                    // eslint-disable-next-line no-prototype-builtins
-                    if (schema.additionalProperties.hasOwnProperty('$ref')) {
-                        const refSchema = retrieveSchema(
-                            { $ref: schema.additionalProperties['$ref'], },
-                            this.registry.definitions,
-                            this.formData
-                        );
-                        type = refSchema.type;
-                    }
 
                     newFormData[
                         getAvailableKey('newKey', newFormData)

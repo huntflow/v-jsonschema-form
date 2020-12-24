@@ -114,9 +114,7 @@
         },
         methods: {
             getMatchingOption(formData, options) {
-                const { definitions, } = this.registry;
-
-                let option = getMatchingOption(formData, options, definitions);
+                let option = getMatchingOption(formData, options);
                 if (option !== 0) {
                     return option;
                 }
@@ -126,11 +124,9 @@
             },
             handleOptionChange(option) {
                 const selectedOption = parseInt(option, 10);
-                const { formData, onChange, options, registry, } = this.$props;
-                const { definitions, } = registry;
+                const { formData, onChange, options } = this.$props;
                 const newOption = retrieveSchema(
                     options[selectedOption],
-                    definitions,
                     formData
                 );
 
@@ -161,7 +157,7 @@
                 // Call getDefaultFormState to make sure defaults are populated on change.
                 onChange(
                     'change',
-                    getDefaultFormState(options[selectedOption], newFormData, definitions)
+                    getDefaultFormState(options[selectedOption], newFormData)
                 );
 
                 this.selectedOption = parseInt(option, 10);

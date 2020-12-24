@@ -131,7 +131,6 @@
             itemsSchema() {
                 return retrieveSchema(
                     this.schema.items,
-                    this.registry.definitions
                 );
             },
         },
@@ -139,7 +138,6 @@
             getItemSchema(item) {
                 return retrieveSchema(
                     this.schema.items,
-                    this.registry.definitions,
                     item
                 );
             },
@@ -153,7 +151,6 @@
                 return toIdSchema(
                     this.getItemSchema(item),
                     itemIdPrefix,
-                    this.registry.definitions,
                     item,
                     this.idPrefix
                 );

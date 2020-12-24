@@ -127,7 +127,6 @@
                 return this.schema.items.map(
                     (item, index) => retrieveSchema(
                         item,
-                        this.registry.definitions,
                         this.formData[index]
                     )
                 );
@@ -136,7 +135,6 @@
                 return allowAdditionalItems(this.schema)
                     ? retrieveSchema(
                         this.schema.additionalItems,
-                        this.registry.definitions,
                         this.formData
                     )
                     : null;
@@ -157,7 +155,6 @@
                 return additional
                     ? retrieveSchema(
                         this.schema.additionalItems,
-                        this.registry.definitions,
                         item
                     )
                     : this.itemSchemas[index];
@@ -181,7 +178,6 @@
                 return toIdSchema(
                     this.getItemSchema(item, index),
                     itemIdPrefix,
-                    this.registry.definitions,
                     item,
                     this.idPrefix
                 );

@@ -157,13 +157,11 @@ export default {
             if (this.omitExtraData === true) {
                 const retrievedSchema = retrieveSchema(
                     this.schemaState,
-                    this.schemaState.definitions,
                     newFormData
                 );
                 const pathSchema = toPathSchema(
                     retrievedSchema,
                     '',
-                    this.schemaState.definitions,
                     newFormData
                 );
 
@@ -227,13 +225,11 @@ export default {
             if (this.omitExtraData === true && this.liveOmit === true) {
                 const retrievedSchema = retrieveSchema(
                     this.schemaState,
-                    this.schemaState.definitions,
                     formData
                 );
                 const pathSchema = toPathSchema(
                     retrievedSchema,
                     '',
-                    this.schemaState.definitions,
                     formData
                 );
 
@@ -264,8 +260,7 @@ export default {
                 widgets: { ...widgets, ...this.$props.widgets, },
                 ArrayFieldTemplate: this.$props.ArrayFieldTemplate,
                 ObjectFieldTemplate: this.$props.ObjectFieldTemplate,
-                FieldTemplate: this.$props.FieldTemplate,
-                definitions: this.$props.schema.definitions || {},
+                FieldTemplate: this.$props.FieldTemplate
             };
         },
         getStateFromProps(props, inputFormData) {
@@ -277,9 +272,8 @@ export default {
             const edit = typeof inputFormData !== 'undefined';
             const liveValidate = props.liveValidate;
             const mustValidate = edit && !props.noValidate && liveValidate;
-            const { definitions, } = schema;
-            const formData = getDefaultFormState(schema, inputFormData, definitions);
-            const retrievedSchema = retrieveSchema(schema, definitions, formData);
+            const formData = getDefaultFormState(schema, inputFormData);
+            const retrievedSchema = retrieveSchema(schema, formData);
             const customFormats = props.customFormats;
             const additionalMetaSchemas = props.additionalMetaSchemas;
             const { errors, errorSchema, } = mustValidate
@@ -291,7 +285,6 @@ export default {
             const idSchema = toIdSchema(
                 retrievedSchema,
                 uiSchema['ui:rootFieldId'],
-                definitions,
                 formData,
                 props.idPrefix
             );
@@ -312,8 +305,7 @@ export default {
             additionalMetaSchemas = this.additionalMetaSchemasState,
             customFormats = this.customFormatsState
         ) {
-            const { definitions, } = this.getRegistry();
-            const resolvedSchema = retrieveSchema(schema, definitions, formData);
+            const resolvedSchema = retrieveSchema(schema, formData);
             return validateFormData(
                 formData,
                 resolvedSchema,
