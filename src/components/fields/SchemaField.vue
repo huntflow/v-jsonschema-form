@@ -5,32 +5,12 @@
     class="form-group field"
     :class="cssClass"
     :disabled="isDisabled"
-    :display-label="shouldDisplayLabel"
     :hidden="isHidden"
     :label="label"
     :readonly="isReadOnly"
     :required="required"
     :schema="retrivedSchema"
   >
-    <template
-      v-if="errors.length > 0 && 'TODO: ошибки отображаются в компонентах' && false"
-      v-slot:errors
-    >
-      <div>
-        <ul class="error-detail bs-callout bs-callout-info">
-          <li v-for="(error, index) in errors" :key="index" class="text-danger">
-            {{ error }}
-          </li>
-        </ul>
-      </div>
-    </template>
-
-    <template v-if="help" v-slot:help>
-      <p class="help-block">
-        {{ help }}
-      </p>
-    </template>
-
     <component
       :is="fieldCls"
       :name="name"
@@ -170,27 +150,6 @@ export default {
     isDisabled() {
       return this.disabled || this.uiSchema['ui:disabled'];
     },
-    shouldDisplayLabel() {
-      return false;
-      // TODO: check if it works & remove unused stuff
-      const uiOptions = getUiOptions(this.uiSchema);
-      let { label: displayLabel } = uiOptions;
-      if (this.retrivedSchema.type === 'array') {
-        displayLabel =
-          isMultiSelect(this.retrivedSchema) || isFilesArray(this.retrivedSchema, this.uiSchema);
-      }
-      if (this.retrivedSchema.type === 'object') {
-        displayLabel = false;
-      }
-      if (this.retrivedSchema.type === 'boolean' && !this.uiSchema['ui:widget']) {
-        displayLabel = false;
-      }
-      if (this.uiSchema['ui:field']) {
-        displayLabel = false;
-      }
-
-      return displayLabel;
-    },
     isReadOnly() {
       return Boolean(
         this.readonly ||
@@ -214,9 +173,6 @@ export default {
         this.schema.description ||
         this.retrivedSchema.description
       );
-    },
-    help() {
-      return this.uiSchema['ui:help'];
     },
     errors() {
       return (this.errorSchema.__errors || []).filter(Boolean);

@@ -3,17 +3,7 @@
     <slot />
   </div>
   <div v-else-if="isAdditional === false">
-    <template v-if="displayLabel">
-      <slot v-if="label" name="label">
-        <label class="form-group__label scheme-form__label" :for="id">
-          {{ label }}
-        </label>
-      </slot>
-    </template>
-    <slot v-if="displayLabel" name="description" />
     <slot />
-    <slot name="errors" />
-    <slot name="help" />
   </div>
   <div v-else> "Additional properties" feature is not supported yet. </div>
 </template>
@@ -28,7 +18,6 @@ const PROPS = {
   hidden: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
-  displayLabel: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
   onKeyChange: Function,
   onDropPropertyClick: Function
