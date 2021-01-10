@@ -1,31 +1,30 @@
 <template>
-    <div class="row">
-        <p class="col-xs-3 col-xs-offset-9 text-right">
-            <icon-button
-                type="info"
-                icon="plus"
-                class="btn-add col-xs-12"
-                tab-index="0"
-                :disabled="disabled"
-                :on-click="onClick"
-            />
-        </p>
-    </div>
+  <div class="row">
+    <p class="col-xs-3 col-xs-offset-9 text-right">
+      <icon-button
+        type="info"
+        icon="plus"
+        class="btn-add col-xs-12"
+        tab-index="0"
+        :disabled="disabled"
+        :on-click="onClick"
+      />
+    </p>
+  </div>
 </template>
 
-
 <script>
-    import IconButton from './IconButton';
+import IconButton from './IconButton';
 
-    const PROPS = {
-        onClick: { type: Function, },
-        disabled: { type: Boolean, default: false, },
-    };
+const PROPS = {
+  onClick: { type: Function },
+  disabled: { type: Boolean, default: false }
+};
 
-    export default {
-        components: {
-            'icon-button': IconButton,
-        },
-        props: PROPS,
-    };
+export default {
+  components: {
+    'icon-button': IconButton
+  },
+  props: PROPS
+};
 </script>

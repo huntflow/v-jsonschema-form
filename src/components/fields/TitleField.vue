@@ -1,16 +1,16 @@
 <template>
-    <legend :id="id">
-        {{ title }}
-    </legend>
+  <legend :id="id">
+    {{ title }}
+  </legend>
 </template>
 
 <script>
-    const PROPS = {
-        id: String,
-        title: String,
-    };
+const PROPS = {
+  id: String,
+  title: String
+};
 
-    export default {
-        props: PROPS,
-    };
+export default {
+  props: PROPS
+};
 </script>

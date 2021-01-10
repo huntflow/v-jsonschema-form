@@ -9,14 +9,14 @@ import BooleanField from './BooleanField';
 import MultiSchemaField from './MultiSchemaField';
 
 export default {
-    DescriptionField,
-    ArrayField,
-    ObjectField,
-    SchemaField,
-    TitleField,
-    StringField,
-    NumberField,
-    BooleanField,
-    OneOfField: MultiSchemaField,
-    AnyOfField: MultiSchemaField,
+  DescriptionField,
+  ArrayField,
+  ObjectField,
+  SchemaField,
+  TitleField,
+  StringField,
+  NumberField,
+  BooleanField,
+  OneOfField: MultiSchemaField,
+  AnyOfField: MultiSchemaField
 };

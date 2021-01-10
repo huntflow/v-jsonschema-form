@@ -1,35 +1,35 @@
 <template>
-    <base-input
-        type="text"
-        class="form-control"
-        :autofocus="autofocus"
-        :disabled="disabled"
-        :readonly="readonly"
-        :required="required"
-        :value="value"
-        @blur="$emit('blur', $event)"
-        @change="$emit('change', $event)"
-        @focus="$emit('focus', $event)"
-    />
+  <base-input
+    type="text"
+    class="form-control"
+    :autofocus="autofocus"
+    :disabled="disabled"
+    :readonly="readonly"
+    :required="required"
+    :value="value"
+    @blur="$emit('blur', $event)"
+    @change="$emit('change', $event)"
+    @focus="$emit('focus', $event)"
+  />
 </template>
 
 <script>
-    import BaseInput from './BaseInput';
+import BaseInput from './BaseInput';
 
-    const PROPS = {
-        autofocus: {},
-        options: Object,
-        value: [String, Number,],
-        disabled: { type: Boolean, default: false, },
-        readonly: { type: Boolean, default: false, },
-        required: { type: Boolean, default: false, },
-    };
+const PROPS = {
+  autofocus: {},
+  options: Object,
+  value: [String, Number],
+  disabled: { type: Boolean, default: false },
+  readonly: { type: Boolean, default: false },
+  required: { type: Boolean, default: false }
+};
 
-    export default {
-        components: {
-            'base-input': BaseInput,
-        },
-        props: PROPS,
-        inheritAttrs: false,
-    };
+export default {
+  components: {
+    'base-input': BaseInput
+  },
+  props: PROPS,
+  inheritAttrs: false
+};
 </script>

@@ -1,12 +1,12 @@
 import toPath from 'lodash.topath';
 import Ajv from 'ajv';
 let ajv = createAjvInstance();
-import { deepEquals, getDefaultFormState, } from './utils';
+import { deepEquals, getDefaultFormState } from './utils';
 
 let formerCustomFormats = null;
 let formerMetaSchema = null;
 
-import { isObject, mergeObjects, } from './utils';
+import { isObject, mergeObjects } from './utils';
 
 function createAjvInstance() {
   const ajv = new Ajv({
@@ -14,7 +14,7 @@ function createAjvInstance() {
     allErrors: true,
     multipleOfPrecision: 8,
     schemaId: 'auto',
-    unknownFormats: 'ignore',
+    unknownFormats: 'ignore'
   });
 
   ajv.addKeyword('isNotEmpty', {
@@ -23,23 +23,22 @@ function createAjvInstance() {
       if (Array.isArray(isNotEmpty.errors) === false) {
         isNotEmpty.errors = [];
       }
-      const isValid = (typeof data === 'string' && data !== '') || (Array.isArray(data) && data.length > 0);
-      !isValid && isNotEmpty.errors.push({
-        keyword: 'isNotEmpty',
-        message: 'should NOT be empty',
-        params: {
-          keyword: 'isNotEmpty'
-        }
-      });
+      const isValid =
+        (typeof data === 'string' && data !== '') || (Array.isArray(data) && data.length > 0);
+      !isValid &&
+        isNotEmpty.errors.push({
+          keyword: 'isNotEmpty',
+          message: 'should NOT be empty',
+          params: {
+            keyword: 'isNotEmpty'
+          }
+        });
       return isValid;
     }
   });
 
   // add custom formats
-  ajv.addFormat(
-    'data-url',
-    /^data:([a-z]+\/[a-z0-9-+.]+)?;(?:name=(.*);)?base64,(.*)$/
-  );
+  ajv.addFormat('data-url', /^data:([a-z]+\/[a-z0-9-+.]+)?;(?:name=(.*);)?base64,(.*)$/);
   ajv.addFormat(
     'color',
     /^(#?([0-9A-Fa-f]{3}){1,2}\b|aqua|black|blue|fuchsia|gray|green|lime|maroon|navy|olive|orange|purple|red|silver|teal|white|yellow|(rgb\(\s*\b([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\b\s*,\s*\b([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\b\s*,\s*\b([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\b\s*\))|(rgb\(\s*(\d?\d%|100%)+\s*,\s*(\d?\d%|100%)+\s*,\s*(\d?\d%|100%)+\s*\)))$/
@@ -67,7 +66,7 @@ function toErrorSchema(errors) {
     return {};
   }
   return errors.reduce((errorSchema, error) => {
-    const { property, message, } = error;
+    const { property, message } = error;
     const path = toPath(property);
     let parent = errorSchema;
 
@@ -92,8 +91,8 @@ function toErrorSchema(errors) {
       parent.__errorInfos = parent.__errorInfos.concat(error);
     } else {
       if (message) {
-        parent.__errors = [message,];
-        parent.__errorInfos = [error,];
+        parent.__errors = [message];
+        parent.__errorInfos = [error];
       }
     }
     return errorSchema;
@@ -105,9 +104,9 @@ export function toErrorList(errorSchema, fieldName = 'root') {
   let errorList = [];
   if ('__errors' in errorSchema) {
     errorList = errorList.concat(
-      errorSchema.__errors.map(stack => {
+      errorSchema.__errors.map((stack) => {
         return {
-          stack: `${fieldName}: ${stack}`,
+          stack: `${fieldName}: ${stack}`
         };
       })
     );
@@ -128,16 +127,16 @@ function createErrorHandler(formData) {
     __errors: [],
     addError(message) {
       this.__errors.push(message);
-    },
+    }
   };
   if (isObject(formData)) {
     return Object.keys(formData).reduce((acc, key) => {
-      return { ...acc, [key]: createErrorHandler(formData[key]), };
+      return { ...acc, [key]: createErrorHandler(formData[key]) };
     }, handler);
   }
   if (Array.isArray(formData)) {
     return formData.reduce((acc, value, key) => {
-      return { ...acc, [key]: createErrorHandler(value), };
+      return { ...acc, [key]: createErrorHandler(value) };
     }, handler);
   }
   return handler;
@@ -148,9 +147,9 @@ function unwrapErrorHandler(errorHandler) {
     if (key === 'addError') {
       return acc;
     } else if (key === '__errors') {
-      return { ...acc, [key]: errorHandler[key], };
+      return { ...acc, [key]: errorHandler[key] };
     }
-    return { ...acc, [key]: unwrapErrorHandler(errorHandler[key]), };
+    return { ...acc, [key]: unwrapErrorHandler(errorHandler[key]) };
   }, {});
 }
 
@@ -163,8 +162,8 @@ function transformAjvErrors(errors = []) {
     return [];
   }
 
-  return errors.map(e => {
-    const { dataPath, keyword, message, params, schemaPath, } = e;
+  return errors.map((e) => {
+    const { dataPath, keyword, message, params, schemaPath } = e;
     let property = `${dataPath}`;
 
     // put data in expected format
@@ -174,7 +173,7 @@ function transformAjvErrors(errors = []) {
       message,
       params, // specific to ajv
       stack: `${property} ${message}`.trim(),
-      schemaPath,
+      schemaPath
     };
   });
 }
@@ -203,18 +202,14 @@ export default function validateFormData(
   }
 
   // add more schemas to validate against
-  if (
-    additionalMetaSchemas &&
-    newMetaSchemas &&
-    Array.isArray(additionalMetaSchemas)
-  ) {
+  if (additionalMetaSchemas && newMetaSchemas && Array.isArray(additionalMetaSchemas)) {
     ajv.addMetaSchema(additionalMetaSchemas);
     formerMetaSchema = additionalMetaSchemas;
   }
 
   // add more custom formats to validate against
   if (customFormats && newFormats && isObject(customFormats)) {
-    Object.keys(customFormats).forEach(formatName => {
+    Object.keys(customFormats).forEach((formatName) => {
       ajv.addFormat(formatName, customFormats[formatName]);
     });
 
@@ -243,8 +238,8 @@ export default function validateFormData(
     errors = [
       ...errors,
       {
-        stack: validationError.message,
-      },
+        stack: validationError.message
+      }
     ];
   }
   if (typeof transformErrors === 'function') {
@@ -258,14 +253,14 @@ export default function validateFormData(
       ...errorSchema,
       ...{
         $schema: {
-          __errors: [validationError.message,],
-        },
-      },
+          __errors: [validationError.message]
+        }
+      }
     };
   }
 
   if (typeof customValidate !== 'function') {
-    return { errors, errorSchema, };
+    return { errors, errorSchema };
   }
 
   const errorHandler = customValidate(formData, createErrorHandler(formData));
@@ -278,7 +273,7 @@ export default function validateFormData(
 
   return {
     errors: newErrors,
-    errorSchema: newErrorSchema,
+    errorSchema: newErrorSchema
   };
 }
 

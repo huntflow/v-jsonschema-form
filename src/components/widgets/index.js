@@ -10,14 +10,14 @@ import RangeWidget from './RangeWidget';
 import RadioWidget from './RadioWidget';
 
 export default {
-    TextWidget,
-    TextareaWidget,
-    PasswordWidget,
-    URLWidget,
-    UpDownWidget,
-    CheckboxWidget,
-    CheckboxesWidget,
-    SelectWidget,
-    RangeWidget,
-    RadioWidget,
+  TextWidget,
+  TextareaWidget,
+  PasswordWidget,
+  URLWidget,
+  UpDownWidget,
+  CheckboxWidget,
+  CheckboxesWidget,
+  SelectWidget,
+  RangeWidget,
+  RadioWidget
 };
