@@ -16,22 +16,22 @@
     :raw-error-infos="rawErrorInfos"
     :registry="registry"
   >
-    <component
-      :is="registry.fields.TitleField"
-      v-if="title"
-      :id="idSchema.$id + '__title'"
-      v-slot:title
-      :title="title"
-      :required="required"
-    />
+    <template v-if="title" #title>
+      <component
+        :is="registry.fields.TitleField"
+        :id="idSchema.$id + '__title'"
+        :title="title"
+        :required="required"
+      />
+    </template>
 
-    <component
-      :is="registry.fields.DescriptionField"
-      v-if="description"
-      :id="idSchema.$id + '__description'"
-      v-slot:description
-      :description="description"
-    />
+    <template v-if="description" #description>
+      <component
+        :is="registry.fields.DescriptionField"
+        :id="idSchema.$id + '__description'"
+        :description="description"
+      />
+    </template>
 
     <array-field-item
       v-for="(keyedItem, index) in keyedFormData"
