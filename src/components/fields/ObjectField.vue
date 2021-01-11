@@ -13,7 +13,7 @@
     :disabled="disabled"
     :readonly="readonly"
     :required="required"
-    :on-add-click="handleAddClick"
+    @add="handleAdd"
   >
     <component
       :is="schemaFieldCls"
@@ -33,10 +33,10 @@
       :registry="registry"
       :disabled="disabled"
       :readonly="readonly"
-      :on-change="handlePropertyChange(propName)"
+      @change="handlePropertyChange(propName, ...arguments)"
+      @focus="handleEvent('focus', ...arguments)"
+      @blur="handleEvent('blur', ...arguments)"
       :on-key-change="handleKeyChange(propName)"
-      :on-blur="onBlur"
-      :on-focus="onFocus"
       :on-drop-property-click="handleDropPropertyClick"
     />
   </component>
@@ -110,6 +110,9 @@ export default {
     }
   },
   methods: {
+    handleEvent(event, ...args) {
+      this.$emit(event, ...args);
+    },
     isRequired(name) {
       const schema = this.schema;
       return Array.isArray(schema.required) && schema.required.indexOf(name) !== -1;
@@ -121,39 +124,37 @@ export default {
           .hasOwnProperty(ADDITIONAL_PROPERTY_FLAG)
       );
     },
-    handleAddClick(schema) {
-      return () => {
-        let type = schema.additionalProperties.type;
-        const newFormData = { ...this.formData };
+    handleAdd() {
+      const schema = this.retrievedSchema;
+      let type = schema.additionalProperties.type;
+      const newFormData = { ...this.formData };
 
-        newFormData[getAvailableKey('newKey', newFormData)] = getDefaultValue(type);
+      newFormData[getAvailableKey('newKey', newFormData)] = getDefaultValue(type);
 
-        this.onChange(newFormData);
-      };
+      this.$emit('change', newFormData);
     },
-    handlePropertyChange(name) {
-      return (value, errorSchema) => {
-        if (!value && this.isAddedByAdditionalProperties(name)) {
-          // Don't set value = undefined for fields added by
-          // additionalProperties. Doing so removes them from the
-          // formData, which causes them to completely disappear
-          // (including the input field for the property name). Unlike
-          // fields which are "mandated" by the schema, these fields can
-          // be set to undefined by clicking a "delete field" button, so
-          // set empty values to the empty string.
-          value = '';
-        }
+    handlePropertyChange(name, value, errorSchema) {
+      if (!value && this.isAddedByAdditionalProperties(name)) {
+        // Don't set value = undefined for fields added by
+        // additionalProperties. Doing so removes them from the
+        // formData, which causes them to completely disappear
+        // (including the input field for the property name). Unlike
+        // fields which are "mandated" by the schema, these fields can
+        // be set to undefined by clicking a "delete field" button, so
+        // set empty values to the empty string.
+        value = '';
+      }
 
-        const newFormData = { ...this.formData, [name]: value };
-        this.onChange(
-          newFormData,
-          errorSchema &&
-            this.errorSchema && {
-              ...this.errorSchema,
-              [name]: errorSchema
-            }
-        );
-      };
+      const newFormData = { ...this.formData, [name]: value };
+      this.$emit(
+        'change',
+        newFormData,
+        errorSchema &&
+          this.errorSchema && {
+            ...this.errorSchema,
+            [name]: errorSchema
+          }
+      );
     },
     handleDropPropertyClick(key) {
       return (event) => {

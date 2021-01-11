@@ -3,7 +3,6 @@
     :is="fieldTemplateCls"
     :id="idSchema.$id"
     class="form-group field"
-    :class="cssClass"
     :disabled="isDisabled"
     :hidden="isHidden"
     :label="label"
@@ -28,11 +27,11 @@
       :schema="retrivedSchema"
       :ui-schema="{ ...uiSchema, class: undefined }"
       :was-property-key-modified="wasPropertyKeyModified"
-      :on-blur="onBlur"
-      :on-change="onChange"
       :on-drop-property-click="onDropPropertyClick"
-      :on-focus="onFocus"
       :on-key-change="onKeyChange"
+      @focus="handleEvent('focus', ...arguments)"
+      @blur="handleEvent('blur', ...arguments)"
+      @change="handleEvent('change', ...arguments)"
     />
 
     <component
@@ -43,14 +42,14 @@
       :form-data="formData"
       :id-prefix="idPrefix"
       :id-schema="idSchema"
-      :on-blur="onBlur"
-      :on-change="onChange"
-      :on-focus="onFocus"
       :options="retrivedSchema.anyOf"
       :base-type="retrivedSchema.type"
       :registry="registry"
       :schema="retrivedSchema"
       :ui-schema="uiSchema"
+      @focus="handleEvent('focus', ...arguments)"
+      @blur="handleEvent('blur', ...arguments)"
+      @change="handleEvent('change', ...arguments)"
     />
 
     <component
@@ -61,14 +60,14 @@
       :form-data="formData"
       :id-prefix="idPrefix"
       :id-schema="idSchema"
-      :on-blur="onBlur"
-      :on-change="onChange"
-      :on-focus="onFocus"
       :options="retrivedSchema.oneOf"
       :base-type="retrivedSchema.type"
       :registry="registry"
       :schema="retrivedSchema"
       :ui-schema="uiSchema"
+      @focus="handleEvent('focus', ...arguments)"
+      @blur="handleEvent('blur', ...arguments)"
+      @change="handleEvent('change', ...arguments)"
     />
   </component>
 </template>
@@ -76,13 +75,10 @@
 <script>
 import {
   isSelect,
-  isMultiSelect,
   retrieveSchema,
   toIdSchema,
   getDefaultRegistry,
   mergeObjects,
-  getUiOptions,
-  isFilesArray,
   getSchemaType
 } from '../../utils';
 
@@ -104,23 +100,11 @@ const PROPS = {
   autofocus: { type: Boolean, default: false },
   onKeyChange: Function,
   onDropPropertyClick: Function,
-  onChange: Function,
-  onFocus: Function,
-  onBlur: Function
 };
 
 export default {
   props: PROPS,
   computed: {
-    cssClass() {
-      return {}; // TODO: классы ошибки навяливаются внутри компонент
-
-      const hasErrors = this.errors && this.errors.length > 0;
-      return {
-        [this.uiSchema.classNames]: Boolean(this.uiSchema.classNames),
-        'field-error has-error form-group_invalid has-danger': hasErrors
-      };
-    },
     isAnyOf() {
       return this.schema.anyOf && !isSelect(this.schema);
     },
@@ -187,6 +171,11 @@ export default {
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:FieldTemplate'] || this.registry.FieldTemplate || DefaultTemplate;
+    }
+  },
+  methods: {
+    handleEvent(event, ...args) {
+      this.$emit(event, ...args);
     }
   }
 };

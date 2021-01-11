@@ -14,9 +14,9 @@
     :placeholder="placeholder"
     :raw-errors="rawErrors"
     :raw-error-infos="rawErrorInfos"
-    @change="onChange"
-    @blur="onBlur"
-    @focus="onFocus"
+    @change="handleEvent('change', ...arguments)"
+    @blur="handleEvent('blur', ...arguments)"
+    @focus="handleEvent('focus', ...arguments)"
   />
 </template>
 
@@ -43,9 +43,6 @@ const PROPS = {
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
   autofocus: { type: Boolean, default: false },
-  onChange: Function,
-  onBlur: Function,
-  onFocus: Function
 };
 
 export default {
@@ -76,6 +73,11 @@ export default {
     },
     placeholder() {
       return getUiOptions(this.uiSchema).placeholder || '';
+    }
+  },
+  methods: {
+    handleEvent(event, ...args) {
+      this.$emit(event, ...args);
     }
   }
 };

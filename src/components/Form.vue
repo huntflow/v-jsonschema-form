@@ -30,9 +30,9 @@
       :registry="getRegistry()"
       :schema="schemaState"
       :ui-schema="uiSchemaState"
-      :on-blur="handleBlur"
-      :on-change="handleChange"
-      :on-focus="handleFocus"
+      @change="handleChange"
+      @blur="handleEvent('blur', ...arguments)"
+      @focus="handleEvent('focus', ...arguments)"
     />
   </form>
 </template>
@@ -198,12 +198,12 @@ export default {
         this.onSubmit(submitPayload, event);
       }
     },
-    handleFocus() {
-      // noop
-      // TODO
+    handleEvent(event, ...args) {
+      this.$emit(event, ...args);
     },
 
     handleChange(formData, newErrorSchema) {
+      console.log('handleChange', formData, newErrorSchema);
       if (isObject(formData) || Array.isArray(formData)) {
         const newState = this.getStateFromProps(this.$props, formData);
         formData = newState.formData;
@@ -230,10 +230,6 @@ export default {
         this.errorsState = newErrorSchema;
         this.errorSchemaState = toErrorList(newErrorSchema);
       }
-    },
-    handleBlur() {
-      // noop
-      // TODO
     },
     getRegistry() {
       // For BC, accept passed SchemaField and TitleField props and pass them to
