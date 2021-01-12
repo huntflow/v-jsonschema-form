@@ -24,8 +24,7 @@ import {
   getWidget,
   getUiOptions,
   optionsList,
-  retrieveSchema,
-  getDefaultRegistry
+  retrieveSchema
 } from '../../utils';
 
 const PROPS = {
@@ -35,7 +34,7 @@ const PROPS = {
   idSchema: Object,
   uiSchema: Object,
   formData: Array,
-  registry: { default: () => getDefaultRegistry() },
+  registry: { type: Object, required: true },
   rawErrors: Array,
   rawErrorInfos: Array,
   disabled: { type: Boolean, default: false },

@@ -70,7 +70,6 @@ import {
   isSelect,
   retrieveSchema,
   toIdSchema,
-  getDefaultRegistry,
   mergeObjects,
   getSchemaType
 } from '../../utils';
@@ -85,7 +84,7 @@ const PROPS = {
   uiSchema: { type: Object, default: () => ({}) },
   errorSchema: { type: Object, default: () => ({}) },
   formData: [String, Number, Boolean, Array, Object],
-  registry: { type: Object, default: () => getDefaultRegistry() },
+  registry: { type: Object, required: true },
   wasPropertyKeyModified: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   required: { type: Boolean, default: false },

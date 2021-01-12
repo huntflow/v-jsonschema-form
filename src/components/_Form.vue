@@ -205,11 +205,8 @@ export default {
       // the "fields" registry one.
       const { fields, widgets } = getDefaultRegistry();
       return {
-        fields: { ...fields, ...this.$props.fields },
-        widgets: { ...widgets, ...this.$props.widgets },
-        ArrayFieldTemplate: this.$props.ArrayFieldTemplate,
-        ObjectFieldTemplate: this.$props.ObjectFieldTemplate,
-        FieldTemplate: this.$props.FieldTemplate
+        fields: { ...fields, ...this.fields },
+        widgets: { ...widgets, ...this.widgets }
       };
     },
     getStateFromProps(props, inputFormData) {

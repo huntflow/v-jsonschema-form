@@ -74,8 +74,7 @@ import {
   getDefaultFormState,
   isMultiSelect,
   isFixedItems,
-  allowAdditionalItems,
-  getDefaultRegistry
+  allowAdditionalItems
 } from '../../utils';
 
 const PROPS = {
@@ -88,7 +87,7 @@ const PROPS = {
   idSchema: { type: Object, default: () => ({}) },
   schema: Object,
   errorSchema: Object,
-  registry: { type: Object, default: () => getDefaultRegistry() },
+  registry: { type: Object, required: true },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },

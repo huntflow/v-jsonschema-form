@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { getWidget, getUiOptions, optionsList, getDefaultRegistry } from '../../utils';
+import { getWidget, getUiOptions, optionsList } from '../../utils';
 
 const PROPS = {
   name: String,
@@ -28,7 +28,7 @@ const PROPS = {
   formData: Boolean,
   rawErrors: Array,
   rawErrorInfos: Array,
-  registry: { type: Object, default: () => getDefaultRegistry() },
+  registry: { type: Object, required: true },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },

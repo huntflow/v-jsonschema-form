@@ -20,7 +20,7 @@
 
 <script>
 import pick from 'lodash/pick';
-import { asNumber, getDefaultRegistry } from '../../utils';
+import { asNumber } from '../../utils';
 const trailingCharMatcherWithPrefix = /\.([0-9]*0)*$/;
 const trailingCharMatcher = /[0.]0*$/;
 
@@ -34,7 +34,7 @@ const PROPS = {
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
   autofocus: { type: Boolean, default: false },
-  registry: { type: Object, default: getDefaultRegistry() },
+  registry: { type: Object, required: true },
   rawErrors: { type: Array },
   rawErrorInfos: { type: Array }
 };

@@ -47,7 +47,6 @@ import DefaultObjectFieldTemplate from './ObjectField.DefaultTemplate.vue';
 import {
   orderProperties,
   retrieveSchema,
-  getDefaultRegistry,
   ADDITIONAL_PROPERTY_FLAG
 } from '../../utils';
 
@@ -62,7 +61,7 @@ const PROPS = {
     default: () => ({})
   },
   schema: Object,
-  registry: { type: Object, default: () => getDefaultRegistry() },
+  registry: { type: Object, required: true },
   disabled: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false }

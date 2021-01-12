@@ -49,14 +49,8 @@
 
 <script>
 import pick from 'lodash/pick';
-import {
-  getUiOptions,
-  allowAdditionalItems,
-  retrieveSchema,
-  toIdSchema,
-  getDefaultRegistry
-} from '../../utils';
-
+import { allowAdditionalItems, retrieveSchema, toIdSchema } from '../../utils';
+import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultFixedArrayFieldTemplate from './ArrayField.FixedArray.DefaultTemplate';
 
@@ -69,7 +63,7 @@ const PROPS = {
   errorSchema: {},
   idPrefix: String,
   idSchema: Object,
-  registry: { type: Object, default: () => getDefaultRegistry() },
+  registry: { type: Object, required: true },
   rawErrors: Array,
   autofocus: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
@@ -93,24 +87,10 @@ export default {
       return this.uiSchema['ui:description'] || this.schema.description;
     },
     canAdd() {
-      let { addable } = getUiOptions(this.uiSchema);
-      if (addable !== false) {
-        // if ui:options.addable was not explicitly set to false, we can add
-        // another item if we have not exceeded maxItems yet
-        if (this.schema.maxItems !== undefined) {
-          addable = this.formData.length < this.schema.maxItems;
-        } else {
-          addable = true;
-        }
-      }
-      return addable;
+      return canAddArrayItem(this.uiSchema, this.schema, this.formData);
     },
     fieldTemplateCls() {
-      return (
-        this.uiSchema['ui:ArrayFieldTemplate'] ||
-        this.registry.ArrayFieldTemplate ||
-        DefaultFixedArrayFieldTemplate
-      );
+      return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultFixedArrayFieldTemplate;
     },
     itemSchemas() {
       return this.schema.items.map((item, index) => retrieveSchema(item, this.formData[index]));

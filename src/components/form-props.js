@@ -22,8 +22,5 @@ export const PROPS = {
   omitExtraData: { type: Boolean, default: false },
   fields: { type: Object, default: () => ({}) },
   widgets: { type: Object, default: () => ({}) },
-  arrayFieldTemplate: { type: Object, default: undefined },
-  objectFieldTemplate: { type: Object, default: undefined },
-  fieldTemplate: { type: Object, default: undefined },
   omitMissingFields: { type: Boolean, default: false }
 };

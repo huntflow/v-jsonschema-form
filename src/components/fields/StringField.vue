@@ -24,7 +24,6 @@ import {
   getUiOptions,
   isSelect,
   optionsList,
-  getDefaultRegistry,
   hasWidget
 } from '../../utils';
 
@@ -34,7 +33,7 @@ const PROPS = {
   uiSchema: Object,
   idSchema: Object,
   formData: [String, Number],
-  registry: { type: Object, default: () => getDefaultRegistry() },
+  registry: { type: Object, required: true },
   rawErrors: { type: Array },
   rawErrorInfos: { type: Array },
   required: { type: Boolean, default: false },
