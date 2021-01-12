@@ -3,9 +3,6 @@
     :is="widgetCls"
     :id="idSchema && idSchema.$id"
     multiple
-    :on-change="onChange"
-    :on-blur="onBlur"
-    :on-focus="onFocus"
     :options="widgetWithOptions.options"
     :schema="schema"
     :registry="registry"
@@ -18,9 +15,7 @@
     :autofocus="autofocus"
     :raw-errors="rawErrors"
     :raw-error-infos="rawErrorInfos"
-    @change="onChange"
-    @blur="onBlur"
-    @focus="onFocus"
+    v-on="$listeners"
   />
 </template>
 
@@ -46,10 +41,7 @@ const PROPS = {
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
-  autofocus: { type: Boolean, default: false },
-  onBlur: Function,
-  onFocus: Function,
-  onChange: Function
+  autofocus: { type: Boolean, default: false }
 };
 
 export default {

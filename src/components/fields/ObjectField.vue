@@ -33,16 +33,16 @@
       :registry="registry"
       :disabled="disabled"
       :readonly="readonly"
+      v-on="schemaFieldEventListeners"
       @change="handlePropertyChange(propName, ...arguments)"
-      @focus="handleEvent('focus', ...arguments)"
-      @blur="handleEvent('blur', ...arguments)"
-      :on-key-change="handleKeyChange(propName)"
-      :on-drop-property-click="handleDropPropertyClick"
+      @key-change="handleKeyChange(propName, ...arguments)"
+      @drop-property="handleDropPropertyClick"
     />
   </component>
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import DefaultObjectFieldTemplate from './ObjectField.DefaultTemplate.vue';
 import {
   orderProperties,
@@ -65,10 +65,7 @@ const PROPS = {
   registry: { type: Object, default: () => getDefaultRegistry() },
   disabled: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false },
-  onChange: Function,
-  onBlur: Function,
-  onFocus: Function
+  readonly: { type: Boolean, default: false }
 };
 
 export default {
@@ -80,6 +77,9 @@ export default {
     };
   },
   computed: {
+    schemaFieldEventListeners() {
+      return pick(this.$listeners, ['focus', 'blur']);
+    },
     retrivedSchema() {
       return retrieveSchema(this.schema, this.formData);
     },
@@ -110,9 +110,6 @@ export default {
     }
   },
   methods: {
-    handleEvent(event, ...args) {
-      this.$emit(event, ...args);
-    },
     isRequired(name) {
       const schema = this.schema;
       return Array.isArray(schema.required) && schema.required.indexOf(name) !== -1;
@@ -157,38 +154,33 @@ export default {
       );
     },
     handleDropPropertyClick(key) {
-      return (event) => {
-        event.preventDefault();
-        const copiedFormData = { ...this.formData };
-        delete copiedFormData[key];
-        this.onChange(copiedFormData);
-      };
+      const copiedFormData = { ...this.formData };
+      delete copiedFormData[key];
+      this.$emit('change', copiedFormData);
     },
-    handleKeyChange(oldValue) {
-      return (value, errorSchema) => {
-        if (oldValue === value) {
-          return;
-        }
+    handleKeyChange(oldValue, value, errorSchema) {
+      if (oldValue === value) {
+        return;
+      }
 
-        value = getAvailableKey(value, this.formData);
-        const newFormData = { ...this.formData };
-        const newKeys = { [oldValue]: value };
-        const keyValues = Object.keys(newFormData).map((key) => {
-          const newKey = newKeys[key] || key;
-          return { [newKey]: newFormData[key] };
-        });
-        const renamedObj = Object.assign({}, ...keyValues);
-        this.wasPropertyKeyModified = true;
-
-        this.onChange(
-          renamedObj,
-          errorSchema &&
-            this.errorSchema && {
-              ...this.errorSchema,
-              [value]: errorSchema
-            }
-        );
-      };
+      value = getAvailableKey(value, this.formData);
+      const newFormData = { ...this.formData };
+      const newKeys = { [oldValue]: value };
+      const keyValues = Object.keys(newFormData).map((key) => {
+        const newKey = newKeys[key] || key;
+        return { [newKey]: newFormData[key] };
+      });
+      const renamedObj = Object.assign({}, ...keyValues);
+      this.wasPropertyKeyModified = true;
+      this.$emit(
+        'change',
+        renamedObj,
+        errorSchema &&
+          this.errorSchema && {
+            ...this.errorSchema,
+            [value]: errorSchema
+          }
+      );
     }
   }
 };

@@ -8,9 +8,8 @@
         :value="selectedOption"
         :options="{ enumOptions }"
         v-bind="widgetWithOptions.options"
+        v-on="widgetWithOptionsEventListeners"
         @change="handleOptionChange"
-        @focus="onFocus"
-        @blur="onBlur"
       />
     </div>
 
@@ -25,14 +24,13 @@
       :form-data="formData"
       :registry="registry"
       :disabled="disabled"
-      @change="onChange"
-      @focus="onFocus"
-      @blur="onBlur"
+      v-on="$listeners"
     />
   </div>
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import {
   getUiOptions,
   getWidget,
@@ -53,9 +51,6 @@ const PROPS = {
   options: Array,
   registry: Object,
   uiSchema: Object,
-  onChange: Function,
-  onFocus: Function,
-  onBlur: Function
 };
 
 export default {
@@ -66,6 +61,9 @@ export default {
     };
   },
   computed: {
+    widgetWithOptionsEventListeners() {
+      return pick(this.$listeners, ['focus', 'blur']);
+    },
     enumOptions() {
       return this.options.map((option, index) => ({
         label: option.title || `Option ${index + 1}`,
@@ -118,7 +116,7 @@ export default {
     },
     handleOptionChange(option) {
       const selectedOption = parseInt(option, 10);
-      const { formData, onChange, options } = this.$props;
+      const { formData, options } = this.$props;
       const newOption = retrieveSchema(options[selectedOption], formData);
 
       // If the new option is of type object and the current data is an object,
@@ -146,7 +144,7 @@ export default {
         }
       }
       // Call getDefaultFormState to make sure defaults are populated on change.
-      onChange('change', getDefaultFormState(options[selectedOption], newFormData));
+      this.$emit('change', getDefaultFormState(options[selectedOption], newFormData));
 
       this.selectedOption = parseInt(option, 10);
     }

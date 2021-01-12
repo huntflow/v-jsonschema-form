@@ -32,7 +32,7 @@ export default {
   },
 
   render(h) {
-    const { id, options, value, autofocus, onChange } = this.$props;
+    const { id, options, value, autofocus } = this.$props;
     const { enumOptions, inline } = options;
 
     const makeCheckbox = ({ index, option }) =>

@@ -7,9 +7,7 @@
     :readonly="readonly"
     :required="required"
     :value="value"
-    @blur="$emit('blur', $event)"
-    @change="$emit('change', $event)"
-    @focus="$emit('focus', $event)"
+    v-on="$listeners"
   />
 </template>
 

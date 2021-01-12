@@ -23,7 +23,7 @@ export default {
   },
 
   render(h) {
-    const { id, options, autofocus, onChange } = this.$props;
+    const { id, options, autofocus } = this.$props;
     const { enumOptions, inline } = options;
     const name = Math.random().toString();
 
@@ -31,8 +31,7 @@ export default {
       h('span', {}, [
         h('input', {
           on: {
-            focus: (event) => this.$emit('focus', event),
-            blur: (event) => this.$emit('blur', event),
+            ...this.$listeners,
             change: () => this.$emit('change', option.value)
           },
           attrs: {

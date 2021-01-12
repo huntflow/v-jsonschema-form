@@ -7,10 +7,8 @@
     :has-remove="has.remove"
     :has-toolbar="has.toolbar"
     :disabled="disabled"
-    :on-add-index-click="onAddIndexClick"
-    :on-drop-index-click="onDropIndexClick"
-    :on-reorder-click="onReorderClick"
     :readonly="readonly"
+    v-on="arrayItemEventListeners"
   >
     <component
       :is="registry.fields.SchemaField"
@@ -20,20 +18,20 @@
       :error-schema="itemErrorSchema"
       :id-schema="itemIdSchema"
       :required="isRequired"
-      :on-change="onChangeForIndex(index)"
-      :on-blur="onBlur"
-      :on-focus="onFocus"
       :registry="registry"
       :disabled="disabled"
       :readonly="readonly"
       :autofocus="autofocus"
       :raw-errors="rawErrors"
       :raw-error-infos="rawErrorInfos"
+      v-on="schemaFieldEventListeners"
+      @change="handleChangeForIndex(index, ...arguments)"
     />
   </default-array-item>
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import DefaultArrayItem from './ArrayField.DefaultArrayItem';
 
 const PROPS = {
@@ -52,13 +50,7 @@ const PROPS = {
   registry: { type: Object, required: true },
   autofocus: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false },
-  onBlur: Function,
-  onFocus: Function,
-  onAddIndexClick: Function,
-  onDropIndexClick: Function,
-  onReorderClick: Function,
-  onChangeForIndex: Function
+  readonly: { type: Boolean, default: false }
 };
 
 export default {
@@ -67,6 +59,12 @@ export default {
   },
   props: PROPS,
   computed: {
+    arrayItemEventListeners() {
+      return pick(this.$listeners, ['drop', 'reorder']);
+    },
+    schemaFieldEventListeners() {
+      return pick(this.$listeners, ['blur', 'focus']);
+    },
     isRequired() {
       if (Array.isArray(this.itemSchema.type)) {
         // While we don't yet support composite/nullable jsonschema types, it's
@@ -90,6 +88,11 @@ export default {
       result.toolbar = Object.keys(result).some((key) => result[key]);
 
       return result;
+    }
+  },
+  methods: {
+    handleChangeForIndex(index, ...args) {
+      this.$emit('change-for-index', index, ...args);
     }
   }
 };

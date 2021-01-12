@@ -18,9 +18,7 @@ const PROPS = {
   hidden: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false },
-  onKeyChange: Function,
-  onDropPropertyClick: Function
+  readonly: { type: Boolean, default: false }
 };
 
 export default {

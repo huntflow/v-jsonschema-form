@@ -27,11 +27,7 @@
       :schema="retrivedSchema"
       :ui-schema="{ ...uiSchema, class: undefined }"
       :was-property-key-modified="wasPropertyKeyModified"
-      :on-drop-property-click="onDropPropertyClick"
-      :on-key-change="onKeyChange"
-      @focus="handleEvent('focus', ...arguments)"
-      @blur="handleEvent('blur', ...arguments)"
-      @change="handleEvent('change', ...arguments)"
+      v-on="fieldEventListeners"
     />
 
     <component
@@ -47,9 +43,7 @@
       :registry="registry"
       :schema="retrivedSchema"
       :ui-schema="uiSchema"
-      @focus="handleEvent('focus', ...arguments)"
-      @blur="handleEvent('blur', ...arguments)"
-      @change="handleEvent('change', ...arguments)"
+      v-on="anyOfFieldEventListeners"
     />
 
     <component
@@ -65,14 +59,13 @@
       :registry="registry"
       :schema="retrivedSchema"
       :ui-schema="uiSchema"
-      @focus="handleEvent('focus', ...arguments)"
-      @blur="handleEvent('blur', ...arguments)"
-      @change="handleEvent('change', ...arguments)"
+      v-on="oneOfFieldEventListeners"
     />
   </component>
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import {
   isSelect,
   retrieveSchema,
@@ -97,14 +90,21 @@ const PROPS = {
   disabled: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
-  autofocus: { type: Boolean, default: false },
-  onKeyChange: Function,
-  onDropPropertyClick: Function,
+  autofocus: { type: Boolean, default: false }
 };
 
 export default {
   props: PROPS,
   computed: {
+    fieldEventListeners() {
+      return pick(this.$listeners, ['drop-property', 'key-change', 'focus', 'blur', 'change']);
+    },
+    anyOfFieldEventListeners() {
+      return pick(this.$listeners, ['focus', 'blur', 'change']);
+    },
+    oneOfFieldEventListeners() {
+      return pick(this.$listeners, ['focus', 'blur', 'change']);
+    },
     isAnyOf() {
       return this.schema.anyOf && !isSelect(this.schema);
     },

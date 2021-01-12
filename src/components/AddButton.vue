@@ -7,7 +7,7 @@
         class="btn-add col-xs-12"
         tab-index="0"
         :disabled="disabled"
-        :on-click="onClick"
+        v-on="$listeners"
       />
     </p>
   </div>
@@ -17,7 +17,6 @@
 import IconButton from './IconButton';
 
 const PROPS = {
-  onClick: { type: Function },
   disabled: { type: Boolean, default: false }
 };
 

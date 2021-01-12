@@ -2,7 +2,6 @@
   <component
     :is="stringFieldCls"
     :form-data="formDataNumericValue"
-    :on-change="handleChange"
     :schema="schema"
     :name="name"
     :ui-schema="uiSchema"
@@ -11,15 +10,16 @@
     :disabled="disabled"
     :readonly="readonly"
     :autofocus="autofocus"
-    :on-blur="onBlur"
-    :on-focus="onFocus"
     :registry="registry"
     :raw-errors="rawErrors"
     :raw-error-infos="rawErrorInfos"
+    v-on="eventListeners"
+    @change="handleChange"
   />
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import { asNumber, getDefaultRegistry } from '../../utils';
 const trailingCharMatcherWithPrefix = /\.([0-9]*0)*$/;
 const trailingCharMatcher = /[0.]0*$/;
@@ -34,9 +34,6 @@ const PROPS = {
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
   autofocus: { type: Boolean, default: false },
-  onChange: Function,
-  onBlur: Function,
-  onFocus: Function,
   registry: { type: Object, default: getDefaultRegistry() },
   rawErrors: { type: Array },
   rawErrorInfos: { type: Array }
@@ -51,6 +48,9 @@ export default {
     };
   },
   computed: {
+    eventListeners() {
+      return pick(this.$listeners, ['focus', 'blur']);
+    },
     stringFieldCls() {
       return this.registry.fields.StringField;
     },
@@ -88,7 +88,7 @@ export default {
           ? asNumber(value.replace(trailingCharMatcher, ''))
           : asNumber(value);
 
-      this.onChange(processed);
+      this.$emit('change', processed);
     }
   }
 };

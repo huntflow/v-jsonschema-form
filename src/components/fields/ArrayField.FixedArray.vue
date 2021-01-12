@@ -7,8 +7,8 @@
     :can-add="canAdd"
     :disabled="disabled"
     :readonly="readonly"
-    :on-add-click="onAddClick"
     class="field field-array field-array-fixed-items"
+    @add="$emit('add')"
   >
     <template v-if="title" #title>
       <component
@@ -42,16 +42,13 @@
       :item-data="keyedItem.item"
       :item-error-schema="errorSchema ? errorSchema[index] : undefined"
       :autofocus="autofocus && index === 0"
-      :on-blur="onBlur"
-      :on-focus="onFocus"
-      :on-change-for-index="onChangeForIndex"
-      :on-reorder-click="onReorderClick"
-      :on-drop-index-click="onDropIndexClick"
+      v-on="arrayFieldItemEventListeners"
     />
   </component>
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import {
   getUiOptions,
   allowAdditionalItems,
@@ -77,13 +74,7 @@ const PROPS = {
   autofocus: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false },
-  onBlur: Function,
-  onFocus: Function,
-  onAddClick: Function,
-  onChangeForIndex: Function,
-  onReorderClick: Function,
-  onDropIndexClick: Function
+  readonly: { type: Boolean, default: false }
 };
 
 export default {
@@ -92,6 +83,9 @@ export default {
   },
   props: PROPS,
   computed: {
+    arrayFieldItemEventListeners() {
+      return pick(this.$listeners, ['focus', 'blur', 'change-for-index', 'reorder', 'drop']);
+    },
     title() {
       return this.schema.title === undefined ? this.name : this.schema.title;
     },

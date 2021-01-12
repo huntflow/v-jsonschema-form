@@ -13,9 +13,7 @@
     :registry="registry"
     :raw-errors="rawErrors"
     :raw-error-infos="rawErrorInfos"
-    @change="onChange"
-    @focus="onFocus"
-    @blur="onBlur"
+    v-on="$listeners"
   />
 </template>
 
@@ -34,10 +32,7 @@ const PROPS = {
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
-  autofocus: { type: Boolean, default: false },
-  onChange: Function,
-  onFocus: Function,
-  onBlur: Function
+  autofocus: { type: Boolean, default: false }
 };
 
 export default {

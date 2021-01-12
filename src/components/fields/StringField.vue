@@ -14,9 +14,7 @@
     :placeholder="placeholder"
     :raw-errors="rawErrors"
     :raw-error-infos="rawErrorInfos"
-    @change="handleEvent('change', ...arguments)"
-    @blur="handleEvent('blur', ...arguments)"
-    @focus="handleEvent('focus', ...arguments)"
+    v-on="$listeners"
   />
 </template>
 
@@ -42,7 +40,7 @@ const PROPS = {
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
-  autofocus: { type: Boolean, default: false },
+  autofocus: { type: Boolean, default: false }
 };
 
 export default {

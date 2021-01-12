@@ -9,9 +9,9 @@
         :required="isRequired"
         :disabled="isDisabled"
         :autoFocus="autofocus"
-        @focus="handleFocus"
-        @change="handleChange"
-        @blur="handleBlur"
+        @focus="$emit('focus', $event)"
+        @change="$emit('change', $event.target.checked)"
+        @blur="$emit('blur', $event)"
       />
       <span>{{ label }}</span>
     </label>
@@ -45,17 +45,6 @@ export default {
     },
     isRequired() {
       return schemaRequiresTrueValue(this.schema);
-    }
-  },
-  methods: {
-    handleFocus() {
-      this.$emit('focus', event.target.checked);
-    },
-    handleChange(event) {
-      this.$emit('change', event.target.checked);
-    },
-    handleBlur() {
-      this.$emit('blur', event.target.checked);
     }
   }
 };

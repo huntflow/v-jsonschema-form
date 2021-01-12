@@ -14,20 +14,6 @@ const schema = {
         }
       },
       required: ['street_address', 'city', 'state']
-    },
-    node: {
-      type: 'object',
-      properties: {
-        name: {
-          type: 'string'
-        },
-        children: {
-          type: 'array',
-          items: {
-            $ref: '#/definitions/node'
-          }
-        }
-      }
     }
   },
   type: 'object',
@@ -39,10 +25,6 @@ const schema = {
     shipping_address: {
       title: 'Shipping address',
       $ref: '#/definitions/address'
-    },
-    tree: {
-      title: 'Recursive references',
-      $ref: '#/definitions/node'
     }
   }
 };
@@ -84,14 +66,6 @@ const formData = {
     street_address: '221B, Baker Street',
     city: 'London',
     state: 'N/A'
-  },
-  tree: {
-    name: 'root',
-    children: [
-      {
-        name: 'leaf'
-      }
-    ]
   }
 };
 

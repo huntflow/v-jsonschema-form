@@ -16,12 +16,11 @@
     :registry="registry"
     :raw-errors="rawErrors"
     :raw-error-infos="rawErrorInfos"
-    :on-blur="onBlur"
-    :on-focus="onFocus"
-    :on-change-for-index="handleChangeForIndex"
-    :on-add-click="handleAddClick"
-    :on-reorder-click="handleReorderClick"
-    :on-drop-index-click="handleDropIndexClick"
+    v-on="fixedArrayEventListeners"
+    @change-for-index="handleChangeForIndex"
+    @add="handleAddClick"
+    @reorder="handleReorderClick"
+    @drop="handleDropIndexClick"
   />
 
   <multiselect-array
@@ -36,11 +35,8 @@
     :autofocus="autofocus"
     :registry="registry"
     :raw-errors="rawErrors"
-    :raw-error-infos="rawErrorInfos"
-    :on-blur="onBlur"
-    :on-focus="onFocus"
-    :on-change="onChange"
-    :on-reorder-click="handleReorderClick"
+    v-on="multiselectArrayEventListeners"
+    @reorder="handleReorderClick"
   />
 
   <normal-array
@@ -60,16 +56,16 @@
     :registry="registry"
     :raw-errors="rawErrors"
     :raw-error-infos="rawErrorInfos"
-    :on-blur="onBlur"
-    :on-focus="onFocus"
-    :on-change-for-index="handleChangeForIndex"
-    :on-add-click="handleAddClick"
-    :on-reorder-click="handleReorderClick"
-    :on-drop-index-click="handleDropIndexClick"
+    v-on="normalArrayEventListeners"
+    @change-for-index="handleChangeForIndex"
+    @add="handleAddClick"
+    @reorder="handleReorderClick"
+    @drop="handleDropIndexClick"
   />
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import shortid from 'shortid';
 import NormalArray from './ArrayField.NormalArray';
 import FixedArray from './ArrayField.FixedArray';
@@ -96,10 +92,7 @@ const PROPS = {
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
-  autofocus: { type: Boolean, default: false },
-  onBlur: Function,
-  onChange: Function,
-  onFocus: Function
+  autofocus: { type: Boolean, default: false }
 };
 
 export default {
@@ -117,6 +110,15 @@ export default {
     };
   },
   computed: {
+    fixedArrayEventListeners() {
+      return pick(this.$listeners, ['blur', 'focus']);
+    },
+    multiselectArrayEventListeners() {
+      return pick(this.$listeners, ['blur', 'focus', 'change']);
+    },
+    normalArrayEventListeners() {
+      return pick(this.$listeners, ['blur', 'focus']);
+    },
     isFixedArray() {
       return isFixedItems(this.schema);
     },
@@ -159,8 +161,7 @@ export default {
       return getDefaultFormState(itemSchema, undefined);
     },
 
-    handleAddClick(event) {
-      event.preventDefault();
+    handleAddClick() {
       const newKeyedFormDataRow = {
         key: generateRowId(),
         item: this.getNewFormDataRow()
@@ -168,53 +169,47 @@ export default {
       const newKeyedFormData = [...this.keyedFormData, newKeyedFormDataRow];
       this.keyedFormData = newKeyedFormData;
       this.updatedKeyedFormData = true;
-      this.onChange(keyedToPlainFormData(newKeyedFormData));
+      this.$emit('change', keyedToPlainFormData(newKeyedFormData));
     },
 
-    handleChangeForIndex(index) {
-      return (value, errorSchema) => {
-        const newFormData = this.formData.map((item, i) => {
-          // We need to treat undefined items as nulls to have validation.
-          // See https://github.com/tdegrunt/jsonschema/issues/206
-          const jsonValue = typeof value === 'undefined' ? null : value;
-          return index === i ? jsonValue : item;
-        });
+    handleChangeForIndex(index, value, errorSchema) {
+      const newFormData = this.formData.map((item, i) => {
+        // We need to treat undefined items as nulls to have validation.
+        // See https://github.com/tdegrunt/jsonschema/issues/206
+        const jsonValue = typeof value === 'undefined' ? null : value;
+        return index === i ? jsonValue : item;
+      });
 
-        this.onChange(
-          newFormData,
-          errorSchema &&
-            this.errorSchema && {
-              ...this.errorSchema,
-              [index]: errorSchema
-            }
-        );
-      };
+      this.$emit(
+        'change',
+        newFormData,
+        errorSchema &&
+          this.errorSchema && {
+            ...this.errorSchema,
+            [index]: errorSchema
+          }
+      );
     },
 
     handleDropIndexClick(index) {
-      return (event) => {
-        if (event) {
-          event.preventDefault();
-        }
-        // refs #195: revalidate to ensure properly reindexing errors
-        let newErrorSchema;
-        if (this.errorSchema) {
-          newErrorSchema = {};
-          const errorSchema = this.errorSchema;
-          for (let i in errorSchema) {
-            i = parseInt(i);
-            if (i < index) {
-              newErrorSchema[i] = errorSchema[i];
-            } else if (i > index) {
-              newErrorSchema[i - 1] = errorSchema[i];
-            }
+      // refs #195: revalidate to ensure properly reindexing errors
+      let newErrorSchema;
+      if (this.errorSchema) {
+        newErrorSchema = {};
+        const errorSchema = this.errorSchema;
+        for (let i in errorSchema) {
+          i = parseInt(i);
+          if (i < index) {
+            newErrorSchema[i] = errorSchema[i];
+          } else if (i > index) {
+            newErrorSchema[i - 1] = errorSchema[i];
           }
         }
-        const newKeyedFormData = this.keyedFormData.filter((_, i) => i !== index);
-        this.keyedFormData = newKeyedFormData;
-        this.updatedKeyedFormData = true;
-        this.onChange(keyedToPlainFormData(newKeyedFormData), newErrorSchema);
-      };
+      }
+      const newKeyedFormData = this.keyedFormData.filter((_, i) => i !== index);
+      this.keyedFormData = newKeyedFormData;
+      this.updatedKeyedFormData = true;
+      this.$emit('change', keyedToPlainFormData(newKeyedFormData), newErrorSchema);
     },
 
     handleReorderClick(index, newIndex) {
@@ -228,30 +223,24 @@ export default {
         return _newKeyedFormData;
       };
 
-      return (event) => {
-        if (event) {
-          event.preventDefault();
-          event.target.blur();
-        }
-        let newErrorSchema;
-        if (this.errorSchema) {
-          newErrorSchema = {};
-          const errorSchema = this.errorSchema;
-          for (let i in errorSchema) {
-            if (i == index) {
-              newErrorSchema[newIndex] = errorSchema[index];
-            } else if (i == newIndex) {
-              newErrorSchema[index] = errorSchema[newIndex];
-            } else {
-              newErrorSchema[i] = errorSchema[i];
-            }
+      let newErrorSchema;
+      if (this.errorSchema) {
+        newErrorSchema = {};
+        const errorSchema = this.errorSchema;
+        for (let i in errorSchema) {
+          if (i == index) {
+            newErrorSchema[newIndex] = errorSchema[index];
+          } else if (i == newIndex) {
+            newErrorSchema[index] = errorSchema[newIndex];
+          } else {
+            newErrorSchema[i] = errorSchema[i];
           }
         }
+      }
 
-        const newKeyedFormData = reOrderArray();
-        this.keyedFormData = newKeyedFormData;
-        this.onChange(keyedToPlainFormData(newKeyedFormData), newErrorSchema);
-      };
+      const newKeyedFormData = reOrderArray();
+      this.keyedFormData = newKeyedFormData;
+      this.$emit('change', keyedToPlainFormData(newKeyedFormData), newErrorSchema);
     }
   }
 };

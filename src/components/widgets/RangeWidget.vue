@@ -3,9 +3,7 @@
     <base-input
       type="range"
       v-bind="componentProps"
-      @blur="$emit('blur', $event)"
-      @change="$emit('change', $event)"
-      @focus="$emit('focus', $event)"
+      v-on="$listeners"
     />
     <span className="range-view">{{ value }}</span>
   </div>

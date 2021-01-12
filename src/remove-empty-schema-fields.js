@@ -1,4 +1,4 @@
-import cloneDeep from 'lodash.clonedeep';
+import cloneDeep from 'lodash/cloneDeep';
 import jsonSchemaTraverse from 'json-schema-traverse';
 import jsonPointer from 'json-pointer';
 

@@ -42,11 +42,7 @@
     "json-pointer": "^0.6.0",
     "json-schema-ref-parser": "^9.0.6",
     "json-schema-traverse": "^0.4.1",
-    "lodash.clonedeep": "^4.5.0",
-    "lodash.get": "^4.4.2",
-    "lodash.isempty": "^4.4.0",
-    "lodash.pick": "^4.4.0",
-    "lodash.topath": "^4.5.2",
+    "lodash": "^4.17.20",
     "shortid": "^2.2.15"
   },
   "browserslist": [

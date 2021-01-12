@@ -7,12 +7,7 @@
       <slot />
     </div>
 
-    <add-button
-      v-if="canAdd"
-      class="array-item-add"
-      :on-click="onAddClick"
-      :disabled="isDisabled"
-    />
+    <add-button v-if="canAdd" class="array-item-add" :disabled="isDisabled" @click="$emit('add')" />
   </fieldset>
 </template>
 
@@ -25,8 +20,7 @@ const PROPS = {
   uiSchema: Object,
   canAdd: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false },
-  onAddClick: Function
+  readonly: { type: Boolean, default: false }
 };
 
 export default {

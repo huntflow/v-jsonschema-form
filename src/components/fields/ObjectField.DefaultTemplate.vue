@@ -15,11 +15,7 @@
     />
     <slot />
     <div v-if="canExpand">
-      <add-button
-        class="object-property-expand"
-        :disabled="isDisabled"
-        :on-click="onAddClick(schema)"
-      />
+      <add-button class="object-property-expand" :disabled="isDisabled" @click="$emit('add')" />
     </div>
   </fieldset>
 </template>
@@ -40,8 +36,7 @@ const PROPS = {
   uiSchema: Object,
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false },
-  onAddClick: Function
+  readonly: { type: Boolean, default: false }
 };
 
 export default {

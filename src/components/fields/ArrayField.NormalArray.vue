@@ -7,7 +7,6 @@
     :disabled="disabled"
     :id-schema="idSchema"
     :ui-schema="uiSchema"
-    :on-add-click="onAddClick"
     :readonly="readonly"
     :required="required"
     :schema="schema"
@@ -15,6 +14,7 @@
     :raw-errors="rawErrors"
     :raw-error-infos="rawErrorInfos"
     :registry="registry"
+    @add="$emit('add')"
   >
     <template v-if="title" #title>
       <component
@@ -47,16 +47,13 @@
       :item-error-schema="errorSchema ? errorSchema[index] : undefined"
       :item-data="keyedItem.item"
       :autofocus="autofocus && index === 0"
-      :on-blur="onBlur"
-      :on-focus="onFocus"
-      :on-change-for-index="onChangeForIndex"
-      :on-reorder-click="onReorderClick"
-      :on-drop-index-click="onDropIndexClick"
+      v-on="arrayFieldItemEvents"
     />
   </component>
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import { getUiOptions, retrieveSchema, toIdSchema, getDefaultRegistry } from '../../utils';
 
 import ArrayFieldItem from './ArrayField.Item';
@@ -77,13 +74,7 @@ const PROPS = {
   autofocus: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false },
-  onBlur: Function,
-  onFocus: Function,
-  onAddClick: Function,
-  onChangeForIndex: Function,
-  onReorderClick: Function,
-  onDropIndexClick: Function
+  readonly: { type: Boolean, default: false }
 };
 
 export default {
@@ -92,6 +83,9 @@ export default {
   },
   props: PROPS,
   computed: {
+    arrayFieldItemEvents() {
+      return pick(this.$listeners, ['focus', 'blur', 'change-for-index', 'reorder', 'drop']);
+    },
     title() {
       return this.schema.title === undefined ? this.name : this.schema.title;
     },

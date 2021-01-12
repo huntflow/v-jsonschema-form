@@ -12,7 +12,7 @@
           tab-index="-1"
           :style="btnStyle"
           :disabled="isDisabled || !hasMoveUp"
-          :on-click="onReorderClick(index, index - 1)"
+          @click="$emit('reorder', index, index - 1)"
         />
 
         <icon-button
@@ -22,7 +22,7 @@
           tab-index="-1"
           :style="btnStyle"
           :disabled="isDisabled || !hasMoveDown"
-          :on-click="onReorderClick(index, index + 1)"
+          @click="$emit('reorder', index, index + 1)"
         />
 
         <icon-button
@@ -33,7 +33,7 @@
           tab-index="-1"
           :style="btnStyle"
           :disabled="isDisabled"
-          :on-click="onDropIndexClick(index)"
+          @click="$emit('drop', index)"
         />
       </div>
     </div>
