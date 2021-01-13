@@ -16,11 +16,11 @@
     :registry="registry"
     @add="$emit('add')"
   >
-    <template v-if="title" #title>
+    <template v-if="label" #title>
       <component
         :is="registry.fields.TitleField"
         :id="idSchema.$id + '__title'"
-        :title="title"
+        :title="label"
         :required="required"
       />
     </template>
@@ -61,6 +61,8 @@ import DefaultNormalArrayFieldTemplate from './ArrayField.NormalArray.DefaultTem
 
 const PROPS = {
   name: String,
+  label: String,
+  description: String,
   idPrefix: String,
   keyedFormData: Array,
   schema: Object,
@@ -85,12 +87,6 @@ export default {
   computed: {
     arrayFieldItemEvents() {
       return pick(this.$listeners, ['focus', 'blur', 'change-for-index', 'reorder', 'drop']);
-    },
-    title() {
-      return this.schema.title === undefined ? this.name : this.schema.title;
-    },
-    description() {
-      return this.uiSchema['ui:description'] || this.schema.description;
     },
     canAdd() {
       return canAddArrayItem(this.uiSchema, this.schema, this.formData);

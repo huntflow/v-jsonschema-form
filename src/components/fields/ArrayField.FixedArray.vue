@@ -10,11 +10,11 @@
     class="field field-array field-array-fixed-items"
     @add="$emit('add')"
   >
-    <template v-if="title" #title>
+    <template v-if="label" #title>
       <component
         :is="registry.fields.TitleField"
         :id="idSchema.$id + '__title'"
-        :title="title"
+        :title="label"
         :required="required"
       />
     </template>
@@ -68,7 +68,9 @@ const PROPS = {
   autofocus: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false }
+  readonly: { type: Boolean, default: false },
+  label: { type: String },
+  description: { type: String }
 };
 
 export default {
@@ -79,12 +81,6 @@ export default {
   computed: {
     arrayFieldItemEventListeners() {
       return pick(this.$listeners, ['focus', 'blur', 'change-for-index', 'reorder', 'drop']);
-    },
-    title() {
-      return this.schema.title === undefined ? this.name : this.schema.title;
-    },
-    description() {
-      return this.uiSchema['ui:description'] || this.schema.description;
     },
     canAdd() {
       return canAddArrayItem(this.uiSchema, this.schema, this.formData);

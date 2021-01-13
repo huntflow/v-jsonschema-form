@@ -2,7 +2,7 @@
   <component
     :is="objectFieldTemplateCls"
     :id="idSchema.$id"
-    :title="title"
+    :label="label"
     :title-field-cls="registry.fields.TitleField"
     :description="description"
     :description-field-cls="registry.fields.DescriptionField"
@@ -52,6 +52,8 @@ import {
 
 const PROPS = {
   name: String,
+  label: String,
+  description: String,
   uiSchema: { type: Object, default: () => ({}) },
   idPrefix: String,
   idSchema: { type: Object, default: () => ({}) },
@@ -81,17 +83,6 @@ export default {
     },
     retrivedSchema() {
       return retrieveSchema(this.schema, this.formData);
-    },
-    title() {
-      // If this schema has a title defined, but the user has set a new key/label, retain their input.
-      if (this.wasPropertyKeyModified) {
-        return this.name;
-      }
-      // otherwise
-      return this.retrivedSchema.title === undefined ? this.name : this.retrivedSchema.title;
-    },
-    description() {
-      return this.uiSchema['ui:description'] || this.retrivedSchema.description;
     },
     objectFieldTemplateCls() {
       return (

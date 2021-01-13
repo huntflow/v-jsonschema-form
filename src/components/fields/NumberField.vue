@@ -1,18 +1,8 @@
 <template>
   <component
     :is="stringFieldCls"
+    v-bind="$props"
     :form-data="formDataNumericValue"
-    :schema="schema"
-    :name="name"
-    :ui-schema="uiSchema"
-    :id-schema="idSchema"
-    :required="required"
-    :disabled="disabled"
-    :readonly="readonly"
-    :autofocus="autofocus"
-    :registry="registry"
-    :raw-errors="rawErrors"
-    :raw-error-infos="rawErrorInfos"
     v-on="eventListeners"
     @change="handleChange"
   />
@@ -27,6 +17,8 @@ const trailingCharMatcher = /[0.]0*$/;
 const PROPS = {
   schema: Object,
   name: String,
+  label: String,
+  description: String,
   uiSchema: Object,
   idSchema: Object,
   formData: Number,

@@ -4,7 +4,7 @@
     :id="idSchema && idSchema.$id"
     :options="widgetWithOptions.options"
     :schema="schema"
-    :label="schema.title === undefined ? name : schema.title"
+    :label="label"
     :value="formData"
     :required="required"
     :disabled="disabled"
@@ -22,6 +22,8 @@ import { getWidget, getUiOptions, optionsList } from '../../utils';
 
 const PROPS = {
   name: String,
+  label: String,
+  description: String,
   schema: Object,
   uiSchema: Object,
   idSchema: Object,

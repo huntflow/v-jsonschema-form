@@ -11,6 +11,7 @@
     :readonly="readonly"
     :required="required"
     :label="label"
+    :description="description"
     :placeholder="placeholder"
     :autofocus="autofocus"
     :raw-errors="rawErrors"
@@ -29,6 +30,7 @@ import {
 
 const PROPS = {
   label: String,
+  description: String,
   placeholder: String,
   schema: Object,
   idSchema: Object,

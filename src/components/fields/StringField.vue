@@ -4,7 +4,8 @@
     :id="idSchema && idSchema.$id"
     :options="widgetOptions"
     :schema="schema"
-    :label="schema.title === undefined ? name : schema.title"
+    :label="label"
+    :description="description"
     :value="formData"
     :required="required"
     :disabled="disabled"
@@ -30,6 +31,8 @@ import {
 const PROPS = {
   schema: Object,
   name: String,
+  label: String,
+  description: String,
   uiSchema: Object,
   idSchema: Object,
   formData: [String, Number],

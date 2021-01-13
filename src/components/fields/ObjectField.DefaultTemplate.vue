@@ -2,14 +2,14 @@
   <fieldset :id="id">
     <component
       :is="titleFieldCls"
-      v-if="shouldShowTitle"
+      v-if="label"
       :id="fieldTitleId"
       :required="required"
-      :title="fieldTitle"
+      :title="label"
     />
     <component
       :is="descriptionFieldCls"
-      v-if="shouldShowDescription"
+      v-if="description"
       :id="fieldDescriptionId"
       :description="description"
     />
@@ -26,7 +26,7 @@ import { getUiOptions } from '../../utils';
 
 const PROPS = {
   id: String,
-  title: String,
+  label: String,
   description: String,
   titleFieldCls: Object,
   descriptionFieldCls: Object,

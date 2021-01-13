@@ -5,7 +5,8 @@
     class="form-group field"
     :disabled="isDisabled"
     :hidden="isHidden"
-    :label="label"
+    :label="title"
+    :description="description"
     :readonly="isReadOnly"
     :required="required"
     :schema="retrivedSchema"
@@ -13,6 +14,8 @@
     <component
       :is="fieldCls"
       :name="name"
+      :label="title"
+      :description="description"
       :autofocus="hasAutofocus"
       :disabled="isDisabled"
       :error-schema="fieldErrorSchema"
@@ -141,13 +144,13 @@ export default {
           this.retrivedSchema.readOnly
       );
     },
-    label() {
+    title() {
       // If this schema has a title defined, but the user has set a new key/label, retain their input.
       if (this.wasPropertyKeyModified) {
         return this.name;
       }
       return (
-        this.uiSchema['ui:title'] || this.schema.title || this.retrivedSchema.title || this.name
+        this.uiSchema['ui:title'] ?? this.schema.title ?? this.retrivedSchema.title ?? '' // this.name
       );
     },
     description() {
