@@ -1,68 +1,68 @@
 const schema = {
-    'type': 'object',
-    'properties': {
-        'age': {
-            'type': 'integer',
-            'title': 'Age',
-        },
-        'items': {
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'anyOf': [
-                    {
-                        'properties': {
-                            'foo': {
-                                'type': 'string',
-                            },
-                        },
-                    },
-                    {
-                        'properties': {
-                            'bar': {
-                                'type': 'string',
-                            },
-                        },
-                    },
-                ],
-            },
-        },
+  type: 'object',
+  properties: {
+    age: {
+      type: 'integer',
+      title: 'Age'
     },
-    'anyOf': [
-        {
-            'title': 'First method of identification',
-            'properties': {
-                'firstName': {
-                    'type': 'string',
-                    'title': 'First name',
-                    'default': 'Chuck',
-                },
-                'lastName': {
-                    'type': 'string',
-                    'title': 'Last name',
-                },
-            },
+    items: {
+      type: 'array',
+      items: {
+        type: 'object',
+        anyOf: [
+          {
+            properties: {
+              foo: {
+                type: 'string'
+              }
+            }
+          },
+          {
+            properties: {
+              bar: {
+                type: 'string'
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  anyOf: [
+    {
+      title: 'First method of identification',
+      properties: {
+        firstName: {
+          type: 'string',
+          title: 'First name',
+          default: 'Chuck'
         },
-        {
-            'title': 'Second method of identification',
-            'properties': {
-                'idCode': {
-                    'type': 'string',
-                    'title': 'ID code',
-                },
-            },
-        },
-    ],
+        lastName: {
+          type: 'string',
+          title: 'Last name'
+        }
+      }
+    },
+    {
+      title: 'Second method of identification',
+      properties: {
+        idCode: {
+          type: 'string',
+          title: 'ID code'
+        }
+      }
+    }
+  ]
 };
 
 const uiSchema = {};
 
 const formData = {
-    'firstName': 'Chuck',
+  firstName: 'Chuck'
 };
 
 export default {
-    schema,
-    uiSchema,
-    formData,
+  schema,
+  uiSchema,
+  formData
 };
