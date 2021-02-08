@@ -1,14 +1,17 @@
 <template>
-  <base-input
-    type="text"
-    class="form-control"
-    :autofocus="autofocus"
-    :disabled="disabled"
-    :readonly="readonly"
-    :required="required"
-    :value="value"
-    v-on="$listeners"
-  />
+  <div>
+    {{ $attrs.id }} TODO: remove later
+    <base-input
+      type="text"
+      class="form-control"
+      :autofocus="autofocus"
+      :disabled="disabled"
+      :readonly="readonly"
+      :required="required"
+      :value="value"
+      v-on="$listeners"
+    />
+  </div>
 </template>
 
 <script>

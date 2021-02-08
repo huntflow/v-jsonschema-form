@@ -6,7 +6,6 @@ import TitleField from './TitleField';
 import StringField from './StringField';
 import NumberField from './NumberField';
 import BooleanField from './BooleanField';
-import MultiSchemaField from './MultiSchemaField';
 
 export default {
   DescriptionField,
@@ -16,7 +15,5 @@ export default {
   TitleField,
   StringField,
   NumberField,
-  BooleanField,
-  OneOfField: MultiSchemaField,
-  AnyOfField: MultiSchemaField
+  BooleanField
 };

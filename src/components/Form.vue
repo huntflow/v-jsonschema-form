@@ -11,6 +11,7 @@
 import BaseForm from './_Form.vue';
 import { PROPS } from './form-props';
 import { dereference } from '../helpers/dereference.js';
+import mergeAllOf from 'json-schema-merge-allof';
 
 export default {
   components: {
@@ -24,7 +25,7 @@ export default {
   },
   mounted() {
     dereference(this.schema).then((result) => {
-      this.dereferencedSchema = result;
+      this.dereferencedSchema = mergeAllOf(result);
     });
   }
 };
