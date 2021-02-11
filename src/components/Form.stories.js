@@ -7,6 +7,7 @@ import orderingData from './Form.stories.data/ordering';
 import referencesData from './Form.stories.data/references';
 import numbersData from './Form.stories.data/numbers';
 import anyOfData from './Form.stories.data/anyOf';
+import availableOn from './Form.stories.data/available-on';
 
 const components = {
   'json-form': JsonForm
@@ -67,5 +68,13 @@ storiesOf('JsonForm', JsonForm)
       '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
     data() {
       return anyOfData;
+    }
+  }))
+  .add('Available on', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    data() {
+      return availableOn;
     }
   }));

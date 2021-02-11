@@ -32,38 +32,6 @@
       :was-property-key-modified="wasPropertyKeyModified"
       v-on="fieldEventListeners"
     />
-
-    <component
-      :is="registry.fields.AnyOfField"
-      v-if="isAnyOf"
-      :disabled="disabled"
-      :error-schema="errorSchema"
-      :form-data="formData"
-      :id-prefix="idPrefix"
-      :id-schema="idSchema"
-      :options="retrivedSchema.anyOf"
-      :base-type="retrivedSchema.type"
-      :registry="registry"
-      :schema="retrivedSchema"
-      :ui-schema="uiSchema"
-      v-on="anyOfFieldEventListeners"
-    />
-
-    <component
-      :is="registry.fields.OneOfField"
-      v-if="isOneOf"
-      :disabled="disabled"
-      :error-schema="errorSchema"
-      :form-data="formData"
-      :id-prefix="idPrefix"
-      :id-schema="idSchema"
-      :options="retrivedSchema.oneOf"
-      :base-type="retrivedSchema.type"
-      :registry="registry"
-      :schema="retrivedSchema"
-      :ui-schema="uiSchema"
-      v-on="oneOfFieldEventListeners"
-    />
   </component>
 </template>
 
