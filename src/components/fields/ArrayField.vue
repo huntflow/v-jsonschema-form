@@ -35,6 +35,7 @@
     :autofocus="autofocus"
     :registry="registry"
     :raw-errors="rawErrors"
+    :raw-error-infos="rawErrorInfos"
     v-on="multiselectArrayEventListeners"
     @reorder="handleReorderClick"
   />
