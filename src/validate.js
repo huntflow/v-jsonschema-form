@@ -20,11 +20,16 @@ function createAjvInstance() {
   ajv.addKeyword('isNotEmpty', {
     errors: true,
     validate: function isNotEmpty(value, data) {
+      if (!value) {
+        return true;
+      }
       if (Array.isArray(isNotEmpty.errors) === false) {
         isNotEmpty.errors = [];
       }
       const isValid =
-        (typeof data === 'string' && data !== '') || (Array.isArray(data) && data.length > 0);
+        (typeof data === 'string' && data !== '') ||
+        typeof data === 'number' ||
+        (Array.isArray(data) && data.length > 0);
       !isValid &&
         isNotEmpty.errors.push({
           keyword: 'isNotEmpty',
