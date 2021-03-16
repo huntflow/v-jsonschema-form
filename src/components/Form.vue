@@ -1,6 +1,7 @@
 <template>
   <base-form
     v-if="dereferencedSchema"
+    ref="vjsf"
     v-bind="$props"
     :schema="dereferencedSchema"
     v-on="$listeners"
@@ -27,6 +28,11 @@ export default {
     dereference(this.schema).then((result) => {
       this.dereferencedSchema = mergeAllOf(result);
     });
+  },
+  methods: {
+    submit() {
+      this.$refs.vjsf.submit();
+    }
   }
 };
 </script>
