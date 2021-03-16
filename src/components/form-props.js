@@ -16,6 +16,7 @@ export const PROPS = {
   uiSchema: { type: Object, default: () => ({}) },
   noValidate: { type: Boolean, default: false },
   liveValidate: { type: Boolean, default: false },
+  validateOnInit: { type: Boolean, default: true },
   disabled: { type: Boolean, default: false },
   noHtml5Validate: { type: Boolean, default: false },
   ErrorList: { type: Object, default: () => DefaultErrorList },

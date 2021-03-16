@@ -63,7 +63,8 @@ export default {
       editState: false,
       errorsState: [],
       errorSchemaState: {},
-      additionalMetaSchemasState: undefined
+      additionalMetaSchemasState: undefined,
+      initialized: false,
     };
   },
   computed: {
@@ -110,6 +111,9 @@ export default {
         this.$emit('change', state);
       }
     }
+  },
+  mounted () {
+    this.initialized = true;
   },
   methods: {
     submit() {
@@ -217,7 +221,8 @@ export default {
       const uiSchema = props.uiSchema;
       const edit = typeof inputFormData !== 'undefined';
       const liveValidate = props.liveValidate;
-      const mustValidate = edit && !props.noValidate && liveValidate;
+      const mustValidate =
+        edit && !props.noValidate && liveValidate && (this.validateOnInit || this.initialized);
       const formData = getDefaultFormState(schema, inputFormData);
       const retrievedSchema = retrieveSchema(schema, formData);
       const customFormats = props.customFormats;
