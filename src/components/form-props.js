@@ -1,3 +1,4 @@
+import { VALIDATION_MODE } from '../constants';
 import DefaultErrorList from './ErrorList.vue';
 
 export const PROPS = {
@@ -16,7 +17,11 @@ export const PROPS = {
   uiSchema: { type: Object, default: () => ({}) },
   noValidate: { type: Boolean, default: false },
   liveValidate: { type: Boolean, default: false },
-  validateOnInit: { type: Boolean, default: true },
+  startValidateMode: {
+    type: String,
+    default: VALIDATION_MODE.onChange, //TODO: по хорошему поменять поведение по умолчанию на 'onSubmit'
+    validator: (mode) => Object.values(VALIDATION_MODE).includes(mode)
+  },
   disabled: { type: Boolean, default: false },
   noHtml5Validate: { type: Boolean, default: false },
   ErrorList: { type: Object, default: () => DefaultErrorList },

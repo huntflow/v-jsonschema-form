@@ -22,10 +22,10 @@ storiesOf('JsonForm', JsonForm)
       return simpleData;
     }
   }))
-  .add('Not validate on initialize', () => ({
+  .add('Start validate after form submitted', () => ({
     components,
     template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate :validate-on-init="false"></json-form>',
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate start-validate-mode="onSubmit"></json-form>',
     data() {
       return simpleData;
     }

@@ -1,7 +1,7 @@
 <template>
   <form
-    ref="form"
     :id="id"
+    ref="form"
     :acceptcharset="acceptcharset"
     :action="action"
     :autocomplete="autocomplete"
@@ -51,6 +51,7 @@ import {
 } from '../utils';
 import { removeEmptySchemaFields } from '../remove-empty-schema-fields';
 import { PROPS } from './form-props';
+import { VALIDATION_MODE } from '../constants';
 
 export default {
   props: PROPS,
@@ -64,7 +65,7 @@ export default {
       errorsState: [],
       errorSchemaState: {},
       additionalMetaSchemasState: undefined,
-      initialized: false,
+      submitted: false
     };
   },
   computed: {
@@ -73,6 +74,15 @@ export default {
     },
     schemaFieldEventListeners() {
       return pick(this.$listeners, ['focus', 'blur']);
+    },
+    isStartValidateOnSubmit() {
+      return this.startValidateMode === VALIDATION_MODE.onSubmit;
+    },
+    canValidateByMode() {
+      return !this.isStartValidateOnSubmit || (this.isStartValidateOnSubmit && this.submitted);
+    },
+    mustValidate() {
+      return this.canValidateByMode && !this.noValidate && this.liveValidate;
     }
   },
   watch: {
@@ -86,8 +96,6 @@ export default {
           {
             schema,
             uiSchema: this.uiSchema,
-            liveValidate: this.liveValidate,
-            noValidate: this.noValidate,
             customFormats: this.customFormats,
             additionalMetaSchemas: this.additionalMetaSchemas,
             idPrefix: this.idPrefix
@@ -112,23 +120,16 @@ export default {
       }
     }
   },
-  mounted () {
+  mounted() {
     this.initialized = true;
   },
   methods: {
     submit() {
-      this.$refs.form.requestSubmit();
+      this.$refs.form.dispatchEvent(new Event('submit'));
     },
     handleSubmit(event) {
       event.preventDefault();
-      if (
-        event.target !== event.currentTarget &&
-        // при вызове метода requestSubmit в сurrentTarget - null
-        event.currentTarget
-      ) {
-        return;
-      }
-
+      this.submitted = true;
       let newFormData = this.formDataState;
 
       if (this.omitExtraData === true) {
@@ -172,9 +173,6 @@ export default {
       };
 
       this.$emit('submit', submitPayload, event);
-      if (this.onSubmit) {
-        this.onSubmit(submitPayload, event);
-      }
     },
     handleChange(formData, newErrorSchema) {
       if (isObject(formData) || Array.isArray(formData)) {
@@ -183,7 +181,6 @@ export default {
       }
       this.formDataState = formData;
 
-      const mustValidate = !this.noValidate && this.liveValidate;
       let newFormData = formData;
 
       if (this.omitExtraData === true && this.liveOmit === true) {
@@ -195,7 +192,7 @@ export default {
         this.formDataState = newFormData;
       }
 
-      if (mustValidate) {
+      if (this.mustValidate) {
         const { errors, errorSchema } = this.doValidate(newFormData);
         this.errorsState = errors;
         this.errorSchemaState = errorSchema;
@@ -220,9 +217,7 @@ export default {
 
       const uiSchema = props.uiSchema;
       const edit = typeof inputFormData !== 'undefined';
-      const liveValidate = props.liveValidate;
-      const mustValidate =
-        edit && !props.noValidate && liveValidate && (this.validateOnInit || this.initialized);
+      const mustValidate = edit && this.mustValidate;
       const formData = getDefaultFormState(schema, inputFormData);
       const retrievedSchema = retrieveSchema(schema, formData);
       const customFormats = props.customFormats;
