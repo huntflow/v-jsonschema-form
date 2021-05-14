@@ -3,9 +3,38 @@ const schema = {
   description: 'Available on simple example',
   type: 'object',
   properties: {
-    something: { type: 'string', enum: ['A', 'B', 'C'] }
+    something: { type: 'string', enum: ['A', 'B', 'C'] },
+    dict: { type: 'number', enum: [10, 20, 30] }
   },
   allOf: [
+    {
+      anyOf: [
+        {
+          not: {
+            properties: {
+              dict: {
+                type: 'number',
+                valid_against_dictionary: {
+                  dictionary: [
+                    { id: 10, meta: { eta: 1 } },
+                    { id: 20, meta: { eta: 2 } },
+                    { id: 30, meta: { eta: 3 } }
+                  ],
+                  path: 'meta.eta',
+                  value: 3,
+                  operator: '=='
+                }
+              }
+            }
+          }
+        },
+        {
+          properties: { dict_dependent_field: { type: 'string' } },
+          required: ['dict']
+        },
+        {}
+      ]
+    },
     {
       anyOf: [
         {
@@ -80,14 +109,15 @@ const schema = {
 };
 
 const uiSchema = {
-  'ui:order': ['something_is_B', 'something', 'something_is_A'],
+  'ui:order': ['dict', 'dict_dependent_field', 'something_is_B', 'something', 'something_is_A'],
+  dict: {},
+  dict_dependent_field: {},
   something_is_B: {
     'ui:order': ['nested_bool_field', 'nested_enum_field', '*']
   }
 };
 
-const formData = {
-};
+const formData = {};
 
 export default {
   schema,

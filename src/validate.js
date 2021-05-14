@@ -1,5 +1,6 @@
 import toPath from 'lodash/toPath';
 import Ajv from 'ajv';
+import get from 'lodash/get';
 let ajv = createAjvInstance();
 import { deepEquals, getDefaultFormState } from './utils';
 
@@ -15,6 +16,23 @@ function createAjvInstance() {
     multipleOfPrecision: 8,
     schemaId: 'auto',
     unknownFormats: 'ignore'
+  });
+
+  ajv.addKeyword('valid_against_dictionary', {
+    errors: true,
+    validate: function validAgainstDictionary(value, data) {
+      const fields = (Array.isArray(data) ? data : [data]).map((dictFieldId) => {
+        return value.dictionary.find(({ id }) => id === parseInt(dictFieldId));
+      });
+      const path = value.path || 'id';
+      if (value.operator === '==') {
+        return fields.some((field) => get(field, path) === value.value);
+      }
+      if (value.operator === '!=') {
+        return fields.every((field) => get(field, path) !== value.value);
+      }
+      return true;
+    }
   });
 
   ajv.addKeyword('isNotEmpty', {
