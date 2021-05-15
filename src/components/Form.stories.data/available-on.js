@@ -13,7 +13,6 @@ const schema = {
           not: {
             properties: {
               dict: {
-                type: 'number',
                 valid_against_dictionary: {
                   dictionary: [
                     { id: 10, meta: { eta: 1 } },
@@ -40,7 +39,12 @@ const schema = {
         {
           not: {
             properties: {
-              something: { type: 'string', enum: ['A'] },
+              something: {
+                valid_against_value: {
+                  operator: '==',
+                  value: 'A'
+                }
+              }
             }
           }
         },

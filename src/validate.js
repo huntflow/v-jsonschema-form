@@ -18,18 +18,30 @@ function createAjvInstance() {
     unknownFormats: 'ignore'
   });
 
-  ajv.addKeyword('valid_against_dictionary', {
-    errors: true,
-    validate: function validAgainstDictionary(value, data) {
-      const fields = (Array.isArray(data) ? data : [data]).map((dictFieldId) => {
-        return value.dictionary.find(({ id }) => id === parseInt(dictFieldId));
-      });
-      const path = value.path || 'id';
-      if (value.operator === '==') {
-        return fields.some((field) => get(field, path) === value.value);
+  ajv.addKeyword('valid_against_value', {
+    validate: function validAgainstValue(kwValue, data) {
+      const values = Array.isArray(data) ? data : [data];
+      if (kwValue.operator === '==') {
+        return values.some((val) => val === kwValue.value);
       }
-      if (value.operator === '!=') {
-        return fields.every((field) => get(field, path) !== value.value);
+      if (kwValue.operator === '!=') {
+        return values.every((val) => val !== kwValue.value);
+      }
+      return true;
+    }
+  });
+
+  ajv.addKeyword('valid_against_dictionary', {
+    validate: function validAgainstDictionary(kwValue, data) {
+      const fields = (Array.isArray(data) ? data : [data]).map((dictFieldId) => {
+        return kwValue.dictionary.find(({ id }) => id === parseInt(dictFieldId));
+      });
+      const path = kwValue.path || 'id';
+      if (kwValue.operator === '==') {
+        return fields.some((field) => get(field, path) === kwValue.value);
+      }
+      if (kwValue.operator === '!=') {
+        return fields.every((field) => get(field, path) !== kwValue.value);
       }
       return true;
     }
