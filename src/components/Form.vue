@@ -15,6 +15,7 @@ import { dereference } from '../helpers/dereference.js';
 import mergeAllOf from 'json-schema-merge-allof';
 
 export default {
+  name: 'VjsfFormWrapper',
   components: {
     BaseForm
   },

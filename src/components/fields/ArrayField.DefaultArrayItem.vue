@@ -56,6 +56,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'ArrayFieldDefaultArrayItem',
   components: {
     'icon-button': IconButton
   },

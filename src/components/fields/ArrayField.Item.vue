@@ -54,6 +54,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'ArrayFieldItem',
   components: {
     'default-array-item': DefaultArrayItem
   },

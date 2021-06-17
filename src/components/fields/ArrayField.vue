@@ -96,6 +96,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'ArrayField',
   components: {
     'normal-array': NormalArray,
     'fixed-array': FixedArray,

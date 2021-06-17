@@ -38,6 +38,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'BooleanField',
   props: PROPS,
   computed: {
     enumOptions() {

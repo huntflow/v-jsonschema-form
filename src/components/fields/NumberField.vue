@@ -32,6 +32,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'NumberField',
   props: PROPS,
   data() {
     return {

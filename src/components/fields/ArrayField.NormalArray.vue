@@ -80,6 +80,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'ArrayFieldNormalArray',
   components: {
     'array-field-item': ArrayFieldItem
   },

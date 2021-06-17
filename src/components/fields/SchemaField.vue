@@ -37,13 +37,7 @@
 
 <script>
 import pick from 'lodash/pick';
-import {
-  isSelect,
-  retrieveSchema,
-  toIdSchema,
-  mergeObjects,
-  getSchemaType
-} from '../../utils';
+import { isSelect, retrieveSchema, toIdSchema, mergeObjects, getSchemaType } from '../../utils';
 
 import DefaultTemplate from './SchemaField.DefaultTemplate.vue';
 
@@ -64,6 +58,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'SchemaField',
   props: PROPS,
   computed: {
     fieldEventListeners() {

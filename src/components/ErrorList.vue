@@ -20,6 +20,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'ErrorList',
   inheritAttrs: false,
   props: PROPS
 };

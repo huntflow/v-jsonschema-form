@@ -44,11 +44,7 @@
 <script>
 import pick from 'lodash/pick';
 import DefaultObjectFieldTemplate from './ObjectField.DefaultTemplate.vue';
-import {
-  orderProperties,
-  retrieveSchema,
-  ADDITIONAL_PROPERTY_FLAG
-} from '../../utils';
+import { orderProperties, retrieveSchema, ADDITIONAL_PROPERTY_FLAG } from '../../utils';
 
 const PROPS = {
   name: String,
@@ -70,6 +66,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'ObjectField',
   props: PROPS,
   data() {
     return {

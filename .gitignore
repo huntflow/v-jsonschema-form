@@ -130,6 +130,8 @@ typings/
 # nuxt.js build output
 .nuxt
 
+.idea
+
 # react / gatsby
 public/
 

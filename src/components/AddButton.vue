@@ -21,6 +21,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'AddButton',
   components: {
     'icon-button': IconButton
   },

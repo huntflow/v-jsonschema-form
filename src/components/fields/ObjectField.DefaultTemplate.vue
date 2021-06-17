@@ -40,6 +40,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'ObjectFieldDefaultTemplate',
   components: {
     'add-button': AddButton
   },

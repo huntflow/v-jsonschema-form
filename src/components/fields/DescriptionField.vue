@@ -11,6 +11,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'DescriptionField',
   props: PROPS
 };
 </script>

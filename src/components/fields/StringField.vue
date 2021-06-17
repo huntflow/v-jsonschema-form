@@ -20,13 +20,7 @@
 </template>
 
 <script>
-import {
-  getWidget,
-  getUiOptions,
-  isSelect,
-  optionsList,
-  hasWidget
-} from '../../utils';
+import { getWidget, getUiOptions, isSelect, optionsList, hasWidget } from '../../utils';
 
 const PROPS = {
   schema: Object,
@@ -46,6 +40,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'StringField',
   props: PROPS,
   computed: {
     enumOptions() {

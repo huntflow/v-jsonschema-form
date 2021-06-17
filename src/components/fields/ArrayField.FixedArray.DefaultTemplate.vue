@@ -7,12 +7,7 @@
       <slot />
     </div>
 
-    <add-button
-      v-if="canAdd"
-      class="array-item-add"
-      :disabled="isDisabled"
-      @click="$emit('add')"
-    />
+    <add-button v-if="canAdd" class="array-item-add" :disabled="isDisabled" @click="$emit('add')" />
   </fieldset>
 </template>
 
@@ -29,6 +24,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'ArrayFieldFixedArrayDefaultTemplate',
   components: {
     'add-button': AddButton
   },

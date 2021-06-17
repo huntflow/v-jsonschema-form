@@ -22,6 +22,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'SchemaFieldDefaultTemplate',
   inheritAttrs: false,
   props: PROPS,
   computed: {

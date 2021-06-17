@@ -24,6 +24,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'ArrayFieldNormalArrayDefaultTemplate',
   components: {
     'add-button': AddButton
   },

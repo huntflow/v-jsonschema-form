@@ -21,12 +21,7 @@
 </template>
 
 <script>
-import {
-  getWidget,
-  getUiOptions,
-  optionsList,
-  retrieveSchema
-} from '../../utils';
+import { getWidget, getUiOptions, optionsList, retrieveSchema } from '../../utils';
 
 const PROPS = {
   label: String,
@@ -46,6 +41,7 @@ const PROPS = {
 };
 
 export default {
+  name: 'ArrayFieldMultiSelect',
   props: PROPS,
   computed: {
     widgetCls() {

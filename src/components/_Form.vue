@@ -54,6 +54,7 @@ import { PROPS } from './form-props';
 import { VALIDATION_MODE } from '../constants';
 
 export default {
+  name: 'VjsfForm',
   props: PROPS,
   data() {
     return {
