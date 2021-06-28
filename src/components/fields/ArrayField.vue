@@ -135,7 +135,7 @@ export default {
           return;
         }
 
-        const nextFormData = newProps.formData;
+        const nextFormData = newProps.formData ?? [];
         const previousKeyedFormData = this.keyedFormData;
         const newKeyedFormData =
           nextFormData.length === previousKeyedFormData.length
@@ -174,7 +174,7 @@ export default {
     },
 
     handleChangeForIndex(index, value, errorSchema) {
-      const newFormData = this.formData.map((item, i) => {
+      const newFormData = (this.formData ?? []).map((item, i) => {
         // We need to treat undefined items as nulls to have validation.
         // See https://github.com/tdegrunt/jsonschema/issues/206
         const jsonValue = typeof value === 'undefined' ? null : value;
