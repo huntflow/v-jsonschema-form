@@ -476,10 +476,18 @@ export function retrieveSchema(schema, formData = {}) {
     // eslint-disable-next-line no-prototype-builtins
     resolvedSchema.hasOwnProperty('additionalProperties') &&
     resolvedSchema.additionalProperties !== false;
-  if (hasAdditionalProperties) {
-    return stubExistingAdditionalProperties(resolvedSchema, formData);
+
+  const result =
+    hasAdditionalProperties ? stubExistingAdditionalProperties(resolvedSchema, formData) : resolvedSchema;
+
+  // remove required-but-hidden fields from validation (see complex-field feature)
+  if (Array.isArray(result.required) && typeof result.properties === 'object') {
+    return {
+      ...result,
+      required: result.required.filter((name) => result.properties[name])
+    };
   }
-  return resolvedSchema;
+  return result;
 }
 
 export function resolveSchema(schema, formData = {}) {
