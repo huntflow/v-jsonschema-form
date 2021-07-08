@@ -3,6 +3,8 @@ import Ajv from 'ajv';
 import get from 'lodash/get';
 let ajv = createAjvInstance();
 import { deepEquals, getDefaultFormState } from './utils';
+import ajvErrors from 'ajv-errors';
+import jsonpointer from 'json-pointer';
 
 let formerCustomFormats = null;
 let formerMetaSchema = null;
@@ -11,12 +13,11 @@ import { isObject, mergeObjects } from './utils';
 
 function createAjvInstance() {
   const ajv = new Ajv({
-    errorDataPath: 'property',
     allErrors: true,
-    multipleOfPrecision: 8,
-    schemaId: 'auto',
-    unknownFormats: 'ignore'
+    verbose: true,
+    multipleOfPrecision: 8
   });
+  ajvErrors(ajv /*, {singleError: true} */); // todo: check if it's needed
 
   ajv.addKeyword('valid_against_value', {
     validate: function validAgainstValue(kwValue, data) {
@@ -198,8 +199,15 @@ function transformAjvErrors(errors = []) {
   }
 
   return errors.map((e) => {
-    const { dataPath, keyword, message, params, schemaPath } = e;
-    let property = `${dataPath}`;
+    const { instancePath, keyword, message, params, schemaPath } = e;
+    // new ajv version responds with a bit different error format
+    // that's why we need to do extra steps
+    const pathArr = jsonpointer.parse(instancePath);
+    const propertyArr = e.params?.missingProperty
+      ? [...pathArr, e.params?.missingProperty]
+      : pathArr;
+
+    const property = propertyArr.join('.');
 
     // put data in expected format
     return {

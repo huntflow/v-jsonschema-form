@@ -8,16 +8,25 @@ import referencesData from './Form.stories.data/references';
 import numbersData from './Form.stories.data/numbers';
 import anyOfData from './Form.stories.data/anyOf';
 import availableOn from './Form.stories.data/available-on';
+import ifThen from './Form.stories.data/if-then';
 
 const components = {
   'json-form': JsonForm
 };
 
 storiesOf('JsonForm', JsonForm)
-  .add('Simple', () => ({
+  .add('If then', () => ({
     components,
     template:
       '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    data() {
+      return ifThen;
+    }
+  }))
+  .add('Simple', () => ({
+    components,
+    template:
+        '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
     data() {
       return simpleData;
     }

@@ -477,16 +477,10 @@ export function retrieveSchema(schema, formData = {}) {
     resolvedSchema.hasOwnProperty('additionalProperties') &&
     resolvedSchema.additionalProperties !== false;
 
-  const result =
-    hasAdditionalProperties ? stubExistingAdditionalProperties(resolvedSchema, formData) : resolvedSchema;
+  const result = hasAdditionalProperties
+    ? stubExistingAdditionalProperties(resolvedSchema, formData)
+    : resolvedSchema;
 
-  // remove required-but-hidden fields from validation (see complex-field feature)
-  if (Array.isArray(result.required) && typeof result.properties === 'object') {
-    return {
-      ...result,
-      required: result.required.filter((name) => result.properties[name])
-    };
-  }
   return result;
 }
 
@@ -509,6 +503,29 @@ export function resolveSchema(schema, formData = {}) {
       return result;
     } else {
       return rest;
+    }
+  }
+
+  if (schema.properties && schema.if) {
+    if (isValid(schema.if, formData) && schema.then?.properties) {
+      const result = {
+        ...schema,
+        properties: {
+          ...schema.properties,
+          ...schema.then.properties
+        }
+      };
+      return result;
+    }
+    if (!isValid(schema.if, formData) && schema.else?.properties) {
+      const result = {
+        ...schema,
+        properties: {
+          ...schema.properties,
+          ...schema.else.properties
+        }
+      };
+      return result;
     }
   }
 
