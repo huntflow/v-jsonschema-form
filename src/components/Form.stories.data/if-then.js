@@ -1,37 +1,37 @@
 const schema = {
   type: 'object',
   properties: {
-    title: {
-      type: 'string'
+    field_a: {
+      default: '1',
+      enum: ['1', '2']
     },
-    street_address: {
-      type: 'string'
-    },
-    country: {
-      default: 'United States of America',
-      enum: ['United States of America, Canada']
-    },
-    nested: {
-      type: 'object',
-      properties: {
-        a: { type: 'string', minLength: 2 }
+    field_b: {
+      default: '1',
+      enum: ['1', '2']
+    }
+  },
+  allOf: [
+    {
+      if: {
+        properties: {
+          field_a: { const: '1' }
+        }
       },
-      required: ['a']
+      then: {
+        properties: { dependency_a_1: { type: 'string' } }
+      }
+    },
+    {
+      if: {
+        properties: {
+          field_b: { const: '1' }
+        }
+      },
+      then: {
+        properties: { dependency_b_1: { type: 'string' } }
+      }
     }
-  },
-  if: {
-    properties: {
-      country: { const: 'United States of America' }
-    }
-  },
-  then: {
-    properties: { postal_code: { type: 'string' } },
-    required: ['postal_code']
-  },
-  else: {
-    properties: { postal_code_else: { type: 'string' } },
-    required: ['postal_code_else']
-  }
+  ]
 };
 
 const formData = {};

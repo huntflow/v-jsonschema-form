@@ -485,48 +485,28 @@ export function retrieveSchema(schema, formData = {}) {
 }
 
 export function resolveSchema(schema, formData = {}) {
-  if (schema.anyOf) {
-    // TODO: кажется опасное изменение, ибо игнорирует логику ниже по работе с dependencies
-    // но пока они не используются - можно скипнуть
-    const { anyOf, ...rest } = schema;
-    const optionIndex = getMatchingOption(formData, anyOf);
-    const option = anyOf[optionIndex];
+  // complex field and availableOn feature support
+  if (schema.allOf && schema.properties) {
+    const newProperties = schema.allOf.reduce((acc, allOfItem) => {
+      if (!allOfItem.if) {
+        return newProperties;
+      }
 
-    if (rest.properties && option?.properties) {
-      const result = {
-        ...rest,
-        properties: {
-          ...rest.properties,
-          ...option.properties
-        }
-      };
-      return result;
-    } else {
-      return rest;
-    }
-  }
+      const thenProps = allOfItem.then?.properties || {};
+      const elseProps = allOfItem.else?.properties || {};
+      const isTruthy = isValid(allOfItem.if, formData);
+      const matchedProps = isTruthy ? thenProps : elseProps;
 
-  if (schema.properties && schema.if) {
-    if (isValid(schema.if, formData) && schema.then?.properties) {
-      const result = {
-        ...schema,
-        properties: {
-          ...schema.properties,
-          ...schema.then.properties
-        }
+      return {
+        ...acc,
+        ...matchedProps
       };
-      return result;
-    }
-    if (!isValid(schema.if, formData) && schema.else?.properties) {
-      const result = {
-        ...schema,
-        properties: {
-          ...schema.properties,
-          ...schema.else.properties
-        }
-      };
-      return result;
-    }
+    }, schema.properties);
+
+    return {
+      ...schema,
+      properties: newProperties
+    };
   }
 
   // eslint-disable-next-line no-prototype-builtins
