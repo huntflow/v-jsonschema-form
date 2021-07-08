@@ -11,7 +11,8 @@ const schema = {
     },
     lastName: {
       type: 'string',
-      title: 'Last name'
+      title: 'Last name',
+      minLength: 3
     },
     age: {
       type: 'integer',
