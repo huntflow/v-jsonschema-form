@@ -13,7 +13,7 @@
       :id="fieldDescriptionId"
       :description="description"
     />
-    <slot />
+    <slot v-for="name in propertyKeys" :name="name" />
     <div v-if="canExpand">
       <add-button class="object-property-expand" :disabled="isDisabled" @click="$emit('add')" />
     </div>
@@ -56,14 +56,8 @@ export default {
     fieldDescriptionId() {
       return this.idSchema.$id + '__description';
     },
-    fieldTitle() {
-      return this.title || this.uiSchema['ui:title'];
-    },
-    shouldShowTitle() {
-      return Boolean(this.fieldTitle);
-    },
-    shouldShowDescription() {
-      return Boolean(this.description);
+    propertyKeys() {
+      return Object.keys(this.schema.properties || {});
     },
     canExpand() {
       if (!this.schema.additionalProperties) {

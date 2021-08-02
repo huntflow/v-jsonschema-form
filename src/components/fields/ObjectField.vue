@@ -15,29 +15,33 @@
     :required="required"
     @add="handleAdd"
   >
-    <component
-      :is="schemaFieldCls"
-      v-for="propName in orderedProperties"
-      :key="propName"
-      :name="propName"
-      :required="isRequired(propName)"
-      :schema="retrivedSchema.properties[propName]"
-      :ui-schema="
-        isAddedByAdditionalProperties(propName) ? uiSchema.additionalProperties : uiSchema[propName]
-      "
-      :error-schema="errorSchema[propName]"
-      :id-schema="idSchema[propName]"
-      :id-prefix="idPrefix"
-      :form-data="(formData || {})[propName]"
-      :was-property-key-modified="wasPropertyKeyModified"
-      :registry="registry"
-      :disabled="disabled"
-      :readonly="readonly"
-      v-on="schemaFieldEventListeners"
-      @change="handlePropertyChange(propName, ...arguments)"
-      @key-change="handleKeyChange(propName, ...arguments)"
-      @drop-property="handleDropPropertyClick"
-    />
+    <template v-for="propName in orderedProperties" #[propName]="scopedProps">
+      <component
+        :is="schemaFieldCls"
+        :key="propName"
+        :name="propName"
+        :required="isRequired(propName)"
+        :schema="retrivedSchema.properties[propName]"
+        :ui-schema="
+          isAddedByAdditionalProperties(propName)
+            ? uiSchema.additionalProperties
+            : uiSchema[propName]
+        "
+        :error-schema="errorSchema[propName]"
+        :id-schema="idSchema[propName]"
+        :id-prefix="idPrefix"
+        :form-data="(formData || {})[propName]"
+        :was-property-key-modified="wasPropertyKeyModified"
+        :registry="registry"
+        :disabled="disabled"
+        :readonly="readonly"
+        v-bind="scopedProps"
+        v-on="schemaFieldEventListeners"
+        @change="handlePropertyChange(propName, ...arguments)"
+        @key-change="handleKeyChange(propName, ...arguments)"
+        @drop-property="handleDropPropertyClick"
+      />
+    </template>
   </component>
 </template>
 
