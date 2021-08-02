@@ -25,7 +25,7 @@
         :ui-schema="
           isAddedByAdditionalProperties(propName)
             ? uiSchema.additionalProperties
-            : uiSchema[propName]
+            : scopedProps.uiSchema || uiSchema[propName]
         "
         :error-schema="errorSchema[propName]"
         :id-schema="idSchema[propName]"
