@@ -9,6 +9,7 @@
     :schema="retrivedSchema"
     :id-schema="idSchema"
     :ui-schema="uiSchema"
+    :ordered-properties="orderedProperties"
     :form-data="formData"
     :disabled="disabled"
     :readonly="readonly"

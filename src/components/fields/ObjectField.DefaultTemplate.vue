@@ -13,7 +13,7 @@
       :id="fieldDescriptionId"
       :description="description"
     />
-    <slot v-for="name in propertyKeys" :name="name" />
+    <slot v-for="name in orderedProperties" :name="name" />
     <div v-if="canExpand">
       <add-button class="object-property-expand" :disabled="isDisabled" @click="$emit('add')" />
     </div>
@@ -34,6 +34,7 @@ const PROPS = {
   idSchema: Object,
   schema: Object,
   uiSchema: Object,
+  orderedProperties: { type: Array, required: true },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false }
@@ -55,9 +56,6 @@ export default {
     },
     fieldDescriptionId() {
       return this.idSchema.$id + '__description';
-    },
-    propertyKeys() {
-      return Object.keys(this.schema.properties || {});
     },
     canExpand() {
       if (!this.schema.additionalProperties) {
