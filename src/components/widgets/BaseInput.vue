@@ -6,6 +6,7 @@
     :readonly="readonly"
     :required="required"
     :value="value"
+    v-bind="options"
     @change="handleChange"
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
@@ -15,7 +16,7 @@
 <script>
 const PROPS = {
   type: String,
-  options: Object,
+  options: { type: Object, default: () => ({}) },
   value: [String, Number],
   autofocus: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
@@ -24,8 +25,8 @@ const PROPS = {
 };
 
 export default {
-  props: PROPS,
   inheritAttrs: false,
+  props: PROPS,
   methods: {
     handleChange(event) {
       const value = event.target.value;
