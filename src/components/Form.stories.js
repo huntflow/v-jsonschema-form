@@ -19,7 +19,7 @@ storiesOf('JsonForm', JsonForm)
   .add('autofocus', () => ({
     components,
     template:
-      '<json-form @submit.prevent.stop :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
     data() {
       return autofocus;
     }
@@ -27,7 +27,7 @@ storiesOf('JsonForm', JsonForm)
   .add('If then', () => ({
     components,
     template:
-      '<json-form @submit.prevent.stop :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
     data() {
       return ifThen;
     }
