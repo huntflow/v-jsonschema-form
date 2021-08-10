@@ -126,7 +126,7 @@ export default {
   },
   methods: {
     submit() {
-      this.$refs.form.dispatchEvent(new Event('submit'));
+      this.$refs.form.dispatchEvent(new Event('submit', { cancelable: true }));
     },
     focusFirstFieldBySelector(selector) {
       this.$nextTick(() => {
