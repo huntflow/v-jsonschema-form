@@ -8,6 +8,7 @@
     :readOnly="readonly"
     :required="required"
     :rows="options.rows"
+    v-bind="options"
     :value="typeof value === 'undefined' ? '' : value"
     @blur="handleBlur"
     @change="handleChange"
@@ -18,7 +19,7 @@
 <script>
 const PROPS = {
   id: String,
-  options: { default: () => ({}) },
+  options: { type: Object, default: () => ({}) },
   placeholder: String,
   value: String,
   required: { type: Boolean, default: false },

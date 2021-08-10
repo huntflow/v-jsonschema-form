@@ -122,11 +122,19 @@ export default {
     }
   },
   mounted() {
-    this.initialized = true;
+    this.focusFirstFieldBySelector(this.fieldsSelector);
   },
   methods: {
     submit() {
       this.$refs.form.dispatchEvent(new Event('submit'));
+    },
+    focusFirstFieldBySelector(selector) {
+      this.$nextTick(() => {
+        const firstField = this.$el.querySelector(selector);
+        if (firstField) {
+          firstField.focus();
+        }
+      });
     },
     handleSubmit(event) {
       event.preventDefault();
@@ -147,12 +155,9 @@ export default {
           this.errorsState = errors;
           this.errorSchemaState = errorSchema;
 
-          // TODO: see React setState callback
-          if (this.onError) {
-            this.onError(errors);
-          } else {
-            console.error('Form validation failed', errors);
-          }
+          this.$emit('error', errors);
+          console.error('Form validation failed', errors);
+          this.focusFirstFieldBySelector(this.invalidFieldsSelector);
           return;
         }
       }

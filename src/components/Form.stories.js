@@ -9,16 +9,25 @@ import numbersData from './Form.stories.data/numbers';
 import anyOfData from './Form.stories.data/anyOf';
 import availableOn from './Form.stories.data/available-on';
 import ifThen from './Form.stories.data/if-then';
+import autofocus from './Form.stories.data/autofocus';
 
 const components = {
   'json-form': JsonForm
 };
 
 storiesOf('JsonForm', JsonForm)
+  .add('autofocus', () => ({
+    components,
+    template:
+      '<json-form @submit.prevent.stop :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    data() {
+      return autofocus;
+    }
+  }))
   .add('If then', () => ({
     components,
     template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+      '<json-form @submit.prevent.stop :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
     data() {
       return ifThen;
     }
@@ -26,7 +35,7 @@ storiesOf('JsonForm', JsonForm)
   .add('Simple', () => ({
     components,
     template:
-        '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
     data() {
       return simpleData;
     }

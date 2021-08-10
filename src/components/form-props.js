@@ -28,5 +28,7 @@ export const PROPS = {
   omitExtraData: { type: Boolean, default: false },
   fields: { type: Object, default: () => ({}) },
   widgets: { type: Object, default: () => ({}) },
-  omitMissingFields: { type: Boolean, default: false }
+  omitMissingFields: { type: Boolean, default: false },
+  fieldsSelector: { type: String, default: '[name]' },
+  invalidFieldsSelector: { type: String, default: '[name][aria-invalid="true"]' }
 };

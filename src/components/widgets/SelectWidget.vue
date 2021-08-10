@@ -2,6 +2,7 @@
   <select
     :id="id"
     :multiple="multiple"
+    v-bind="options"
     class="form-control"
     :value="typeof value === 'undefined' ? emptyValue : value"
     :required="required"

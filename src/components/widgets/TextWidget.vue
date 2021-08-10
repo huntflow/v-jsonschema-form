@@ -9,6 +9,7 @@
       :readonly="readonly"
       :required="required"
       :value="value"
+      :options="options"
       v-on="$listeners"
     />
   </div>
@@ -19,7 +20,7 @@ import BaseInput from './BaseInput';
 
 const PROPS = {
   autofocus: {},
-  options: Object,
+  options: { type: Object, default: () => ({}) },
   value: [String, Number],
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
@@ -30,7 +31,7 @@ export default {
   components: {
     'base-input': BaseInput
   },
-  props: PROPS,
-  inheritAttrs: false
+  inheritAttrs: false,
+  props: PROPS
 };
 </script>
