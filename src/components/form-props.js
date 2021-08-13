@@ -29,6 +29,7 @@ export const PROPS = {
   fields: { type: Object, default: () => ({}) },
   widgets: { type: Object, default: () => ({}) },
   omitMissingFields: { type: Boolean, default: false },
+  customFormats: { type: Object, default: () => ({}) },
   fieldsSelector: { type: String, default: '[name]' },
   invalidFieldsSelector: { type: String, default: '[name][aria-invalid="true"]' }
 };

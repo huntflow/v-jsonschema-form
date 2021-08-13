@@ -255,7 +255,7 @@ export default {
       formData,
       schema = this.schemaState,
       additionalMetaSchemas = this.additionalMetaSchemasState,
-      customFormats = this.customFormatsState
+      customFormats = this.customFormats
     ) {
       const resolvedSchema = retrieveSchema(schema, formData);
       return validateFormData(
