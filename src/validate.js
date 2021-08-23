@@ -21,12 +21,14 @@ function createAjvInstance() {
 
   ajv.addKeyword('valid_against_value', {
     validate: function validAgainstValue(kwValue, data) {
+      const expectedValues = Array.isArray(kwValue.value) ? kwValue.value : [kwValue.value];
       const values = Array.isArray(data) ? data : [data];
+
       if (kwValue.operator === '==') {
-        return values.some((val) => val === kwValue.value);
+        return values.some((val) => expectedValues.includes(val));
       }
       if (kwValue.operator === '!=') {
-        return values.every((val) => val !== kwValue.value);
+        return values.every((val) => !expectedValues.includes(val));
       }
       return true;
     }
@@ -34,15 +36,16 @@ function createAjvInstance() {
 
   ajv.addKeyword('valid_against_dictionary', {
     validate: function validAgainstDictionary(kwValue, data) {
+      const expectedValues = Array.isArray(kwValue.value) ? kwValue.value : [kwValue.value];
       const fields = (Array.isArray(data) ? data : [data]).map((dictFieldId) => {
         return kwValue.dictionary.find(({ id }) => id === parseInt(dictFieldId));
       });
       const path = kwValue.path || 'id';
       if (kwValue.operator === '==') {
-        return fields.some((field) => get(field, path) === kwValue.value);
+        return fields.some((field) => expectedValues.includes(get(field, path)));
       }
       if (kwValue.operator === '!=') {
-        return fields.every((field) => get(field, path) !== kwValue.value);
+        return fields.every((field) => !expectedValues.includes(get(field, path)));
       }
       return true;
     }
