@@ -18,7 +18,8 @@ const schema = {
         }
       },
       then: {
-        properties: { dependency_a_1: { type: 'string' } }
+        properties: { dependency_a_1: { type: 'string' } },
+        required: ['dependency_a_1']
       }
     },
     {

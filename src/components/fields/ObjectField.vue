@@ -49,7 +49,12 @@
 <script>
 import pick from 'lodash/pick';
 import DefaultObjectFieldTemplate from './ObjectField.DefaultTemplate.vue';
-import { orderProperties, retrieveSchema, ADDITIONAL_PROPERTY_FLAG } from '../../utils';
+import {
+  orderProperties,
+  retrieveSchema,
+  ADDITIONAL_PROPERTY_FLAG,
+  getCurrentRequired
+} from '../../utils';
 
 const PROPS = {
   name: String,
@@ -86,6 +91,9 @@ export default {
     retrivedSchema() {
       return retrieveSchema(this.schema, this.formData);
     },
+    requiredFields() {
+      return getCurrentRequired(this.schema, this.formData);
+    },
     objectFieldTemplateCls() {
       return (
         this.uiSchema['ui:ObjectFieldTemplate'] ||
@@ -103,8 +111,7 @@ export default {
   },
   methods: {
     isRequired(name) {
-      const schema = this.schema;
-      return Array.isArray(schema.required) && schema.required.indexOf(name) !== -1;
+      return this.requiredFields.includes(name);
     },
     isAddedByAdditionalProperties(name) {
       return (
