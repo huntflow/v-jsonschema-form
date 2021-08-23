@@ -489,21 +489,26 @@ export function getCurrentRequired(schema, formData = {}) {
     return schema.required || [];
   }
 
-  return schema.allOf.reduce((acc, allOfItem) => {
-    if (!allOfItem.if) {
-      return acc;
-    }
-    const isTruthy = isValid(allOfItem.if, formData);
-    const result = isTruthy ? allOfItem.then : allOfItem.else;
-    if (!result) {
-      return acc;
-    }
-    if (result.required) {
-      acc.push(...result.required);
-    }
+  const requiredFields = schema.allOf.reduce(
+    (acc, allOfItem) => {
+      if (!allOfItem.if) {
+        return acc;
+      }
+      const isTruthy = isValid(allOfItem.if, formData);
+      const result = isTruthy ? allOfItem.then : allOfItem.else;
+      if (!result) {
+        return acc;
+      }
+      if (result.required) {
+        acc.push(...result.required);
+      }
 
-    return acc;
-  }, schema.required || []);
+      return acc;
+    },
+    [...(schema.required || [])]
+  );
+
+  return Array.from(new Set(requiredFields));
 }
 
 export function resolveSchema(schema, formData = {}) {
