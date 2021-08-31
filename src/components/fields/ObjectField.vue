@@ -82,7 +82,7 @@ export default {
     return {
       wasPropertyKeyModified: false,
       additionalProperties: {},
-      innerFormData: {}
+      innerFormData: {} // TODO: используется для того чтобы можно было обновить несколько вложенных полей одновременно, допустим если в инпутах заполняются данные при mounted
     };
   },
   computed: {
