@@ -10,7 +10,7 @@
     :id-schema="idSchema"
     :ui-schema="uiSchema"
     :ordered-properties="orderedProperties"
-    :form-data="formData"
+    :form-data="innerFormData"
     :disabled="disabled"
     :readonly="readonly"
     :required="required"
@@ -31,7 +31,7 @@
         :error-schema="errorSchema[propName]"
         :id-schema="idSchema[propName]"
         :id-prefix="idPrefix"
-        :form-data="(formData || {})[propName]"
+        :form-data="(innerFormData || {})[propName]"
         :was-property-key-modified="wasPropertyKeyModified"
         :registry="registry"
         :disabled="disabled"
@@ -81,7 +81,8 @@ export default {
   data() {
     return {
       wasPropertyKeyModified: false,
-      additionalProperties: {}
+      additionalProperties: {},
+      innerFormData: {}
     };
   },
   computed: {
@@ -89,10 +90,10 @@ export default {
       return pick(this.$listeners, ['focus', 'blur']);
     },
     retrivedSchema() {
-      return retrieveSchema(this.schema, this.formData);
+      return retrieveSchema(this.schema, this.innerFormData);
     },
     requiredFields() {
-      return getCurrentRequired(this.schema, this.formData);
+      return getCurrentRequired(this.schema, this.innerFormData);
     },
     objectFieldTemplateCls() {
       return (
@@ -109,6 +110,14 @@ export default {
       return orderProperties(properties, this.uiSchema['ui:order']);
     }
   },
+  watch: {
+    formData: {
+      immediate: true,
+      handler(formData) {
+        this.innerFormData = formData;
+      }
+    }
+  },
   methods: {
     isRequired(name) {
       return this.requiredFields.includes(name);
@@ -123,11 +132,9 @@ export default {
     handleAdd() {
       const schema = this.retrievedSchema;
       let type = schema.additionalProperties.type;
-      const newFormData = { ...this.formData };
+      this.innerFormData[getAvailableKey('newKey', this.innerFormData)] = getDefaultValue(type);
 
-      newFormData[getAvailableKey('newKey', newFormData)] = getDefaultValue(type);
-
-      this.$emit('change', newFormData);
+      this.$emit('change', { ...this.innerFormData });
     },
     handlePropertyChange(name, value, errorSchema) {
       if (!value && this.isAddedByAdditionalProperties(name)) {
@@ -141,10 +148,10 @@ export default {
         value = '';
       }
 
-      const newFormData = { ...this.formData, [name]: value };
+      this.innerFormData[name] = value;
       this.$emit(
         'change',
-        newFormData,
+        { ...this.innerFormData },
         errorSchema &&
           this.errorSchema && {
             ...this.errorSchema,
@@ -153,27 +160,26 @@ export default {
       );
     },
     handleDropPropertyClick(key) {
-      const copiedFormData = { ...this.formData };
-      delete copiedFormData[key];
-      this.$emit('change', copiedFormData);
+      delete this.innerFormData[key];
+      this.$emit('change', { ...this.innerFormData });
     },
     handleKeyChange(oldValue, value, errorSchema) {
       if (oldValue === value) {
         return;
       }
 
-      value = getAvailableKey(value, this.formData);
-      const newFormData = { ...this.formData };
+      value = getAvailableKey(value, this.innerFormData);
+      const newFormData = { ...this.innerFormData };
       const newKeys = { [oldValue]: value };
       const keyValues = Object.keys(newFormData).map((key) => {
         const newKey = newKeys[key] || key;
         return { [newKey]: newFormData[key] };
       });
-      const renamedObj = Object.assign({}, ...keyValues);
+      Object.assign(this.innerFormData, ...keyValues);
       this.wasPropertyKeyModified = true;
       this.$emit(
         'change',
-        renamedObj,
+        { ...this.innerFormData },
         errorSchema &&
           this.errorSchema && {
             ...this.errorSchema,
