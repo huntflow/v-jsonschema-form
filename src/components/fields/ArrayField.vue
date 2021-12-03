@@ -1,6 +1,8 @@
 <template>
   <fixed-array
     v-if="isFixedArray"
+    :label="label"
+    :description="description"
     :keyed-form-data="keyedFormData"
     :schema="schema"
     :ui-schema="uiSchema"
@@ -25,6 +27,8 @@
 
   <multiselect-array
     v-else-if="isMultiSelectArray"
+    :label="label"
+    :description="description"
     :schema="schema"
     :ui-schema="uiSchema"
     :form-data="formData"
@@ -42,6 +46,8 @@
 
   <normal-array
     v-else
+    :label="label"
+    :description="description"
     :keyed-form-data="keyedFormData"
     :schema="schema"
     :ui-schema="uiSchema"
@@ -79,6 +85,8 @@ import {
 } from '../../utils';
 
 const PROPS = {
+  label: String,
+  description: String,
   name: String,
   idPrefix: String,
   rawErrors: Array,
