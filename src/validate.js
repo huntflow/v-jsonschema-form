@@ -18,7 +18,8 @@ function createAjvInstance() {
   });
   ajvErrors(ajv /*, {singleError: true} */); // todo: check if it's needed
 
-  ajv.addKeyword('valid_against_value', {
+  ajv.addKeyword({
+    keyword: 'valid_against_value',
     validate: function validAgainstValue(kwValue, data) {
       const expectedValues = Array.isArray(kwValue.value) ? kwValue.value : [kwValue.value];
       const values = Array.isArray(data) ? data : [data];
@@ -33,7 +34,8 @@ function createAjvInstance() {
     }
   });
 
-  ajv.addKeyword('valid_against_dictionary', {
+  ajv.addKeyword({
+    keyword: 'valid_against_dictionary',
     validate: function validAgainstDictionary(kwValue, data) {
       const expectedValues = Array.isArray(kwValue.value) ? kwValue.value : [kwValue.value];
       const fields = (Array.isArray(data) ? data : [data]).map((dictFieldId) => {
@@ -50,7 +52,8 @@ function createAjvInstance() {
     }
   });
 
-  ajv.addKeyword('isNotEmpty', {
+  ajv.addKeyword({
+    keyword: 'isNotEmpty',
     errors: true,
     validate: function isNotEmpty(value, data) {
       if (!value) {
