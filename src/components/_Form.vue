@@ -65,7 +65,6 @@ export default {
       editState: false,
       errorsState: [],
       errorSchemaState: {},
-      additionalMetaSchemasState: undefined,
       submitted: false
     };
   },
@@ -98,7 +97,6 @@ export default {
             schema,
             uiSchema: this.uiSchema,
             customFormats: this.customFormats,
-            additionalMetaSchemas: this.additionalMetaSchemas,
             idPrefix: this.idPrefix
           },
           formData
@@ -111,7 +109,6 @@ export default {
         this.editState = newState.edit;
         this.errorsState = newState.errors;
         this.errorSchemaState = newState.errorSchema;
-        this.additionalMetaSchemasState = newState.additionalMetaSchemas;
       },
       immediate: true
     },
@@ -174,7 +171,6 @@ export default {
         edit: this.editState,
         errors: this.errorsState,
         errorSchema: this.errorSchemaState,
-        additionalMetaSchemas: this.additionalMetaSchemasState,
         status: 'submitted'
       };
 
@@ -227,9 +223,8 @@ export default {
       const formData = getDefaultFormState(schema, inputFormData);
       const retrievedSchema = retrieveSchema(schema, formData);
       const customFormats = props.customFormats;
-      const additionalMetaSchemas = props.additionalMetaSchemas;
       const { errors, errorSchema } = mustValidate
-        ? this.doValidate(formData, schema, additionalMetaSchemas, customFormats)
+        ? this.doValidate(formData, schema, customFormats)
         : {
             errors: this.errorsState || [],
             errorSchema: this.errorSchemaState || {}
@@ -247,23 +242,16 @@ export default {
         formData,
         edit,
         errors,
-        errorSchema,
-        additionalMetaSchemas
+        errorSchema
       };
     },
-    doValidate(
-      formData,
-      schema = this.schemaState,
-      additionalMetaSchemas = this.additionalMetaSchemasState,
-      customFormats = this.customFormats
-    ) {
+    doValidate(formData, schema = this.schemaState, customFormats = this.customFormats) {
       const resolvedSchema = retrieveSchema(schema, formData);
       return validateFormData(
         formData,
         resolvedSchema,
         this.validate,
         this.transformErrors,
-        additionalMetaSchemas,
         customFormats
       );
     }

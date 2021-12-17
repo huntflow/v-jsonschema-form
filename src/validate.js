@@ -7,7 +7,6 @@ import ajvErrors from 'ajv-errors';
 import jsonpointer from 'json-pointer';
 
 let formerCustomFormats = null;
-let formerMetaSchema = null;
 
 import { isObject, mergeObjects } from './utils';
 
@@ -235,23 +234,15 @@ export default function validateFormData(
   schema,
   customValidate,
   transformErrors,
-  additionalMetaSchemas = [],
   customFormats = {}
 ) {
   // Include form data with undefined values, which is required for validation.
   formData = getDefaultFormState(schema, formData, true);
 
-  const newMetaSchemas = !deepEquals(formerMetaSchema, additionalMetaSchemas);
   const newFormats = !deepEquals(formerCustomFormats, customFormats);
 
-  if (newMetaSchemas || newFormats) {
+  if (newFormats) {
     ajv = createAjvInstance();
-  }
-
-  // add more schemas to validate against
-  if (additionalMetaSchemas && newMetaSchemas && Array.isArray(additionalMetaSchemas)) {
-    ajv.addMetaSchema(additionalMetaSchemas);
-    formerMetaSchema = additionalMetaSchemas;
   }
 
   // add more custom formats to validate against
