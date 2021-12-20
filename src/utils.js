@@ -410,7 +410,7 @@ export function optionsList(schema) {
     });
   } else {
     const altSchemas = schema.oneOf || schema.anyOf;
-    return altSchemas.map((schema, i) => {
+    return altSchemas.map((schema) => {
       const value = toConstant(schema);
       const label = schema.title || String(value);
       return { label, value };
@@ -726,16 +726,15 @@ export function shouldRender(comp, nextProps, nextState) {
   return !deepEquals(props, nextProps) || !deepEquals(state, nextState);
 }
 
-export function toIdSchema(schema, id, formData = {}, idPrefix = 'root') {
+export function toIdSchema(schema, id, idPrefix = 'root') {
   const idSchema = {
     $id: id || idPrefix
   };
   if ('dependencies' in schema) {
-    const _schema = retrieveSchema(schema, formData);
-    return toIdSchema(_schema, id, formData, idPrefix);
+    return toIdSchema(schema, id, idPrefix);
   }
   if ('items' in schema) {
-    return toIdSchema(schema.items, id, formData, idPrefix);
+    return toIdSchema(schema.items, id, idPrefix);
   }
   if (schema.type !== 'object') {
     return idSchema;
@@ -743,14 +742,7 @@ export function toIdSchema(schema, id, formData = {}, idPrefix = 'root') {
   for (const name in schema.properties || {}) {
     const field = schema.properties[name];
     const fieldId = idSchema.$id + '_' + name;
-    idSchema[name] = toIdSchema(
-      field,
-      fieldId,
-      // It's possible that formData is not an object -- this can happen if an
-      // array item has just been added, but not populated with data yet
-      (formData || {})[name],
-      idPrefix
-    );
+    idSchema[name] = toIdSchema(field, fieldId, idPrefix);
   }
   return idSchema;
 }

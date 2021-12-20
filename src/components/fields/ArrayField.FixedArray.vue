@@ -128,7 +128,7 @@ export default {
     },
     getItemIdSchema(item, index) {
       const itemIdPrefix = this.idSchema.$id + '_' + index;
-      return toIdSchema(this.getItemSchema(item, index), itemIdPrefix, item, this.idPrefix);
+      return toIdSchema(this.getItemSchema(item, index), itemIdPrefix, this.idPrefix);
     }
   }
 };

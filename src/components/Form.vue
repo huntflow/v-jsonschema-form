@@ -1,6 +1,6 @@
 <template>
   <base-form
-    v-if="dereferencedSchema"
+    v-if="isDereference"
     ref="vjsf"
     v-bind="$props"
     :schema="dereferencedSchema"
@@ -9,9 +9,10 @@
 </template>
 
 <script>
-import BaseForm from './_Form.vue';
+import { dereference } from '@/helpers/dereference';
+import { getSchemaWithDefault } from '@/helpers/schema';
+import BaseForm from './_Form';
 import { PROPS } from './form-props';
-import { dereference } from '../helpers/dereference.js';
 
 export default {
   name: 'VjsfFormWrapper',
@@ -21,13 +22,24 @@ export default {
   props: PROPS,
   data() {
     return {
-      dereferencedSchema: null
+      dereferencedSchema: null,
+      isDereference: false
     };
   },
-  mounted() {
-    dereference(this.schema).then((result) => {
-      this.dereferencedSchema = result;
-    });
+  watch: {
+    schema: {
+      immediate: true,
+      handler(schema) {
+        this.isDereference = false;
+        dereference(schema)
+          .then((result) => {
+            this.dereferencedSchema = getSchemaWithDefault(result);
+          })
+          .finally(() => {
+            this.isDereference = true;
+          });
+      }
+    }
   },
   methods: {
     submit() {

@@ -85,10 +85,7 @@ export default {
       return fieldErrorSchema;
     },
     mergedIdSchema() {
-      return mergeObjects(
-        toIdSchema(this.retrivedSchema, null, this.formData, this.idPrefix),
-        this.idSchema
-      );
+      return mergeObjects(toIdSchema(this.retrivedSchema, null, this.idPrefix), this.idSchema);
     },
     retrivedSchema() {
       return retrieveSchema(this.schema, this.formData);

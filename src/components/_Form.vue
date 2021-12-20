@@ -17,8 +17,8 @@
       v-if="shouldShowErrorList"
       :error-schema="errorSchemaState"
       :errors="errorsState"
-      :schema="schemaState"
-      :ui-schema="uiSchemaState"
+      :schema="resolvedSchema"
+      :ui-schema="uiSchema"
     />
     <component
       :is="getRegistry().fields.SchemaField"
@@ -26,10 +26,10 @@
       :error-schema="errorSchemaState"
       :form-data="formDataState"
       :id-prefix="idPrefix"
-      :id-schema="idSchemaState"
+      :id-schema="idSchema"
       :registry="getRegistry()"
-      :schema="schemaState"
-      :ui-schema="uiSchemaState"
+      :schema="resolvedSchema"
+      :ui-schema="uiSchema"
       v-on="schemaFieldEventListeners"
       @change="handleChange"
     />
@@ -37,38 +37,41 @@
 </template>
 
 <script>
-import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
 import pick from 'lodash/pick';
-import validateFormData, { toErrorList } from '../validate';
-import {
-  getDefaultFormState,
-  retrieveSchema,
-  toIdSchema,
-  getDefaultRegistry,
-  toPathSchema,
-  isObject
-} from '../utils';
+import { compileSchema, toErrorList } from '../validate';
+import { toIdSchema, getDefaultRegistry } from '../utils';
 import { removeEmptySchemaFields } from '../remove-empty-schema-fields';
 import { PROPS } from './form-props';
 import { VALIDATION_MODE } from '../constants';
+import { getDefaults, resolveSchema } from '@/helpers/schema';
 
 export default {
   name: 'VjsfForm',
   props: PROPS,
   data() {
     return {
-      schemaState: {},
-      uiSchemaState: {},
-      idSchemaState: {},
-      formDataState: {},
-      editState: false,
+      formDataState: undefined,
       errorsState: [],
       errorSchemaState: {},
       submitted: false
     };
   },
   computed: {
+    compiledSchemaData() {
+      return compileSchema({
+        schema: this.schema,
+        customFormats: this.customFormats,
+        removeAdditional: this.omitExtraData
+      });
+    },
+    resolvedSchema() {
+      const formData = this.formDataState;
+      const schema = resolveSchema(this.compiledSchemaData, formData);
+      return this.omitMissingFields ? removeEmptySchemaFields(schema, formData) : schema;
+    },
+    idSchema() {
+      return toIdSchema(this.resolvedSchema, this.uiSchema['ui:rootFieldId'], this.idPrefix);
+    },
     shouldShowErrorList() {
       return this.showErrorList !== false && this.errorsState && this.errorsState.length > 0;
     },
@@ -81,6 +84,9 @@ export default {
     canValidateByMode() {
       return !this.isStartValidateOnSubmit || (this.isStartValidateOnSubmit && this.submitted);
     },
+    isEdit() {
+      return typeof this.formDataState !== 'undefined';
+    },
     mustValidate() {
       return this.canValidateByMode && !this.noValidate && this.liveValidate;
     }
@@ -88,27 +94,18 @@ export default {
   watch: {
     formData: {
       handler(formData) {
-        const schema = this.omitMissingFields
-          ? removeEmptySchemaFields(this.schema, formData)
-          : this.schema;
+        this.formDataState = getDefaults(this.compiledSchemaData, formData);
 
-        const newState = this.getStateFromProps(
-          {
-            schema,
-            uiSchema: this.uiSchema,
-            customFormats: this.customFormats,
-            idPrefix: this.idPrefix
-          },
-          formData
-        );
+        const mustValidate = typeof formData !== 'undefined' && this.mustValidate;
+        const { errors, errorSchema } = mustValidate
+          ? this.doValidate(this.formDataState)
+          : {
+              errors: this.errorsState || [],
+              errorSchema: this.errorSchemaState || {}
+            };
 
-        this.schemaState = newState.schema;
-        this.uiSchemaState = newState.uiSchema;
-        this.idSchemaState = newState.idSchema;
-        this.formDataState = newState.formData;
-        this.editState = newState.edit;
-        this.errorsState = newState.errors;
-        this.errorSchemaState = newState.errorSchema;
+        this.errorsState = errors;
+        this.errorSchemaState = errorSchema;
       },
       immediate: true
     },
@@ -138,14 +135,6 @@ export default {
       this.submitted = true;
       let newFormData = this.formDataState;
 
-      if (this.omitExtraData === true) {
-        const retrievedSchema = retrieveSchema(this.schemaState, newFormData);
-        const pathSchema = toPathSchema(retrievedSchema, '', newFormData);
-
-        const fieldNames = getFieldNames(pathSchema, newFormData);
-        newFormData = getUsedFormData(newFormData, fieldNames);
-      }
-
       if (!this.noValidate) {
         const { errors, errorSchema } = this.doValidate(newFormData);
         if (Object.keys(errors).length > 0) {
@@ -164,11 +153,11 @@ export default {
       this.errorSchemaState = {};
 
       const submitPayload = {
-        schema: this.schemaState,
-        uiSchema: this.uiSchemaState,
-        idSchema: this.idSchemaState,
+        schema: this.resolvedSchema,
+        uiSchema: this.uiSchema,
+        idSchema: this.idSchema,
         formData: this.formDataState,
-        edit: this.editState,
+        edit: this.isEdit,
         errors: this.errorsState,
         errorSchema: this.errorSchemaState,
         status: 'submitted'
@@ -177,25 +166,10 @@ export default {
       this.$emit('submit', submitPayload, event);
     },
     handleChange(formData, newErrorSchema) {
-      if (isObject(formData) || Array.isArray(formData)) {
-        const newState = this.getStateFromProps(this.$props, formData);
-        formData = newState.formData;
-      }
-      this.formDataState = formData;
-
-      let newFormData = formData;
-
-      if (this.omitExtraData === true && this.liveOmit === true) {
-        const retrievedSchema = retrieveSchema(this.schemaState, formData);
-        const pathSchema = toPathSchema(retrievedSchema, '', formData);
-
-        const fieldNames = getFieldNames(pathSchema, formData);
-        newFormData = getUsedFormData(formData, fieldNames);
-        this.formDataState = newFormData;
-      }
+      this.formDataState = getDefaults(this.compiledSchemaData, formData);
 
       if (this.mustValidate) {
-        const { errors, errorSchema } = this.doValidate(newFormData);
+        const { errors, errorSchema } = this.doValidate(formData);
         this.errorsState = errors;
         this.errorSchemaState = errorSchema;
       } else if (!this.noValidate && newErrorSchema) {
@@ -212,85 +186,11 @@ export default {
         widgets: { ...widgets, ...this.widgets }
       };
     },
-    getStateFromProps(props, inputFormData) {
-      const schema = this.omitMissingFields
-        ? removeEmptySchemaFields(this.schema, inputFormData)
-        : this.schema;
-
-      const uiSchema = props.uiSchema;
-      const edit = typeof inputFormData !== 'undefined';
-      const mustValidate = edit && this.mustValidate;
-      const formData = getDefaultFormState(schema, inputFormData);
-      const retrievedSchema = retrieveSchema(schema, formData);
-      const customFormats = props.customFormats;
-      const { errors, errorSchema } = mustValidate
-        ? this.doValidate(formData, schema, customFormats)
-        : {
-            errors: this.errorsState || [],
-            errorSchema: this.errorSchemaState || {}
-          };
-      const idSchema = toIdSchema(
-        retrievedSchema,
-        uiSchema['ui:rootFieldId'],
-        formData,
-        props.idPrefix
-      );
-      return {
-        schema,
-        uiSchema,
-        idSchema,
-        formData,
-        edit,
-        errors,
-        errorSchema
-      };
-    },
-    doValidate(formData, schema = this.schemaState, customFormats = this.customFormats) {
-      const resolvedSchema = retrieveSchema(schema, formData);
-      return validateFormData(
-        formData,
-        resolvedSchema,
-        this.validate,
-        this.transformErrors,
-        customFormats
-      );
+    doValidate(formData) {
+      const { validate, getErrorData } = this.compiledSchemaData;
+      validate(formData);
+      return getErrorData();
     }
   }
 };
-
-function getUsedFormData(formData, fields) {
-  //for the case of a single input form
-  if (fields.length === 0 && typeof formData !== 'object') {
-    return formData;
-  }
-  let data = pick(formData, fields);
-  if (Array.isArray(formData)) {
-    return Object.keys(data).map((key) => data[key]);
-  }
-  return data;
-}
-
-function getFieldNames(pathSchema, formData) {
-  const getAllPaths = (_obj, acc = [], paths = ['']) => {
-    Object.keys(_obj).forEach((key) => {
-      if (typeof _obj[key] === 'object') {
-        let newPaths = paths.map((path) => `${path}.${key}`);
-        getAllPaths(_obj[key], acc, newPaths);
-      } else if (key === '$name' && _obj[key] !== '') {
-        paths.forEach((path) => {
-          path = path.replace(/^\./, '');
-          const formValue = get(formData, path);
-          // adds path to fieldNames if it points to a value
-          // or an empty object/array
-          if (typeof formValue !== 'object' || isEmpty(formValue)) {
-            acc.push(path);
-          }
-        });
-      }
-    });
-    return acc;
-  };
-
-  return getAllPaths(pathSchema);
-}
 </script>
