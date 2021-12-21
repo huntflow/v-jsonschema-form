@@ -2,7 +2,7 @@
   <component
     :is="fieldTemplateCls"
     :id-schema="idSchema"
-    :schema="schema"
+    :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :can-add="canAdd"
     :disabled="disabled"
@@ -49,7 +49,7 @@
 
 <script>
 import pick from 'lodash/pick';
-import { allowAdditionalItems, retrieveSchema, toIdSchema } from '../../utils';
+import { toIdSchema } from '../../utils';
 import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultFixedArrayFieldTemplate from './ArrayField.FixedArray.DefaultTemplate';
@@ -75,6 +75,7 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldFixedArray',
+  inject: ['resolveSchemaShallowly'],
   components: {
     'array-field-item': ArrayFieldItem
   },
@@ -83,19 +84,19 @@ export default {
     arrayFieldItemEventListeners() {
       return pick(this.$listeners, ['focus', 'blur', 'change-for-index', 'reorder', 'drop']);
     },
+    resolvedSchema() {
+      return this.resolveSchemaShallowly(this.schema, this.formData);
+    },
     canAdd() {
-      return canAddArrayItem(this.uiSchema, this.schema, this.formData);
+      return canAddArrayItem(this.uiSchema, this.resolvedSchema, this.formData);
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultFixedArrayFieldTemplate;
     },
     itemSchemas() {
-      return this.schema.items.map((item, index) => retrieveSchema(item, this.formData[index]));
-    },
-    additionalSchema() {
-      return allowAdditionalItems(this.schema)
-        ? retrieveSchema(this.schema.additionalItems, this.formData)
-        : null;
+      return this.resolvedSchema.items.map((item, index) =>
+        this.resolveSchemaShallowly(item, this.formData[index])
+      );
     },
     formDataItems() {
       let items = this.formData;
@@ -110,9 +111,7 @@ export default {
   methods: {
     getItemSchema(item, index) {
       const additional = index >= this.itemSchemas.length;
-      return additional
-        ? retrieveSchema(this.schema.additionalItems, item)
-        : this.itemSchemas[index];
+      return additional ? this.resolvedSchema.additionalItems : this.itemSchemas[index];
     },
     getItemErrorSchema(index) {
       return this.errorSchema ? this.errorSchema[index] : undefined;

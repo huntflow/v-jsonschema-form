@@ -1,74 +1,45 @@
 import cloneDeep from 'lodash/cloneDeep';
 import merge from 'lodash/merge';
-import omit from 'lodash/omit';
-import get from 'lodash/get';
 import jsonSchemaTraverse from 'json-schema-traverse';
 import jsonPointer from 'json-pointer';
+import shortid from 'shortid';
 import { getSchemaType } from '@/utils';
 
 jsonSchemaTraverse.keywords.if = true;
+jsonSchemaTraverse.keywords.additionalItems = true;
+jsonSchemaTraverse.keywords.prefixItems = true;
+jsonSchemaTraverse.arrayKeywords.prefixItems = true;
 
-function omitKeys(schema) {
-  return omit(schema, ['if', 'then', 'else']);
-}
+const CONDITIONAL_KEYWORDS = ['not', 'anyOf', 'oneOf', 'allOf', 'if'];
 
-export function resolveSchema({ getSchema }, data) {
-  const { schema } = getSchema();
+export function resolveSchemaShallowly(schema, { getSchema, data }) {
+  if (!schema.$id) {
+    return schema;
+  }
   let resultSchema = cloneDeep(schema);
-
-  jsonSchemaTraverse(schema, {
-    cb: {
-      post: (
-        schema,
-        currentJsonPointer,
-        rootSchema,
-        parentJsonPointer,
-        parentKeyword,
-        parentSchema,
-        property
-      ) => {
-        if (parentKeyword === 'if') {
-          jsonPointer.set(
-            resultSchema,
-            parentJsonPointer,
-            resolveIfThenElse(getSchema, parentJsonPointer, { data })
-          );
-        }
-
-        if (parentKeyword === 'allOf' && parentSchema.allOf.length === property + 1) {
-          const { allOf, ...subSchema } = jsonPointer.get(resultSchema, parentJsonPointer);
-          if (parentJsonPointer === '') {
-            resultSchema = merge(subSchema, ...allOf);
-          } else {
-            jsonPointer.set(resultSchema, parentJsonPointer, merge(subSchema, ...allOf));
-          }
-        }
-      }
+  if (resultSchema.allOf) {
+    resultSchema.allOf.forEach((cond) => {
+      merge(resultSchema, resolveSchemaShallowly(cond, { getSchema, data }));
+    });
+    delete resultSchema.allOf;
+  }
+  if (resultSchema.if) {
+    const validate = getSchema(resultSchema.if.$id);
+    if (validate(data)) {
+      merge(resultSchema, resultSchema.then);
+    } else {
+      merge(resultSchema, resultSchema.else);
     }
-  });
+    delete resultSchema.if;
+    delete resultSchema.then;
+    delete resultSchema.else;
+  }
   return resultSchema;
 }
 
-function resolveIfThenElse(getSchema, pointer, { data }) {
-  const { schema } = getSchema(`#${pointer}`);
-  const pointerParts = jsonPointer.parse(pointer);
-  const dataParts = jsonPointer.parse(pointer).filter((part, index) => {
-    if (['if', 'else', 'then', 'allOf', 'properties'].includes(part)) {
-      return false;
-    }
-    return !(!Number.isNaN(Number(part)) && pointerParts[index - 1] === 'allOf');
-  });
-  const currentData = dataParts.length ? get(data, dataParts) : data;
-  const validate = getSchema(`#${pointer}/if`);
-  if (validate(currentData)) {
-    return omitKeys(merge(schema, schema.then));
-  }
-  return omitKeys(merge(schema, schema.else));
-}
-
-export function getDefaults({ getSchema, validate }, formData) {
+export function getDefaults({ validate }, formData) {
   let data = cloneDeep(formData);
-  const { schema } = getSchema();
+  const { schema } = validate;
 
   if ([null, undefined].includes(data)) {
     switch (getSchemaType(schema)) {
@@ -78,6 +49,9 @@ export function getDefaults({ getSchema, validate }, formData) {
       case 'array':
         data = [];
         break;
+      default:
+        data = schema.default || undefined;
+        break;
     }
   }
   validate(data);
@@ -85,22 +59,30 @@ export function getDefaults({ getSchema, validate }, formData) {
   return data;
 }
 
-export function getSchemaWithDefault(schema) {
+export function getEnrichedSchema(schema) {
   let resultSchema = cloneDeep(schema);
 
   jsonSchemaTraverse(schema, {
     cb: (schema, currentJsonPointer, rootSchema, parentJsonPointer, parentKeyword) => {
-      if ('properties' !== parentKeyword || schema.hasOwnProperty('default')) {
-        return;
+      if (
+        ['properties', 'prefixItems', 'additionalItems', 'items'].includes(parentKeyword) &&
+        !schema.hasOwnProperty('default')
+      ) {
+        const schemaType = getSchemaType(schema);
+        switch (schemaType) {
+          case 'object':
+            jsonPointer.set(resultSchema, `${currentJsonPointer}/default`, {});
+            break;
+          case 'array':
+            jsonPointer.set(resultSchema, `${currentJsonPointer}/default`, []);
+            break;
+        }
       }
-      const schemaType = getSchemaType(schema);
-      switch (schemaType) {
-        case 'object':
-          jsonPointer.set(resultSchema, `${currentJsonPointer}/default`, {});
-          break;
-        case 'array':
-          jsonPointer.set(resultSchema, `${currentJsonPointer}/default`, []);
-          break;
+      if (
+        CONDITIONAL_KEYWORDS.some((cond) => schema.hasOwnProperty(cond)) ||
+        CONDITIONAL_KEYWORDS.includes(parentKeyword)
+      ) {
+        jsonPointer.set(resultSchema, `${currentJsonPointer}/$id`, shortid.generate());
       }
     }
   });

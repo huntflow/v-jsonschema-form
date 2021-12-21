@@ -10,7 +10,7 @@
 
 <script>
 import { dereference } from '@/helpers/dereference';
-import { getSchemaWithDefault } from '@/helpers/schema';
+import { getEnrichedSchema } from '@/helpers/schema';
 import BaseForm from './_Form';
 import { PROPS } from './form-props';
 
@@ -33,7 +33,7 @@ export default {
         this.isDereference = false;
         dereference(schema)
           .then((result) => {
-            this.dereferencedSchema = getSchemaWithDefault(result);
+            this.dereferencedSchema = getEnrichedSchema(result);
           })
           .finally(() => {
             this.isDereference = true;

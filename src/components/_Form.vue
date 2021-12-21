@@ -38,16 +38,22 @@
 
 <script>
 import pick from 'lodash/pick';
-import { compileSchema, toErrorList } from '../validate';
+import cloneDeep from 'lodash/cloneDeep';
+import { compileSchema, toErrorList } from '@/validate';
 import { toIdSchema, getDefaultRegistry } from '../utils';
 import { removeEmptySchemaFields } from '../remove-empty-schema-fields';
 import { PROPS } from './form-props';
 import { VALIDATION_MODE } from '../constants';
-import { getDefaults, resolveSchema } from '@/helpers/schema';
+import { getDefaults, resolveSchemaShallowly } from '@/helpers/schema';
 
 export default {
   name: 'VjsfForm',
   props: PROPS,
+  provide() {
+    return {
+      resolveSchemaShallowly: this.resolveSchemaShallowly
+    };
+  },
   data() {
     return {
       formDataState: undefined,
@@ -65,9 +71,8 @@ export default {
       });
     },
     resolvedSchema() {
-      const formData = this.formDataState;
-      const schema = resolveSchema(this.compiledSchemaData, formData);
-      return this.omitMissingFields ? removeEmptySchemaFields(schema, formData) : schema;
+      const schema = this.resolveSchemaShallowly(this.schema, this.formDataState);
+      return this.omitMissingFields ? removeEmptySchemaFields(schema, this.formDataState) : schema; // TODO: перенести в resolveSchemaShallowly и удалять так же по уровням
     },
     idSchema() {
       return toIdSchema(this.resolvedSchema, this.uiSchema['ui:rootFieldId'], this.idPrefix);
@@ -186,9 +191,13 @@ export default {
         widgets: { ...widgets, ...this.widgets }
       };
     },
+    resolveSchemaShallowly(schema, data) {
+      const { getSchema } = this.compiledSchemaData;
+      return resolveSchemaShallowly(schema, { getSchema, data: cloneDeep(data) });
+    },
     doValidate(formData) {
       const { validate, getErrorData } = this.compiledSchemaData;
-      validate(formData);
+      validate(formData); // TODO возможен сайд эффект, мутируется formData, возможно стоит юзать cloneDeep
       return getErrorData();
     }
   }

@@ -6,7 +6,7 @@
     :title-field-cls="registry.fields.TitleField"
     :description="description"
     :description-field-cls="registry.fields.DescriptionField"
-    :schema="schema"
+    :schema="resolvedSchema"
     :id-schema="idSchema"
     :ui-schema="uiSchema"
     :ordered-properties="orderedProperties"
@@ -22,7 +22,7 @@
         :key="propName"
         :name="propName"
         :required="isRequired(propName)"
-        :schema="schema.properties[propName]"
+        :schema="resolvedSchema.properties[propName]"
         :ui-schema="scopedProps.uiSchema || uiSchema[propName]"
         :error-schema="errorSchema[propName]"
         :id-schema="idSchema[propName]"
@@ -69,6 +69,7 @@ const PROPS = {
 export default {
   name: 'ObjectField',
   props: PROPS,
+  inject: ['resolveSchemaShallowly'],
   data() {
     return {
       wasPropertyKeyModified: false,
@@ -80,8 +81,11 @@ export default {
     schemaFieldEventListeners() {
       return pick(this.$listeners, ['focus', 'blur']);
     },
+    resolvedSchema() {
+      return this.resolveSchemaShallowly(this.schema, this.innerFormData);
+    },
     requiredFields() {
-      return this.schema.required || [];
+      return this.resolvedSchema.required || [];
     },
     objectFieldTemplateCls() {
       return (
@@ -94,7 +98,7 @@ export default {
       return this.registry.fields.SchemaField;
     },
     orderedProperties() {
-      const properties = Object.keys(this.schema.properties || {});
+      const properties = Object.keys(this.resolvedSchema.properties || {});
       return orderProperties(properties, this.uiSchema['ui:order']);
     }
   },
@@ -111,8 +115,7 @@ export default {
       return this.requiredFields.includes(name);
     },
     handleAdd() {
-      const schema = this.retrievedSchema;
-      let type = schema.additionalProperties.type;
+      let type = this.resolvedSchema.additionalProperties.type;
       this.innerFormData[getAvailableKey('newKey', this.innerFormData)] = getDefaultValue(type);
 
       this.$emit('change', { ...this.innerFormData });

@@ -1,5 +1,3 @@
-import validateFormData, { isValid } from './validate';
-
 export const ADDITIONAL_PROPERTY_FLAG = '__additional_property';
 
 const widgetMap = {
@@ -131,98 +129,6 @@ export function hasWidget(schema, widget, registeredWidgets = {}) {
   }
 }
 
-function computeDefaults(schema, parentDefaults, rawFormData = {}, includeUndefinedValues = false) {
-  const formData = isObject(rawFormData) ? rawFormData : {};
-  // Compute the defaults recursively: give highest priority to deepest nodes.
-  let defaults = parentDefaults;
-  if (isObject(defaults) && isObject(schema.default)) {
-    // For object defaults, only override parent defaults that are defined in
-    // schema.default.
-    defaults = mergeObjects(defaults, schema.default);
-  } else if ('default' in schema) {
-    // Use schema defaults for this node.
-    defaults = schema.default;
-  } else if ('dependencies' in schema) {
-    const resolvedSchema = resolveDependencies(schema, formData);
-    return computeDefaults(resolvedSchema, defaults, formData, includeUndefinedValues);
-  } else if (isFixedItems(schema)) {
-    defaults = schema.items.map((itemSchema) =>
-      computeDefaults(itemSchema, undefined, formData, includeUndefinedValues)
-    );
-  } else if ('oneOf' in schema) {
-    schema = schema.oneOf[getMatchingOption(undefined, schema.oneOf)];
-  } else if ('anyOf' in schema) {
-    schema = schema.anyOf[getMatchingOption(undefined, schema.anyOf)];
-  }
-
-  // Not defaults defined for this node, fallback to generic typed ones.
-  if (typeof defaults === 'undefined') {
-    defaults = schema.default;
-  }
-
-  switch (getSchemaType(schema)) {
-    // We need to recur for object schema inner default values.
-    case 'object':
-      return Object.keys(schema.properties || {}).reduce((acc, key) => {
-        // Compute the defaults for this node, with the parent defaults we might
-        // have from a previous run: defaults[key].
-        let computedDefault = computeDefaults(
-          schema.properties[key],
-          (defaults || {})[key],
-          (formData || {})[key],
-          includeUndefinedValues
-        );
-        if (includeUndefinedValues || computedDefault !== undefined) {
-          acc[key] = computedDefault;
-        }
-        return acc;
-      }, {});
-
-    case 'array':
-      if (schema.minItems) {
-        if (!isMultiSelect(schema)) {
-          const defaultsLength = defaults ? defaults.length : 0;
-          if (schema.minItems > defaultsLength) {
-            const defaultEntries = defaults || [];
-            // populate the array with the defaults
-            const fillerSchema = Array.isArray(schema.items)
-              ? schema.additionalItems
-              : schema.items;
-            const fillerEntries = new Array(schema.minItems - defaultsLength).fill(
-              computeDefaults(fillerSchema, fillerSchema.defaults)
-            );
-            // then fill up the rest with either the item default or empty, up to minItems
-
-            return defaultEntries.concat(fillerEntries);
-          }
-        } else {
-          return defaults ? defaults : [];
-        }
-      }
-  }
-  return defaults;
-}
-
-export function getDefaultFormState(_schema, formData, includeUndefinedValues = false) {
-  if (!isObject(_schema)) {
-    throw new Error('Invalid schema: ' + _schema);
-  }
-  const schema = retrieveSchema(_schema, formData);
-  const defaults = computeDefaults(schema, _schema.default, formData, includeUndefinedValues);
-  if (typeof formData === 'undefined') {
-    // No form data? Use schema defaults.
-    return defaults;
-  }
-  if (isObject(formData)) {
-    // Override schema defaults with form data.
-    return mergeObjects(defaults, formData);
-  }
-  if (formData === 0 || formData === false) {
-    return formData;
-  }
-  return formData || defaults;
-}
-
 export function getUiOptions(uiSchema) {
   // get all passed options from ui:widget, ui:options, and ui:<optionName>
   return Object.keys(uiSchema)
@@ -250,24 +156,6 @@ export function isObject(thing) {
     return false;
   }
   return typeof thing === 'object' && thing !== null && !Array.isArray(thing);
-}
-
-export function mergeObjects(obj1, obj2, concatArrays = false) {
-  // Recursively merge deeply nested objects.
-  var acc = Object.assign({}, obj1); // Prevent mutation of source object.
-  return Object.keys(obj2).reduce((acc, key) => {
-    const left = obj1 ? obj1[key] : {},
-      right = obj2[key];
-    // eslint-disable-next-line no-prototype-builtins
-    if (obj1 && obj1.hasOwnProperty(key) && isObject(right)) {
-      acc[key] = mergeObjects(left, right, concatArrays);
-    } else if (concatArrays && Array.isArray(left) && Array.isArray(right)) {
-      acc[key] = left.concat(right);
-    } else {
-      acc[key] = right;
-    }
-    return acc;
-  }, acc);
 }
 
 export function asNumber(value) {
@@ -336,18 +224,6 @@ export function orderProperties(properties, order) {
   return complete;
 }
 
-/**
- * This function checks if the given schema matches a single
- * constant value.
- */
-export function isConstant(schema) {
-  return (
-    (Array.isArray(schema.enum) && schema.enum.length === 1) ||
-    // eslint-disable-next-line no-prototype-builtins
-    schema.hasOwnProperty('const')
-  );
-}
-
 export function toConstant(schema) {
   if (Array.isArray(schema.enum) && schema.enum.length === 1) {
     return schema.enum[0];
@@ -359,15 +235,8 @@ export function toConstant(schema) {
   }
 }
 
-export function isSelect(_schema) {
-  const schema = retrieveSchema(_schema);
-  const altSchemas = schema.oneOf || schema.anyOf;
-  if (Array.isArray(schema.enum)) {
-    return true;
-  } else if (Array.isArray(altSchemas)) {
-    return altSchemas.every((altSchemas) => isConstant(altSchemas));
-  }
-  return false;
+export function isSelect(schema) {
+  return !!Array.isArray(schema.enum);
 }
 
 export function isMultiSelect(schema) {
@@ -375,16 +244,6 @@ export function isMultiSelect(schema) {
     return false;
   }
   return isSelect(schema.items);
-}
-
-export function isFilesArray(schema, uiSchema) {
-  if (uiSchema['ui:widget'] === 'files') {
-    return true;
-  } else if (schema.items) {
-    const itemsSchema = retrieveSchema(schema.items);
-    return itemsSchema.type === 'string' && itemsSchema.format === 'data-url';
-  }
-  return false;
 }
 
 export function isFixedItems(schema) {
@@ -438,267 +297,6 @@ export const guessType = function guessType(value) {
   return 'string';
 };
 
-// This function will create new "properties" items for each key in our formData
-export function stubExistingAdditionalProperties(schema, formData = {}) {
-  // Clone the schema so we don't ruin the consumer's original
-  schema = {
-    ...schema,
-    properties: { ...schema.properties }
-  };
-
-  Object.keys(formData).forEach((key) => {
-    // eslint-disable-next-line no-prototype-builtins
-    if (schema.properties.hasOwnProperty(key)) {
-      // No need to stub, our schema already has the property
-      return;
-    }
-
-    let additionalProperties;
-    // eslint-disable-next-line no-prototype-builtins
-    if (schema.additionalProperties.hasOwnProperty('type')) {
-      additionalProperties = { ...schema.additionalProperties };
-    } else {
-      additionalProperties = { type: guessType(formData[key]) };
-    }
-
-    // The type of our new key should match the additionalProperties value;
-    schema.properties[key] = additionalProperties;
-    // Set our additional property flag so we know it was dynamically added
-    schema.properties[key][ADDITIONAL_PROPERTY_FLAG] = true;
-  });
-
-  return schema;
-}
-
-export function retrieveSchema(schema, formData = {}) {
-  const resolvedSchema = resolveSchema(schema, formData);
-  const hasAdditionalProperties =
-    // eslint-disable-next-line no-prototype-builtins
-    resolvedSchema.hasOwnProperty('additionalProperties') &&
-    resolvedSchema.additionalProperties !== false;
-
-  const result = hasAdditionalProperties
-    ? stubExistingAdditionalProperties(resolvedSchema, formData)
-    : resolvedSchema;
-
-  return result;
-}
-
-export function resolveSchema(schema, formData = {}) {
-  // complex field and availableOn feature support
-  if (schema.allOf && schema.properties) {
-    const newProperties = schema.allOf.reduce((acc, allOfItem) => {
-      if (!allOfItem.if) {
-        return newProperties;
-      }
-
-      const thenProps = allOfItem.then?.properties || {};
-      const elseProps = allOfItem.else?.properties || {};
-      const isTruthy = isValid(allOfItem.if, formData);
-      const matchedProps = isTruthy ? thenProps : elseProps;
-
-      return {
-        ...acc,
-        ...matchedProps
-      };
-    }, schema.properties);
-
-    return {
-      ...schema,
-      properties: newProperties
-    };
-  }
-
-  // eslint-disable-next-line no-prototype-builtins
-  if (schema.hasOwnProperty('dependencies')) {
-    const resolvedSchema = resolveDependencies(schema, formData);
-    return retrieveSchema(resolvedSchema, formData);
-  } else {
-    // No $ref or dependencies attribute found, returning the original schema.
-    return schema;
-  }
-}
-
-function resolveDependencies(schema, formData) {
-  // Drop the dependencies from the source schema.
-  let { dependencies = {}, ...resolvedSchema } = schema;
-  if ('oneOf' in resolvedSchema) {
-    resolvedSchema = resolvedSchema.oneOf[getMatchingOption(formData, resolvedSchema.oneOf)];
-  } else if ('anyOf' in resolvedSchema) {
-    resolvedSchema = resolvedSchema.anyOf[getMatchingOption(formData, resolvedSchema.anyOf)];
-  }
-  return processDependencies(dependencies, resolvedSchema, formData);
-}
-function processDependencies(dependencies, resolvedSchema, formData) {
-  // Process dependencies updating the local schema properties as appropriate.
-  for (const dependencyKey in dependencies) {
-    // Skip this dependency if its trigger property is not present.
-    if (formData[dependencyKey] === undefined) {
-      continue;
-    }
-    // Skip this dependency if it is not included in the schema (such as when dependencyKey is itself a hidden dependency.)
-    if (resolvedSchema.properties && !(dependencyKey in resolvedSchema.properties)) {
-      continue;
-    }
-    const { [dependencyKey]: dependencyValue, ...remainingDependencies } = dependencies;
-    if (Array.isArray(dependencyValue)) {
-      resolvedSchema = withDependentProperties(resolvedSchema, dependencyValue);
-    } else if (isObject(dependencyValue)) {
-      resolvedSchema = withDependentSchema(
-        resolvedSchema,
-        formData,
-        dependencyKey,
-        dependencyValue
-      );
-    }
-    return processDependencies(remainingDependencies, resolvedSchema, formData);
-  }
-  return resolvedSchema;
-}
-
-function withDependentProperties(schema, additionallyRequired) {
-  if (!additionallyRequired) {
-    return schema;
-  }
-  const required = Array.isArray(schema.required)
-    ? Array.from(new Set([...schema.required, ...additionallyRequired]))
-    : additionallyRequired;
-  return { ...schema, required: required };
-}
-
-function withDependentSchema(schema, formData, dependencyKey, dependencyValue) {
-  let { oneOf, ...dependentSchema } = retrieveSchema(dependencyValue, formData);
-  schema = mergeSchemas(schema, dependentSchema);
-  // Since it does not contain oneOf, we return the original schema.
-  if (oneOf === undefined) {
-    return schema;
-  } else if (!Array.isArray(oneOf)) {
-    throw new Error(`invalid: it is some ${typeof oneOf} instead of an array`);
-  }
-
-  return withExactlyOneSubschema(schema, formData, dependencyKey, oneOf);
-}
-
-function withExactlyOneSubschema(schema, formData, dependencyKey, oneOf) {
-  const validSubschemas = oneOf.filter((subschema) => {
-    if (!subschema.properties) {
-      return false;
-    }
-    const { [dependencyKey]: conditionPropertySchema } = subschema.properties;
-    if (conditionPropertySchema) {
-      const conditionSchema = {
-        type: 'object',
-        properties: {
-          [dependencyKey]: conditionPropertySchema
-        }
-      };
-      const { errors } = validateFormData(formData, conditionSchema);
-      return errors.length === 0;
-    }
-  });
-
-  if (validSubschemas.length !== 1) {
-    console.warn(
-      "ignoring oneOf in dependencies because there isn't exactly one subschema that is valid"
-    );
-    return schema;
-  }
-  const subschema = validSubschemas[0];
-  const { [dependencyKey]: conditionPropertySchema, ...dependentSubschema } = subschema.properties;
-  const dependentSchema = { ...subschema, properties: dependentSubschema };
-  return mergeSchemas(schema, retrieveSchema(dependentSchema, formData));
-}
-
-function mergeSchemas(schema1, schema2) {
-  return mergeObjects(schema1, schema2, true);
-}
-
-function isArguments(object) {
-  return Object.prototype.toString.call(object) === '[object Arguments]';
-}
-
-export function deepEquals(a, b, ca = [], cb = []) {
-  // Partially extracted from node-deeper and adapted to exclude comparison
-  // checks for functions.
-  // https://github.com/othiym23/node-deeper
-  if (a === b) {
-    return true;
-  } else if (typeof a === 'function' || typeof b === 'function') {
-    // Assume all functions are equivalent
-    // see https://github.com/mozilla-services/react-jsonschema-form/issues/255
-    return true;
-  } else if (typeof a !== 'object' || typeof b !== 'object') {
-    return false;
-  } else if (a === null || b === null) {
-    return false;
-  } else if (a instanceof Date && b instanceof Date) {
-    return a.getTime() === b.getTime();
-  } else if (a instanceof RegExp && b instanceof RegExp) {
-    return (
-      a.source === b.source &&
-      a.global === b.global &&
-      a.multiline === b.multiline &&
-      a.lastIndex === b.lastIndex &&
-      a.ignoreCase === b.ignoreCase
-    );
-  } else if (isArguments(a) || isArguments(b)) {
-    if (!(isArguments(a) && isArguments(b))) {
-      return false;
-    }
-    let slice = Array.prototype.slice;
-    return deepEquals(slice.call(a), slice.call(b), ca, cb);
-  } else {
-    if (a.constructor !== b.constructor) {
-      return false;
-    }
-
-    let ka = Object.keys(a);
-    let kb = Object.keys(b);
-    // don't bother with stack acrobatics if there's nothing there
-    if (ka.length === 0 && kb.length === 0) {
-      return true;
-    }
-    if (ka.length !== kb.length) {
-      return false;
-    }
-
-    let cal = ca.length;
-    while (cal--) {
-      if (ca[cal] === a) {
-        return cb[cal] === b;
-      }
-    }
-    ca.push(a);
-    cb.push(b);
-
-    ka.sort();
-    kb.sort();
-    for (var j = ka.length - 1; j >= 0; j--) {
-      if (ka[j] !== kb[j]) {
-        return false;
-      }
-    }
-
-    let key;
-    for (let k = ka.length - 1; k >= 0; k--) {
-      key = ka[k];
-      if (!deepEquals(a[key], b[key], ca, cb)) {
-        return false;
-      }
-    }
-
-    ca.pop();
-    cb.pop();
-
-    return true;
-  }
-}
-
-export function shouldRender(comp, nextProps, nextState) {
-  const { props, state } = comp;
-  return !deepEquals(props, nextProps) || !deepEquals(state, nextState);
-}
-
 export function toIdSchema(schema, id, idPrefix = 'root') {
   const idSchema = {
     $id: id || idPrefix
@@ -720,116 +318,6 @@ export function toIdSchema(schema, id, idPrefix = 'root') {
   return idSchema;
 }
 
-export function toPathSchema(schema, name = '', formData = {}) {
-  const pathSchema = {
-    $name: name.replace(/^\./, '')
-  };
-  if ('dependencies' in schema) {
-    const _schema = retrieveSchema(schema, formData);
-    return toPathSchema(_schema, name, formData);
-  }
-  // eslint-disable-next-line no-prototype-builtins
-  if (schema.hasOwnProperty('items') && Array.isArray(formData)) {
-    formData.forEach((element, i) => {
-      pathSchema[i] = toPathSchema(schema.items, `${name}.${i}`, element);
-    });
-    // eslint-disable-next-line no-prototype-builtins
-  } else if (schema.hasOwnProperty('properties')) {
-    for (const property in schema.properties) {
-      pathSchema[property] = toPathSchema(
-        schema.properties[property],
-        `${name}.${property}`,
-        // It's possible that formData is not an object -- this can happen if an
-        // array item has just been added, but not populated with data yet
-        (formData || {})[property]
-      );
-    }
-  }
-  return pathSchema;
-}
-
-export function parseDateString(dateString, includeTime = true) {
-  if (!dateString) {
-    return {
-      year: -1,
-      month: -1,
-      day: -1,
-      hour: includeTime ? -1 : 0,
-      minute: includeTime ? -1 : 0,
-      second: includeTime ? -1 : 0
-    };
-  }
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) {
-    throw new Error('Unable to parse date ' + dateString);
-  }
-  return {
-    year: date.getUTCFullYear(),
-    month: date.getUTCMonth() + 1, // oh you, javascript.
-    day: date.getUTCDate(),
-    hour: includeTime ? date.getUTCHours() : 0,
-    minute: includeTime ? date.getUTCMinutes() : 0,
-    second: includeTime ? date.getUTCSeconds() : 0
-  };
-}
-
-export function toDateString({ year, month, day, hour = 0, minute = 0, second = 0 }, time = true) {
-  const utcTime = Date.UTC(year, month - 1, day, hour, minute, second);
-  const datetime = new Date(utcTime).toJSON();
-  return time ? datetime : datetime.slice(0, 10);
-}
-
-export function pad(num, size) {
-  let s = String(num);
-  while (s.length < size) {
-    s = '0' + s;
-  }
-  return s;
-}
-
-export function setState(instance, state, callback) {
-  const { safeRenderCompletion } = instance.props;
-  if (safeRenderCompletion) {
-    instance.setState(state, callback);
-  } else {
-    instance.setState(state);
-    setImmediate(callback);
-  }
-}
-
-export function dataURItoBlob(dataURI) {
-  // Split metadata from data
-  const splitted = dataURI.split(',');
-  // Split params
-  const params = splitted[0].split(';');
-  // Get mime-type from params
-  const type = params[0].replace('data:', '');
-  // Filter the name property from params
-  const properties = params.filter((param) => {
-    return param.split('=')[0] === 'name';
-  });
-  // Look for the name and use unknown if no name property.
-  let name;
-  if (properties.length !== 1) {
-    name = 'unknown';
-  } else {
-    // Because we filtered out the other property,
-    // we only have the name case here.
-    name = properties[0].split('=')[1];
-  }
-
-  // Built the Uint8Array Blob parameter from the base64 string.
-  const binary = atob(splitted[1]);
-  const array = [];
-  for (let i = 0; i < binary.length; i++) {
-    array.push(binary.charCodeAt(i));
-  }
-  // Create the blob object
-  const blob = new window.Blob([new Uint8Array(array)], { type });
-
-  return { blob, name };
-}
-
 export function rangeSpec(schema) {
   const spec = {};
   if (schema.multipleOf) {
@@ -842,13 +330,4 @@ export function rangeSpec(schema) {
     spec.max = schema.maximum;
   }
   return spec;
-}
-
-export function getMatchingOption(formData, options) {
-  for (let i = 0; i < options.length; i++) {
-    if (isValid(options[i], formData)) {
-      return i;
-    }
-  }
-  return 0;
 }

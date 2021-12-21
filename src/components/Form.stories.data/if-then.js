@@ -8,6 +8,36 @@ const schema = {
     field_b: {
       default: '1',
       enum: ['1', '2']
+    },
+    field_c: {
+      type: 'object',
+      required: ['title'],
+      properties: {
+        title: {
+          type: 'string',
+          title: 'Title',
+          description: 'A sample title'
+        },
+        details: {
+          type: 'string',
+          title: 'Task details',
+          description: 'Enter the task details'
+        }
+      },
+      allOf: [
+        {
+          if: {
+            properties: {
+              title: { const: 'qwe' }
+            },
+            required: ['title']
+          },
+          then: {
+            properties: { dependency_c_1: { type: 'string' } },
+            required: ['dependency_c_1']
+          }
+        }
+      ]
     }
   },
   allOf: [

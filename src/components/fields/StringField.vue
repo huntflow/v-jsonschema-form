@@ -3,7 +3,7 @@
     :is="widgetCls"
     :id="idSchema && idSchema.$id"
     :options="widgetOptions"
-    :schema="schema"
+    :schema="resolvedSchema"
     :label="label"
     :description="description"
     :value="formData"
@@ -41,20 +41,24 @@ const PROPS = {
 
 export default {
   name: 'StringField',
+  inject: ['resolveSchemaShallowly'],
   props: PROPS,
   computed: {
+    resolvedSchema() {
+      return this.resolveSchemaShallowly(this.schema, this.formData);
+    },
     enumOptions() {
-      return isSelect(this.schema) && optionsList(this.schema);
+      return isSelect(this.resolvedSchema) && optionsList(this.resolvedSchema);
     },
     widgetCls() {
-      const { format } = this.schema;
+      const { format } = this.resolvedSchema;
       const { widgets } = this.registry;
       let defaultWidget = this.enumOptions ? 'select' : 'text';
-      if (format && hasWidget(this.schema, format, widgets)) {
+      if (format && hasWidget(this.resolvedSchema, format, widgets)) {
         defaultWidget = format;
       }
       const { widget = defaultWidget } = getUiOptions(this.uiSchema);
-      return getWidget(this.schema, widget, widgets);
+      return getWidget(this.resolvedSchema, widget, widgets);
     },
     widgetOptions() {
       const {
