@@ -10,8 +10,7 @@ jsonSchemaTraverse.keywords.additionalItems = true;
 jsonSchemaTraverse.keywords.prefixItems = true;
 jsonSchemaTraverse.arrayKeywords.prefixItems = true;
 
-const ARRAY_CONDITIONAL_KEYWORDS = [/*'anyOf', 'oneOf',*/ 'allOf'];
-const CONDITIONAL_KEYWORDS = [/*'not',*/ 'if'];
+const CONDITIONAL_KEYWORDS = [/*'not', 'anyOf', 'oneOf',*/ 'allOf', 'if'];
 
 export function resolveSchemaShallowly(schema, { getSchema, data }) {
   if (!schema.$id) {
@@ -83,7 +82,7 @@ export function getEnrichedSchema(schema) {
       }
       if (
         CONDITIONAL_KEYWORDS.some((cond) => schema.hasOwnProperty(cond)) ||
-        ARRAY_CONDITIONAL_KEYWORDS.includes(parentKeyword)
+        CONDITIONAL_KEYWORDS.includes(parentKeyword)
       ) {
         jsonPointer.set(resultSchema, `${currentJsonPointer}/$id`, shortid.generate());
       }
