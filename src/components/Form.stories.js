@@ -24,10 +24,26 @@ storiesOf('JsonForm', JsonForm)
       return autofocus;
     }
   }))
+  .add('autofocus (exclude missing fields)', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    data() {
+      return autofocus;
+    }
+  }))
   .add('custom format', () => ({
     components,
     template:
       '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" :custom-formats="customFormats" live-validate></json-form>',
+    data() {
+      return customFormat;
+    }
+  }))
+  .add('custom format (exclude missing fields)', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" :custom-formats="customFormats" live-validate omit-missing-fields></json-form>',
     data() {
       return customFormat;
     }
@@ -40,10 +56,26 @@ storiesOf('JsonForm', JsonForm)
       return ifThen;
     }
   }))
+  .add('If then (exclude missing fields)', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    data() {
+      return ifThen;
+    }
+  }))
   .add('Simple', () => ({
     components,
     template:
       '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    data() {
+      return simpleData;
+    }
+  }))
+  .add('Simple (exclude missing fields)', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
     data() {
       return simpleData;
     }
@@ -56,10 +88,26 @@ storiesOf('JsonForm', JsonForm)
       return simpleData;
     }
   }))
+  .add('Start validate after form submitted (exclude missing fields)', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate start-validate-mode="onSubmit" omit-missing-fields></json-form>',
+    data() {
+      return simpleData;
+    }
+  }))
   .add('Nested', () => ({
     components,
     template:
       '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    data() {
+      return nestedData;
+    }
+  }))
+  .add('Nested (exclude missing fields)', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
     data() {
       return nestedData;
     }
@@ -72,10 +120,26 @@ storiesOf('JsonForm', JsonForm)
       return arraysData;
     }
   }))
+  .add('Arrays (exclude missing fields)', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    data() {
+      return arraysData;
+    }
+  }))
   .add('Ordering', () => ({
     components,
     template:
       '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    data() {
+      return orderingData;
+    }
+  }))
+  .add('Ordering (exclude missing fields)', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
     data() {
       return orderingData;
     }
@@ -88,6 +152,14 @@ storiesOf('JsonForm', JsonForm)
       return referencesData;
     }
   }))
+  .add('References (exclude missing fields)', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    data() {
+      return referencesData;
+    }
+  }))
   .add('Numbers', () => ({
     components,
     template:
@@ -96,10 +168,26 @@ storiesOf('JsonForm', JsonForm)
       return numbersData;
     }
   }))
+  .add('Numbers (exclude missing fields)', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    data() {
+      return numbersData;
+    }
+  }))
   .add('Any of', () => ({
     components,
     template:
       '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    data() {
+      return anyOfData;
+    }
+  }))
+  .add('Any of (exclude missing fields)', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
     data() {
       return anyOfData;
     }

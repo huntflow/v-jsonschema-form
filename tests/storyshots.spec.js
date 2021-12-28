@@ -4,11 +4,11 @@ import registerRequireContextHook from 'babel-plugin-require-context-hook/regist
 
 registerRequireContextHook();
 
-const beforeScreenshot = (page, { context: { kind, story }, url }) => {
+const beforeScreenshot = () => {
   return new Promise((resolve) =>
     setTimeout(() => {
       resolve();
-    }, 200)
+    }, 100)
   );
 };
 
