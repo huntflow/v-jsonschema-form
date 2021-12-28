@@ -7,21 +7,6 @@ const schema = {
           type: 'string',
           default: 'Default name'
         }
-      },
-      if: {
-        properties: {
-          name: {
-            const: 'qwe'
-          }
-        }
-      },
-      then: {
-        properties: {
-          lastName: {
-            type: 'string',
-            default: 'eeeee'
-          }
-        }
       }
     }
   },
