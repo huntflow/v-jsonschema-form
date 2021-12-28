@@ -99,7 +99,7 @@ export default {
   watch: {
     formData: {
       handler(formData) {
-        this.formDataState = getDefaults(this.compiledSchemaData, formData);
+        this.formDataState = this.enrichFormData(formData);
 
         const mustValidate = typeof formData !== 'undefined' && this.mustValidate;
         const { errors, errorSchema } = mustValidate
@@ -171,10 +171,10 @@ export default {
       this.$emit('submit', submitPayload, event);
     },
     handleChange(formData, newErrorSchema) {
-      this.formDataState = getDefaults(this.compiledSchemaData, formData);
+      this.formDataState = this.enrichFormData(formData);
 
       if (this.mustValidate) {
-        const { errors, errorSchema } = this.doValidate(formData);
+        const { errors, errorSchema } = this.doValidate(this.formDataState);
         this.errorsState = errors;
         this.errorSchemaState = errorSchema;
       } else if (!this.noValidate && newErrorSchema) {
@@ -191,13 +191,17 @@ export default {
         widgets: { ...widgets, ...this.widgets }
       };
     },
+    enrichFormData(formData) {
+      // непонятно нужно ли нам учитывать дефолтные значения с флагом omitMissingFields (режим просмотра)
+      return this.omitMissingFields ? formData : getDefaults(this.compiledSchemaData, formData);
+    },
     resolveSchemaShallowly(schema, data) {
       const { getSchema } = this.compiledSchemaData;
       return resolveSchemaShallowly(schema, { getSchema, data: cloneDeep(data) });
     },
     doValidate(formData) {
       const { validate, getErrorData } = this.compiledSchemaData;
-      validate(formData); // TODO возможен сайд эффект, мутируется formData, возможно стоит юзать cloneDeep
+      validate(cloneDeep(formData));
       return getErrorData();
     }
   }
