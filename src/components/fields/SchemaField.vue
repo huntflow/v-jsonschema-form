@@ -9,7 +9,7 @@
     :description="description"
     :readonly="isReadOnly"
     :required="required"
-    :schema="retrivedSchema"
+    :schema="resolvedSchema"
   >
     <component
       :is="fieldCls"
@@ -27,7 +27,7 @@
       :readonly="isReadOnly"
       :registry="registry"
       :required="required"
-      :schema="retrivedSchema"
+      :schema="resolvedSchema"
       :ui-schema="{ ...uiSchema, class: undefined }"
       :was-property-key-modified="wasPropertyKeyModified"
       v-on="fieldEventListeners"
@@ -37,7 +37,8 @@
 
 <script>
 import pick from 'lodash/pick';
-import { isSelect, retrieveSchema, toIdSchema, mergeObjects, getSchemaType } from '../../utils';
+import merge from 'lodash/merge';
+import { toIdSchema, getSchemaType } from '../../utils';
 
 import DefaultTemplate from './SchemaField.DefaultTemplate.vue';
 
@@ -60,6 +61,7 @@ const PROPS = {
 export default {
   name: 'SchemaField',
   props: PROPS,
+  inject: ['resolveSchemaShallowly'],
   computed: {
     fieldEventListeners() {
       return pick(this.$listeners, ['drop-property', 'key-change', 'focus', 'blur', 'change']);
@@ -70,12 +72,6 @@ export default {
     oneOfFieldEventListeners() {
       return pick(this.$listeners, ['focus', 'blur', 'change']);
     },
-    isAnyOf() {
-      return this.schema.anyOf && !isSelect(this.schema);
-    },
-    isOneOf() {
-      return this.schema.oneOf && !isSelect(this.schema);
-    },
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);
     },
@@ -84,14 +80,11 @@ export default {
       const { __errors, ...fieldErrorSchema } = this.errorSchema;
       return fieldErrorSchema;
     },
-    mergedIdSchema() {
-      return mergeObjects(
-        toIdSchema(this.retrivedSchema, null, this.formData, this.idPrefix),
-        this.idSchema
-      );
+    resolvedSchema() {
+      return this.resolveSchemaShallowly(this.schema, this.formData);
     },
-    retrivedSchema() {
-      return retrieveSchema(this.schema, this.formData);
+    mergedIdSchema() {
+      return merge(toIdSchema(this.resolvedSchema, null, this.idPrefix), this.idSchema);
     },
     isHidden() {
       return this.uiSchema['ui:widget'] === 'hidden';
@@ -100,12 +93,7 @@ export default {
       return this.disabled || this.uiSchema['ui:disabled'];
     },
     isReadOnly() {
-      return Boolean(
-        this.readonly ||
-          this.uiSchema['ui:readonly'] ||
-          this.schema.readOnly ||
-          this.retrivedSchema.readOnly
-      );
+      return Boolean(this.readonly || this.uiSchema['ui:readonly'] || this.resolvedSchema.readOnly);
     },
     title() {
       // If this schema has a title defined, but the user has set a new key/label, retain their input.
@@ -113,22 +101,18 @@ export default {
         return this.name;
       }
       return (
-        this.uiSchema['ui:title'] ?? this.schema.title ?? this.retrivedSchema.title ?? '' // this.name
+        this.uiSchema['ui:title'] ?? this.resolvedSchema.title ?? '' // this.name
       );
     },
     description() {
-      return (
-        this.uiSchema['ui:description'] ||
-        this.schema.description ||
-        this.retrivedSchema.description
-      );
+      return this.uiSchema['ui:description'] || this.resolvedSchema.description;
     },
     errors() {
       return (this.errorSchema.__errors || []).filter(Boolean);
     },
     fieldCls() {
       return getFieldComponent(
-        this.retrivedSchema,
+        this.resolvedSchema,
         this.uiSchema,
         this.mergedIdSchema,
         this.registry.fields

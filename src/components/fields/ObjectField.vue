@@ -6,7 +6,7 @@
     :title-field-cls="registry.fields.TitleField"
     :description="description"
     :description-field-cls="registry.fields.DescriptionField"
-    :schema="retrivedSchema"
+    :schema="resolvedSchema"
     :id-schema="idSchema"
     :ui-schema="uiSchema"
     :ordered-properties="orderedProperties"
@@ -22,12 +22,8 @@
         :key="propName"
         :name="propName"
         :required="isRequired(propName)"
-        :schema="retrivedSchema.properties[propName]"
-        :ui-schema="
-          isAddedByAdditionalProperties(propName)
-            ? uiSchema.additionalProperties
-            : scopedProps.uiSchema || uiSchema[propName]
-        "
+        :schema="resolvedSchema.properties[propName]"
+        :ui-schema="scopedProps.uiSchema || uiSchema[propName]"
         :error-schema="errorSchema[propName]"
         :id-schema="idSchema[propName]"
         :id-prefix="idPrefix"
@@ -49,12 +45,7 @@
 <script>
 import pick from 'lodash/pick';
 import DefaultObjectFieldTemplate from './ObjectField.DefaultTemplate.vue';
-import {
-  orderProperties,
-  retrieveSchema,
-  ADDITIONAL_PROPERTY_FLAG,
-  getCurrentRequired
-} from '../../utils';
+import { orderProperties } from '../../utils';
 
 const PROPS = {
   name: String,
@@ -78,6 +69,7 @@ const PROPS = {
 export default {
   name: 'ObjectField',
   props: PROPS,
+  inject: ['resolveSchemaShallowly'],
   data() {
     return {
       wasPropertyKeyModified: false,
@@ -89,11 +81,11 @@ export default {
     schemaFieldEventListeners() {
       return pick(this.$listeners, ['focus', 'blur']);
     },
-    retrivedSchema() {
-      return retrieveSchema(this.schema, this.innerFormData);
+    resolvedSchema() {
+      return this.resolveSchemaShallowly(this.schema, this.innerFormData);
     },
     requiredFields() {
-      return getCurrentRequired(this.schema, this.innerFormData);
+      return this.resolvedSchema.required || [];
     },
     objectFieldTemplateCls() {
       return (
@@ -106,7 +98,7 @@ export default {
       return this.registry.fields.SchemaField;
     },
     orderedProperties() {
-      const properties = Object.keys(this.retrivedSchema.properties || {});
+      const properties = Object.keys(this.resolvedSchema.properties || {});
       return orderProperties(properties, this.uiSchema['ui:order']);
     }
   },
@@ -122,32 +114,13 @@ export default {
     isRequired(name) {
       return this.requiredFields.includes(name);
     },
-    isAddedByAdditionalProperties(name) {
-      return (
-        this.retrivedSchema.properties[name]
-          // eslint-disable-next-line no-prototype-builtins
-          .hasOwnProperty(ADDITIONAL_PROPERTY_FLAG)
-      );
-    },
     handleAdd() {
-      const schema = this.retrievedSchema;
-      let type = schema.additionalProperties.type;
+      let type = this.resolvedSchema.additionalProperties.type;
       this.innerFormData[getAvailableKey('newKey', this.innerFormData)] = getDefaultValue(type);
 
       this.$emit('change', { ...this.innerFormData });
     },
     handlePropertyChange(name, value, errorSchema) {
-      if (!value && this.isAddedByAdditionalProperties(name)) {
-        // Don't set value = undefined for fields added by
-        // additionalProperties. Doing so removes them from the
-        // formData, which causes them to completely disappear
-        // (including the input field for the property name). Unlike
-        // fields which are "mandated" by the schema, these fields can
-        // be set to undefined by clicking a "delete field" button, so
-        // set empty values to the empty string.
-        value = '';
-      }
-
       this.innerFormData[name] = value;
       this.$emit(
         'change',

@@ -4,7 +4,7 @@
     :id="idSchema && idSchema.$id"
     multiple
     :options="widgetWithOptions.options"
-    :schema="schema"
+    :schema="resolvedSchema"
     :registry="registry"
     :value="formData"
     :disabled="disabled"
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { getWidget, getUiOptions, optionsList, retrieveSchema } from '../../utils';
+import { getWidget, getUiOptions, optionsList } from '../../utils';
 
 const PROPS = {
   label: String,
@@ -42,13 +42,17 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldMultiSelect',
+  inject: ['resolveSchemaShallowly'],
   props: PROPS,
   computed: {
+    resolvedSchema() {
+      return this.resolveSchemaShallowly(this.schema, this.formData);
+    },
     widgetCls() {
-      return getWidget(this.schema, this.widgetWithOptions.widget, this.registry.widgets);
+      return getWidget(this.resolvedSchema, this.widgetWithOptions.widget, this.registry.widgets);
     },
     widgetWithOptions() {
-      const itemsSchema = retrieveSchema(this.schema.items, this.formData);
+      const itemsSchema = this.resolveSchemaShallowly(this.resolvedSchema.items, this.formData);
       const enumOptions = optionsList(itemsSchema);
       const { widget = 'select', ...options } = {
         ...getUiOptions(this.uiSchema),

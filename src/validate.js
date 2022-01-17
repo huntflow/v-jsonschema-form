@@ -1,25 +1,26 @@
 import toPath from 'lodash/toPath';
 import Ajv from 'ajv';
 import get from 'lodash/get';
-let ajv = createAjvInstance();
-import { deepEquals, getDefaultFormState } from './utils';
-import ajvErrors from 'ajv-errors';
+// import ajvErrors from 'ajv-errors';
 import jsonpointer from 'json-pointer';
 
-let formerCustomFormats = null;
-let formerMetaSchema = null;
-
-import { isObject, mergeObjects } from './utils';
-
-function createAjvInstance() {
+export function compileSchema({
+  schema,
+  customFormats = {},
+  transformErrors,
+  removeAdditional = false
+}) {
   const ajv = new Ajv({
     allErrors: true,
     verbose: true,
+    removeAdditional,
+    strictSchema: false, // т.к. мы валидируем вложенную структуру, то может ругаться на `default` свойство, если оно на корневом объекте
+    useDefaults: 'empty',
     multipleOfPrecision: 8
   });
-  ajvErrors(ajv /*, {singleError: true} */); // todo: check if it's needed
 
-  ajv.addKeyword('valid_against_value', {
+  ajv.addKeyword({
+    keyword: 'valid_against_value',
     validate: function validAgainstValue(kwValue, data) {
       const expectedValues = Array.isArray(kwValue.value) ? kwValue.value : [kwValue.value];
       const values = Array.isArray(data) ? data : [data];
@@ -34,7 +35,8 @@ function createAjvInstance() {
     }
   });
 
-  ajv.addKeyword('valid_against_dictionary', {
+  ajv.addKeyword({
+    keyword: 'valid_against_dictionary',
     validate: function validAgainstDictionary(kwValue, data) {
       const expectedValues = Array.isArray(kwValue.value) ? kwValue.value : [kwValue.value];
       const fields = (Array.isArray(data) ? data : [data]).map((dictFieldId) => {
@@ -51,7 +53,8 @@ function createAjvInstance() {
     }
   });
 
-  ajv.addKeyword('isNotEmpty', {
+  ajv.addKeyword({
+    keyword: 'isNotEmpty',
     errors: true,
     validate: function isNotEmpty(value, data) {
       if (!value) {
@@ -76,14 +79,33 @@ function createAjvInstance() {
     }
   });
 
-  // add custom formats
   ajv.addFormat('data-url', /^data:([a-z]+\/[a-z0-9-+.]+)?;(?:name=(.*);)?base64,(.*)$/);
   ajv.addFormat(
     'color',
     /^(#?([0-9A-Fa-f]{3}){1,2}\b|aqua|black|blue|fuchsia|gray|green|lime|maroon|navy|olive|orange|purple|red|silver|teal|white|yellow|(rgb\(\s*\b([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\b\s*,\s*\b([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\b\s*,\s*\b([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\b\s*\))|(rgb\(\s*(\d?\d%|100%)+\s*,\s*(\d?\d%|100%)+\s*,\s*(\d?\d%|100%)+\s*\)))$/
   );
   ajv.addFormat('uri', /^[a-z]+:\/\/([^/:]+)(:[0-9]+)?(\/.*)?$/);
-  return ajv;
+
+  Object.keys(customFormats).forEach((formatName) => {
+    ajv.addFormat(formatName, customFormats[formatName]);
+  });
+
+  const validate = ajv.compile(schema);
+
+  return {
+    validate,
+    getSchema: ajv.getSchema.bind(ajv),
+    getErrorData() {
+      let errors = transformAjvErrors(validate.errors);
+      if (typeof transformErrors === 'function') {
+        errors = transformErrors(errors);
+      }
+
+      let errorSchema = toErrorSchema(errors);
+
+      return { errors, errorSchema };
+    }
+  };
 }
 
 function toErrorSchema(errors) {
@@ -159,40 +181,6 @@ export function toErrorList(errorSchema, fieldName = 'root') {
   }, errorList);
 }
 
-function createErrorHandler(formData) {
-  const handler = {
-    // We store the list of errors for this node in a property named __errors
-    // to avoid name collision with a possible sub schema field named
-    // "errors" (see `utils.toErrorSchema`).
-    __errors: [],
-    addError(message) {
-      this.__errors.push(message);
-    }
-  };
-  if (isObject(formData)) {
-    return Object.keys(formData).reduce((acc, key) => {
-      return { ...acc, [key]: createErrorHandler(formData[key]) };
-    }, handler);
-  }
-  if (Array.isArray(formData)) {
-    return formData.reduce((acc, value, key) => {
-      return { ...acc, [key]: createErrorHandler(value) };
-    }, handler);
-  }
-  return handler;
-}
-
-function unwrapErrorHandler(errorHandler) {
-  return Object.keys(errorHandler).reduce((acc, key) => {
-    if (key === 'addError') {
-      return acc;
-    } else if (key === '__errors') {
-      return { ...acc, [key]: errorHandler[key] };
-    }
-    return { ...acc, [key]: unwrapErrorHandler(errorHandler[key]) };
-  }, {});
-}
-
 /**
  * Transforming the error output from ajv to format used by jsonschema.
  * At some point, components should be updated to support ajv.
@@ -223,116 +211,4 @@ function transformAjvErrors(errors = []) {
       schemaPath
     };
   });
-}
-
-/**
- * This function processes the formData with a user `validate` contributed
- * function, which receives the form data and an `errorHandler` object that
- * will be used to add custom validation errors for each field.
- */
-export default function validateFormData(
-  formData,
-  schema,
-  customValidate,
-  transformErrors,
-  additionalMetaSchemas = [],
-  customFormats = {}
-) {
-  // Include form data with undefined values, which is required for validation.
-  formData = getDefaultFormState(schema, formData, true);
-
-  const newMetaSchemas = !deepEquals(formerMetaSchema, additionalMetaSchemas);
-  const newFormats = !deepEquals(formerCustomFormats, customFormats);
-
-  if (newMetaSchemas || newFormats) {
-    ajv = createAjvInstance();
-  }
-
-  // add more schemas to validate against
-  if (additionalMetaSchemas && newMetaSchemas && Array.isArray(additionalMetaSchemas)) {
-    ajv.addMetaSchema(additionalMetaSchemas);
-    formerMetaSchema = additionalMetaSchemas;
-  }
-
-  // add more custom formats to validate against
-  if (customFormats && newFormats && isObject(customFormats)) {
-    Object.keys(customFormats).forEach((formatName) => {
-      ajv.addFormat(formatName, customFormats[formatName]);
-    });
-
-    formerCustomFormats = customFormats;
-  }
-
-  let validationError = null;
-  try {
-    ajv.validate(schema, formData);
-  } catch (err) {
-    validationError = err;
-  }
-
-  let errors = transformAjvErrors(ajv.errors);
-  // Clear errors to prevent persistent errors, see #1104
-
-  ajv.errors = null;
-
-  const noProperMetaSchema =
-    validationError &&
-    validationError.message &&
-    typeof validationError.message === 'string' &&
-    validationError.message.includes('no schema with key or ref ');
-
-  if (noProperMetaSchema) {
-    errors = [
-      ...errors,
-      {
-        stack: validationError.message
-      }
-    ];
-  }
-  if (typeof transformErrors === 'function') {
-    errors = transformErrors(errors);
-  }
-
-  let errorSchema = toErrorSchema(errors);
-
-  if (noProperMetaSchema) {
-    errorSchema = {
-      ...errorSchema,
-      ...{
-        $schema: {
-          __errors: [validationError.message]
-        }
-      }
-    };
-  }
-
-  if (typeof customValidate !== 'function') {
-    return { errors, errorSchema };
-  }
-
-  const errorHandler = customValidate(formData, createErrorHandler(formData));
-  const userErrorSchema = unwrapErrorHandler(errorHandler);
-  const newErrorSchema = mergeObjects(errorSchema, userErrorSchema, true);
-  // XXX: The errors list produced is not fully compliant with the format
-  // exposed by the jsonschema lib, which contains full field paths and other
-  // properties.
-  const newErrors = toErrorList(newErrorSchema);
-
-  return {
-    errors: newErrors,
-    errorSchema: newErrorSchema
-  };
-}
-
-/**
- * Validates data against a schema, returning true if the data is valid, or
- * false otherwise. If the schema is invalid, then this function will return
- * false.
- */
-export function isValid(schema, data) {
-  try {
-    return ajv.validate(schema, data);
-  } catch (e) {
-    return false;
-  }
 }

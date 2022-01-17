@@ -54,7 +54,7 @@
 
 <script>
 import pick from 'lodash/pick';
-import { retrieveSchema, toIdSchema } from '../../utils';
+import { toIdSchema } from '../../utils';
 import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultNormalArrayFieldTemplate from './ArrayField.NormalArray.DefaultTemplate';
@@ -81,6 +81,7 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldNormalArray',
+  inject: ['resolveSchemaShallowly'],
   components: {
     'array-field-item': ArrayFieldItem
   },
@@ -89,26 +90,29 @@ export default {
     arrayFieldItemEvents() {
       return pick(this.$listeners, ['focus', 'blur', 'change-for-index', 'reorder', 'drop']);
     },
+    resolvedSchema() {
+      return this.resolveSchemaShallowly(this.schema, this.formData);
+    },
     canAdd() {
-      return canAddArrayItem(this.uiSchema, this.schema, this.formData);
+      return canAddArrayItem(this.uiSchema, this.resolvedSchema, this.formData);
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultNormalArrayFieldTemplate;
     },
     itemsSchema() {
-      return retrieveSchema(this.schema.items);
+      return this.resolveSchemaShallowly(this.resolvedSchema.items, this.formData);
     }
   },
   methods: {
     getItemSchema(item) {
-      return retrieveSchema(this.schema.items, item);
+      return this.resolveSchemaShallowly(this.resolvedSchema.items, item);
     },
     getItemErrorSchema(index) {
       return this.errorSchema ? this.errorSchema[index] : undefined;
     },
     getItemIdSchema(item, index) {
       const itemIdPrefix = this.idSchema.$id + '_' + index;
-      return toIdSchema(this.getItemSchema(item), itemIdPrefix, item, this.idPrefix);
+      return toIdSchema(this.getItemSchema(item), itemIdPrefix, this.idPrefix);
     }
   }
 };

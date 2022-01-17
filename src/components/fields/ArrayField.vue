@@ -4,7 +4,7 @@
     :label="label"
     :description="description"
     :keyed-form-data="keyedFormData"
-    :schema="schema"
+    :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :form-data="formData"
     :error-schema="errorSchema"
@@ -29,7 +29,7 @@
     v-else-if="isMultiSelectArray"
     :label="label"
     :description="description"
-    :schema="schema"
+    :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :form-data="formData"
     :id-schema="idSchema"
@@ -49,7 +49,7 @@
     :label="label"
     :description="description"
     :keyed-form-data="keyedFormData"
-    :schema="schema"
+    :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :form-data="formData"
     :error-schema="errorSchema"
@@ -77,12 +77,7 @@ import shortid from 'shortid';
 import NormalArray from './ArrayField.NormalArray';
 import FixedArray from './ArrayField.FixedArray';
 import MultiSelect from './ArrayField.MultiSelect';
-import {
-  getDefaultFormState,
-  isMultiSelect,
-  isFixedItems,
-  allowAdditionalItems
-} from '../../utils';
+import { isMultiSelect, isFixedItems, allowAdditionalItems } from '../../utils';
 
 const PROPS = {
   label: String,
@@ -105,6 +100,7 @@ const PROPS = {
 
 export default {
   name: 'ArrayField',
+  inject: ['resolveSchemaShallowly'],
   components: {
     'normal-array': NormalArray,
     'fixed-array': FixedArray,
@@ -128,11 +124,14 @@ export default {
     normalArrayEventListeners() {
       return pick(this.$listeners, ['blur', 'focus']);
     },
+    resolvedSchema() {
+      return this.resolveSchemaShallowly(this.schema, this.formData);
+    },
     isFixedArray() {
-      return isFixedItems(this.schema);
+      return isFixedItems(this.resolvedSchema);
     },
     isMultiSelectArray() {
-      return isMultiSelect(this.schema);
+      return isMultiSelect(this.resolvedSchema, this.formData);
     }
   },
   watch: {
@@ -163,11 +162,11 @@ export default {
   },
   methods: {
     getNewFormDataRow() {
-      let itemSchema = this.schema.items;
-      if (isFixedItems(this.schema) && allowAdditionalItems(this.schema)) {
-        itemSchema = this.schema.additionalItems;
+      let itemSchema = this.resolvedSchema.items;
+      if (this.isFixedArray && allowAdditionalItems(this.resolvedSchema)) {
+        itemSchema = this.resolvedSchema.additionalItems;
       }
-      return getDefaultFormState(itemSchema, undefined);
+      return itemSchema.default;
     },
 
     handleAddClick() {
