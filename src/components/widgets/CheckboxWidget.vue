@@ -57,14 +57,6 @@ function schemaRequiresTrueValue(schema) {
   }
 
   // Check if an enum has a single value of true
-  if (schema.enum && schema.enum.length === 1 && schema.enum[0] === true) {
-    return true;
-  }
-
-  // Evaluate each subschema in allOf, to see if one of them requires a true
-  // value
-  if (schema.allOf) {
-    return schema.allOf.some(schemaRequiresTrueValue);
-  }
+  return schema.enum && schema.enum.length === 1 && schema.enum[0] === true;
 }
 </script>
