@@ -61,11 +61,6 @@ function schemaRequiresTrueValue(schema) {
     return true;
   }
 
-  // If oneOf has a single value, evaluate the subschema
-  if (schema.oneOf && schema.oneOf.length === 1) {
-    return schemaRequiresTrueValue(schema.oneOf[0]);
-  }
-
   // Evaluate each subschema in allOf, to see if one of them requires a true
   // value
   if (schema.allOf) {

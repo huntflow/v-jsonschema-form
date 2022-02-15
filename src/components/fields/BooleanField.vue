@@ -42,15 +42,6 @@ export default {
   props: PROPS,
   computed: {
     enumOptions() {
-      if (Array.isArray(this.schema.oneOf)) {
-        return optionsList({
-          oneOf: this.schema.oneOf.map((option) => ({
-            ...option,
-            title: option.title || (option.const === true ? 'yes' : 'no')
-          }))
-        });
-      }
-
       return optionsList({
         enum: this.schema.enum || [true, false],
         enumNames:
