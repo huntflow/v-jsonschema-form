@@ -16,7 +16,7 @@ export function resolveSchemaShallowly(schema, { getSchema, data }) {
   if (!schema.$id) {
     return schema;
   }
-  let resultSchema = cloneDeep(schema);
+  const resultSchema = cloneDeep(schema);
 
   if (resultSchema.allOf) {
     resultSchema.allOf.forEach((cond) => {
@@ -36,6 +36,20 @@ export function resolveSchemaShallowly(schema, { getSchema, data }) {
     delete resultSchema.else;
   }
   delete resultSchema.$id;
+  return resultSchema;
+}
+
+export function removeEmptySchemaFields(schema, { data = {} }) {
+  if (!schema.properties || !Object.keys(schema.properties).length) {
+    return schema;
+  }
+  const resultSchema = cloneDeep(schema);
+  Object.keys(schema.properties).forEach((property) => {
+    const value = data[property];
+    if ([undefined, null, ''].includes(value) || (Array.isArray(value) && !value.length)) {
+      delete resultSchema.properties[property];
+    }
+  });
   return resultSchema;
 }
 

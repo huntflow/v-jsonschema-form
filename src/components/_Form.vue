@@ -40,11 +40,10 @@
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import { compileSchema, toErrorList } from '@/validate';
-import { toIdSchema, getDefaultRegistry } from '../utils';
-import { removeEmptySchemaFields } from '../remove-empty-schema-fields';
+import { toIdSchema, getDefaultRegistry } from '@/utils';
 import { PROPS } from './form-props';
-import { VALIDATION_MODE } from '../constants';
-import { getDefaults, resolveSchemaShallowly } from '@/helpers/schema';
+import { VALIDATION_MODE } from '@/constants';
+import { getDefaults, resolveSchemaShallowly, removeEmptySchemaFields } from '@/helpers/schema';
 
 export default {
   name: 'VjsfForm',
@@ -71,8 +70,7 @@ export default {
       });
     },
     resolvedSchema() {
-      const schema = this.resolveSchemaShallowly(this.schema, this.formDataState);
-      return this.omitMissingFields ? removeEmptySchemaFields(schema, this.formDataState) : schema; // TODO: перенести в resolveSchemaShallowly и удалять так же по уровням
+      return this.resolveSchemaShallowly(this.schema, this.formDataState);
     },
     idSchema() {
       return toIdSchema(this.resolvedSchema, this.uiSchema['ui:rootFieldId'], this.idPrefix);
@@ -197,7 +195,14 @@ export default {
     },
     resolveSchemaShallowly(schema, data) {
       const { getSchema } = this.compiledSchemaData;
-      return resolveSchemaShallowly(schema, { getSchema, data: cloneDeep(data) });
+      const resolvedSchema = resolveSchemaShallowly(schema, {
+        getSchema,
+        data: cloneDeep(data)
+      });
+      if (this.omitMissingFields) {
+        return removeEmptySchemaFields(resolvedSchema, { data });
+      }
+      return resolvedSchema;
     },
     doValidate(formData) {
       const { validate, getErrorData } = this.compiledSchemaData;
