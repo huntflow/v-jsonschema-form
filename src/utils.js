@@ -267,14 +267,8 @@ export function optionsList(schema) {
       const label = (schema.enumNames && schema.enumNames[i]) || String(value);
       return { label, value };
     });
-  } else {
-    const altSchemas = schema.oneOf || schema.anyOf;
-    return altSchemas.map((schema) => {
-      const value = toConstant(schema);
-      const label = schema.title || String(value);
-      return { label, value };
-    });
   }
+  return [];
 }
 
 // In the case where we have to implicitly create a schema, it is useful to know what type to use
