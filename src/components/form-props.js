@@ -3,7 +3,7 @@ import DefaultErrorList from './ErrorList.vue';
 
 export const PROPS = {
   id: String,
-  idPrefix: String,
+  idPrefix: { type: String, default: 'root' },
   name: String,
   method: String,
   target: String,

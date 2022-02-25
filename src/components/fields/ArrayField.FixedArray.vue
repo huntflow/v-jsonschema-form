@@ -1,7 +1,7 @@
 <template>
   <component
     :is="fieldTemplateCls"
-    :id-schema="idSchema"
+    :id="id"
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :can-add="canAdd"
@@ -13,7 +13,7 @@
     <template v-if="label" #title>
       <component
         :is="registry.fields.TitleField"
-        :id="idSchema.$id + '__title'"
+        :id="id + '__title'"
         :title="label"
         :required="required"
       />
@@ -22,13 +22,14 @@
     <template v-if="description" #description>
       <component
         :is="registry.fields.DescriptionField"
-        :id="idSchema.$id + '__description'"
+        :id="id + '__description'"
         :description="description"
       />
     </template>
 
     <array-field-item
       v-for="(keyedItem, index) in keyedFormData"
+      :id="`${id}_${index}`"
       :key="keyedItem.key"
       :registry="registry"
       :index="index"
@@ -37,7 +38,6 @@
       :can-move-down="index >= itemSchemas.length && index < formDataItems.length - 1"
       :ui-schema="uiSchema"
       :item-schema="getItemSchema(keyedItem.item, index)"
-      :item-id-schema="getItemIdSchema(keyedItem.item, index)"
       :item-ui-schema="getItemUiSchema(index)"
       :item-data="keyedItem.item"
       :item-error-schema="errorSchema ? errorSchema[index] : undefined"
@@ -49,7 +49,6 @@
 
 <script>
 import pick from 'lodash/pick';
-import { toIdSchema } from '../../utils';
 import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultFixedArrayFieldTemplate from './ArrayField.FixedArray.DefaultTemplate';
@@ -61,8 +60,7 @@ const PROPS = {
   uiSchema: {},
   formData: {},
   errorSchema: {},
-  idPrefix: String,
-  idSchema: Object,
+  id: String,
   registry: { type: Object, required: true },
   rawErrors: Array,
   autofocus: { type: Boolean, default: false },
@@ -124,10 +122,6 @@ export default {
         ? this.uiSchema.items[index]
         : this.uiSchema.items || {};
       return itemUiSchema;
-    },
-    getItemIdSchema(item, index) {
-      const itemIdPrefix = this.idSchema.$id + '_' + index;
-      return toIdSchema(this.getItemSchema(item, index), itemIdPrefix, this.idPrefix);
     }
   }
 };

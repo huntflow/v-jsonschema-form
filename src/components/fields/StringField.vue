@@ -1,7 +1,7 @@
 <template>
   <component
     :is="widgetCls"
-    :id="idSchema && idSchema.$id"
+    :id="id"
     :options="widgetOptions"
     :schema="resolvedSchema"
     :label="label"
@@ -28,7 +28,7 @@ const PROPS = {
   label: String,
   description: String,
   uiSchema: Object,
-  idSchema: Object,
+  id: String,
   formData: [String, Number],
   registry: { type: Object, required: true },
   rawErrors: { type: Array },

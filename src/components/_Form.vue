@@ -22,11 +22,10 @@
     />
     <component
       :is="getRegistry().fields.SchemaField"
+      :id="idPrefix"
       :disabled="disabled"
       :error-schema="errorSchemaState"
       :form-data="formDataState"
-      :id-prefix="idPrefix"
-      :id-schema="idSchema"
       :registry="getRegistry()"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
@@ -40,7 +39,7 @@
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import { compileSchema, toErrorList } from '@/validate';
-import { toIdSchema, getDefaultRegistry } from '@/utils';
+import { getDefaultRegistry } from '@/utils';
 import { PROPS } from './form-props';
 import { VALIDATION_MODE } from '@/constants';
 import { getDefaults, resolveSchemaShallowly, removeEmptySchemaFields } from '@/helpers/schema';
@@ -71,9 +70,6 @@ export default {
     },
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formDataState);
-    },
-    idSchema() {
-      return toIdSchema(this.resolvedSchema, this.uiSchema['ui:rootFieldId'], this.idPrefix);
     },
     shouldShowErrorList() {
       return this.showErrorList !== false && this.errorsState && this.errorsState.length > 0;
@@ -158,7 +154,6 @@ export default {
       const submitPayload = {
         schema: this.resolvedSchema,
         uiSchema: this.uiSchema,
-        idSchema: this.idSchema,
         formData: this.formDataState,
         edit: this.isEdit,
         errors: this.errorsState,

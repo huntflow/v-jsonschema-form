@@ -12,12 +12,18 @@ jsonSchemaTraverse.arrayKeywords.prefixItems = true;
 
 const CONDITIONAL_KEYWORDS = [/*'not', 'anyOf', 'oneOf',*/ 'allOf', 'if'];
 
+const KEYWORDS_FOR_RESOLVING = ['$ref'].concat(CONDITIONAL_KEYWORDS);
+
 export function resolveSchemaShallowly(schema, { getSchema, data }) {
-  if (!schema.$id) {
+  if (!KEYWORDS_FOR_RESOLVING.some((keyword) => keyword in schema)) {
     return schema;
   }
   const resultSchema = cloneDeep(schema);
 
+  if (resultSchema.$ref) {
+    merge(resultSchema, getSchema(resultSchema.$ref).schema);
+    delete resultSchema.$ref;
+  }
   if (resultSchema.allOf) {
     resultSchema.allOf.forEach((cond) => {
       merge(resultSchema, resolveSchemaShallowly(cond, { getSchema, data }));
@@ -80,10 +86,7 @@ export function getEnrichedSchema(schema) {
 
   jsonSchemaTraverse(schema, {
     cb: (schema, currentJsonPointer, rootSchema, parentJsonPointer, parentKeyword) => {
-      if (
-        ['properties', 'prefixItems', 'additionalItems', 'items'].includes(parentKeyword) &&
-        !schema.hasOwnProperty('default')
-      ) {
+      if (parentKeyword && !schema.hasOwnProperty('default')) {
         const schemaType = getSchemaType(schema);
         switch (schemaType) {
           case 'object':

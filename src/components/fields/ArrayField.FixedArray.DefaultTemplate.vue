@@ -1,9 +1,9 @@
 <template>
-  <fieldset :id="idSchema.$id">
+  <fieldset :id="id">
     <slot name="title" />
     <slot name="description" />
 
-    <div :key="'array-item-list-' + idSchema.$id" class="row array-item-list">
+    <div :key="'array-item-list-' + id" class="row array-item-list">
       <slot />
     </div>
 
@@ -15,7 +15,7 @@
 import AddButton from '../AddButton';
 
 const PROPS = {
-  idSchema: Object,
+  id: String,
   schema: Object,
   uiSchema: Object,
   canAdd: { type: Boolean, default: false },

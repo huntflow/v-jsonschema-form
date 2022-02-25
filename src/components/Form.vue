@@ -1,15 +1,8 @@
 <template>
-  <base-form
-    v-if="isDereference"
-    ref="vjsf"
-    v-bind="$props"
-    :schema="dereferencedSchema"
-    v-on="$listeners"
-  />
+  <base-form ref="vjsf" v-bind="$props" :schema="enrichedSchema" v-on="$listeners" />
 </template>
 
 <script>
-import { dereference } from '@/helpers/dereference';
 import { getEnrichedSchema } from '@/helpers/schema';
 import BaseForm from './_Form';
 import { PROPS } from './form-props';
@@ -26,19 +19,9 @@ export default {
       isDereference: false
     };
   },
-  watch: {
-    schema: {
-      immediate: true,
-      handler(schema) {
-        this.isDereference = false;
-        dereference(schema)
-          .then((result) => {
-            this.dereferencedSchema = getEnrichedSchema(result);
-          })
-          .finally(() => {
-            this.isDereference = true;
-          });
-      }
+  computed: {
+    enrichedSchema() {
+      return getEnrichedSchema(this.schema);
     }
   },
   methods: {

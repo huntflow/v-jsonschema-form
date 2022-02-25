@@ -70,7 +70,7 @@ export function getSchemaType(schema) {
   }
 
   if (!type && schema.enum) {
-    return 'string';
+    return 'string'; // TODO: кажется что тут нужно вычислять через `guessType`
   }
 
   if (!type && (schema.properties || schema.additionalProperties)) {
@@ -290,27 +290,6 @@ export const guessType = function guessType(value) {
   // Default to string if we can't figure it out
   return 'string';
 };
-
-export function toIdSchema(schema, id, idPrefix = 'root') {
-  const idSchema = {
-    $id: id || idPrefix
-  };
-  if ('dependencies' in schema) {
-    return toIdSchema(schema, id, idPrefix);
-  }
-  if ('items' in schema) {
-    return toIdSchema(schema.items, id, idPrefix);
-  }
-  if (schema.type !== 'object') {
-    return idSchema;
-  }
-  for (const name in schema.properties || {}) {
-    const field = schema.properties[name];
-    const fieldId = idSchema.$id + '_' + name;
-    idSchema[name] = toIdSchema(field, fieldId, idPrefix);
-  }
-  return idSchema;
-}
 
 export function rangeSpec(schema) {
   const spec = {};
