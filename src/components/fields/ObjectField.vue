@@ -26,14 +26,12 @@
         :ui-schema="scopedProps.uiSchema || uiSchema[propName]"
         :error-schema="errorSchema[propName]"
         :form-data="(innerFormData || {})[propName]"
-        :was-property-key-modified="wasPropertyKeyModified"
         :registry="registry"
         :disabled="disabled"
         :readonly="readonly"
         v-bind="scopedProps"
         v-on="schemaFieldEventListeners"
         @change="handlePropertyChange(propName, ...arguments)"
-        @key-change="handleKeyChange(propName, ...arguments)"
         @drop-property="handleDropPropertyClick"
       />
     </template>
@@ -69,7 +67,6 @@ export default {
   inject: ['resolveSchemaShallowly'],
   data() {
     return {
-      wasPropertyKeyModified: false,
       additionalProperties: {},
       innerFormData: {} // TODO: используется для того чтобы можно было обновить несколько вложенных полей одновременно, допустим если в инпутах заполняются данные при mounted
     };
@@ -132,30 +129,6 @@ export default {
     handleDropPropertyClick(key) {
       delete this.innerFormData[key];
       this.$emit('change', { ...this.innerFormData });
-    },
-    handleKeyChange(oldValue, value, errorSchema) {
-      if (oldValue === value) {
-        return;
-      }
-
-      value = getAvailableKey(value, this.innerFormData);
-      const newFormData = { ...this.innerFormData };
-      const newKeys = { [oldValue]: value };
-      const keyValues = Object.keys(newFormData).map((key) => {
-        const newKey = newKeys[key] || key;
-        return { [newKey]: newFormData[key] };
-      });
-      Object.assign(this.innerFormData, ...keyValues);
-      this.wasPropertyKeyModified = true;
-      this.$emit(
-        'change',
-        { ...this.innerFormData },
-        errorSchema &&
-          this.errorSchema && {
-            ...this.errorSchema,
-            [value]: errorSchema
-          }
-      );
     }
   }
 };

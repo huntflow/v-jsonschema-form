@@ -28,7 +28,6 @@
       :required="required"
       :schema="resolvedSchema"
       :ui-schema="{ ...uiSchema, class: undefined }"
-      :was-property-key-modified="wasPropertyKeyModified"
       v-on="fieldEventListeners"
     />
   </component>
@@ -48,7 +47,6 @@ const PROPS = {
   errorSchema: { type: Object, default: () => ({}) },
   formData: [String, Number, Boolean, Array, Object],
   registry: { type: Object, required: true },
-  wasPropertyKeyModified: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
@@ -61,7 +59,7 @@ export default {
   inject: ['resolveSchemaShallowly'],
   computed: {
     fieldEventListeners() {
-      return pick(this.$listeners, ['drop-property', 'key-change', 'focus', 'blur', 'change']);
+      return pick(this.$listeners, ['drop-property', 'focus', 'blur', 'change']);
     },
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);
@@ -84,13 +82,7 @@ export default {
       return Boolean(this.readonly || this.uiSchema['ui:readonly'] || this.resolvedSchema.readOnly);
     },
     title() {
-      // If this schema has a title defined, but the user has set a new key/label, retain their input.
-      if (this.wasPropertyKeyModified) {
-        return this.name;
-      }
-      return (
-        this.uiSchema['ui:title'] ?? this.resolvedSchema.title ?? '' // this.name
-      );
+      return this.uiSchema['ui:title'] ?? this.resolvedSchema.title ?? '';
     },
     description() {
       return this.uiSchema['ui:description'] || this.resolvedSchema.description;
