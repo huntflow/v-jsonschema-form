@@ -42,7 +42,7 @@
       :can-remove="true"
       :can-move-up="index > 0"
       :can-move-down="index < formData.length - 1"
-      :item-schema="getItemSchema(keyedItem.item)"
+      :item-schema="resolvedSchema.items"
       :item-ui-schema="uiSchema.items"
       :item-error-schema="errorSchema ? errorSchema[index] : undefined"
       :item-data="keyedItem.item"
@@ -102,9 +102,6 @@ export default {
     }
   },
   methods: {
-    getItemSchema(item) {
-      return this.resolveSchemaShallowly(this.resolvedSchema.items, item);
-    },
     getItemErrorSchema(index) {
       return this.errorSchema ? this.errorSchema[index] : undefined;
     }
