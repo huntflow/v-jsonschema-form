@@ -73,7 +73,7 @@ export function getSchemaType(schema) {
     return 'string'; // TODO: кажется что тут нужно вычислять через `guessType`
   }
 
-  if (!type && (schema.properties || schema.additionalProperties)) {
+  if (!type && schema.properties) {
     return 'object';
   }
 

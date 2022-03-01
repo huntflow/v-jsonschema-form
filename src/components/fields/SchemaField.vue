@@ -59,7 +59,7 @@ export default {
   inject: ['resolveSchemaShallowly'],
   computed: {
     fieldEventListeners() {
-      return pick(this.$listeners, ['drop-property', 'focus', 'blur', 'change']);
+      return pick(this.$listeners, ['focus', 'blur', 'change']);
     },
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);
