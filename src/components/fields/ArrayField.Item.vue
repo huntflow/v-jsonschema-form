@@ -13,7 +13,7 @@
     <component
       :is="registry.fields.SchemaField"
       :id="id"
-      :schema="itemSchema"
+      :schema="resolvedSchema"
       :ui-schema="itemUiSchema"
       :form-data="itemData"
       :error-schema="itemErrorSchema"
@@ -58,8 +58,12 @@ export default {
   components: {
     'default-array-item': DefaultArrayItem
   },
+  inject: ['resolveSchemaShallowly'],
   props: PROPS,
   computed: {
+    resolvedSchema() {
+      return this.resolveSchemaShallowly(this.itemSchema, this.itemData);
+    },
     arrayItemEventListeners() {
       return pick(this.$listeners, ['drop', 'reorder']);
     },
@@ -67,13 +71,13 @@ export default {
       return pick(this.$listeners, ['blur', 'focus']);
     },
     isRequired() {
-      if (Array.isArray(this.itemSchema.type)) {
+      if (Array.isArray(this.resolvedSchema.type)) {
         // While we don't yet support composite/nullable jsonschema types, it's
         // future-proof to check for requirement against these.
-        return this.itemSchema.type.includes('null') === false;
+        return this.resolvedSchema.type.includes('null') === false;
       }
       // All non-null array item types are inherently required by design
-      return this.itemSchema.type !== 'null';
+      return this.resolvedSchema.type !== 'null';
     },
     has() {
       const { orderable, removable } = {
