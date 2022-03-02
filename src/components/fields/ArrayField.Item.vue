@@ -12,11 +12,11 @@
   >
     <component
       :is="registry.fields.SchemaField"
+      :id="id"
       :schema="itemSchema"
       :ui-schema="itemUiSchema"
       :form-data="itemData"
       :error-schema="itemErrorSchema"
-      :id-schema="itemIdSchema"
       :required="isRequired"
       :registry="registry"
       :disabled="disabled"
@@ -42,7 +42,7 @@ const PROPS = {
   itemSchema: Object,
   itemData: {},
   itemUiSchema: Object,
-  itemIdSchema: Object,
+  id: String,
   itemErrorSchema: Object,
   rawErrors: { type: Array },
   rawErrorInfos: { type: Array },

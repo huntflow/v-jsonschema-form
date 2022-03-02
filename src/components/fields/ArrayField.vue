@@ -1,6 +1,7 @@
 <template>
   <fixed-array
     v-if="isFixedArray"
+    :id="id"
     :label="label"
     :description="description"
     :keyed-form-data="keyedFormData"
@@ -8,8 +9,6 @@
     :ui-schema="uiSchema"
     :form-data="formData"
     :error-schema="errorSchema"
-    :id-prefix="idPrefix"
-    :id-schema="idSchema"
     :name="name"
     :required="required"
     :disabled="disabled"
@@ -27,12 +26,12 @@
 
   <multiselect-array
     v-else-if="isMultiSelectArray"
+    :id="id"
     :label="label"
     :description="description"
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :form-data="formData"
-    :id-schema="idSchema"
     :required="required"
     :disabled="disabled"
     :readonly="readonly"
@@ -46,6 +45,7 @@
 
   <normal-array
     v-else
+    :id="id"
     :label="label"
     :description="description"
     :keyed-form-data="keyedFormData"
@@ -53,8 +53,6 @@
     :ui-schema="uiSchema"
     :form-data="formData"
     :error-schema="errorSchema"
-    :id-prefix="idPrefix"
-    :id-schema="idSchema"
     :name="name"
     :required="required"
     :disabled="disabled"
@@ -83,12 +81,11 @@ const PROPS = {
   label: String,
   description: String,
   name: String,
-  idPrefix: String,
+  id: String,
   rawErrors: Array,
   rawErrorInfos: Array,
   uiSchema: { type: Object, default: () => ({}) },
   formData: { type: Array, default: () => [] },
-  idSchema: { type: Object, default: () => ({}) },
   schema: Object,
   errorSchema: Object,
   registry: { type: Object, required: true },

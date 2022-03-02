@@ -1,7 +1,7 @@
 <template>
   <component
     :is="widgetWithOptions.widget"
-    :id="idSchema && idSchema.$id"
+    :id="id"
     :options="widgetWithOptions.options"
     :schema="schema"
     :label="label"
@@ -26,7 +26,7 @@ const PROPS = {
   description: String,
   schema: Object,
   uiSchema: Object,
-  idSchema: Object,
+  id: String,
   formData: Boolean,
   rawErrors: Array,
   rawErrorInfos: Array,

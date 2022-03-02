@@ -20,7 +20,7 @@ const PROPS = {
   label: String,
   description: String,
   uiSchema: Object,
-  idSchema: Object,
+  id: String,
   formData: Number,
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },

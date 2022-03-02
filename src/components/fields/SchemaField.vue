@@ -1,7 +1,7 @@
 <template>
   <component
     :is="fieldTemplateCls"
-    :id="idSchema.$id"
+    :id="id"
     class="form-group field"
     :disabled="isDisabled"
     :hidden="isHidden"
@@ -13,6 +13,7 @@
   >
     <component
       :is="fieldCls"
+      :id="id"
       :name="name"
       :label="title"
       :description="description"
@@ -20,8 +21,6 @@
       :disabled="isDisabled"
       :error-schema="fieldErrorSchema"
       :form-data="formData"
-      :id-prefix="idPrefix"
-      :id-schema="mergedIdSchema"
       :raw-errors="errorSchema.__errors"
       :raw-error-infos="errorSchema.__errorInfos"
       :readonly="isReadOnly"
@@ -37,16 +36,14 @@
 
 <script>
 import pick from 'lodash/pick';
-import merge from 'lodash/merge';
-import { toIdSchema, getSchemaType } from '../../utils';
+import { getSchemaType } from '../../utils';
 
 import DefaultTemplate from './SchemaField.DefaultTemplate.vue';
 
 const PROPS = {
   name: String,
-  idPrefix: String,
+  id: String,
   schema: Object,
-  idSchema: { type: Object, default: () => ({}) },
   uiSchema: { type: Object, default: () => ({}) },
   errorSchema: { type: Object, default: () => ({}) },
   formData: [String, Number, Boolean, Array, Object],
@@ -83,9 +80,6 @@ export default {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);
     },
-    mergedIdSchema() {
-      return merge(toIdSchema(this.resolvedSchema, null, this.idPrefix), this.idSchema);
-    },
     isHidden() {
       return this.uiSchema['ui:widget'] === 'hidden';
     },
@@ -111,12 +105,7 @@ export default {
       return (this.errorSchema.__errors || []).filter(Boolean);
     },
     fieldCls() {
-      return getFieldComponent(
-        this.resolvedSchema,
-        this.uiSchema,
-        this.mergedIdSchema,
-        this.registry.fields
-      );
+      return getFieldComponent(this.resolvedSchema, this.uiSchema, this.registry.fields);
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:FieldTemplate'] || this.registry.FieldTemplate || DefaultTemplate;
@@ -139,7 +128,7 @@ const COMPONENT_TYPES = {
   null: 'NullField'
 };
 
-function getFieldComponent(schema, uiSchema, idSchema, fields) {
+function getFieldComponent(schema, uiSchema, fields) {
   const field = uiSchema['ui:field'];
   if (typeof field === 'function') {
     return field;

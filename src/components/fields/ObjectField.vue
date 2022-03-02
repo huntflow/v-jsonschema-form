@@ -1,13 +1,12 @@
 <template>
   <component
     :is="objectFieldTemplateCls"
-    :id="idSchema.$id"
+    :id="id"
     :label="label"
     :title-field-cls="registry.fields.TitleField"
     :description="description"
     :description-field-cls="registry.fields.DescriptionField"
     :schema="resolvedSchema"
-    :id-schema="idSchema"
     :ui-schema="uiSchema"
     :ordered-properties="orderedProperties"
     :form-data="innerFormData"
@@ -19,14 +18,13 @@
     <template v-for="propName in orderedProperties" #[propName]="scopedProps">
       <component
         :is="schemaFieldCls"
+        :id="`${id}_${propName}`"
         :key="propName"
         :name="propName"
         :required="isRequired(propName)"
         :schema="resolvedSchema.properties[propName]"
         :ui-schema="scopedProps.uiSchema || uiSchema[propName]"
         :error-schema="errorSchema[propName]"
-        :id-schema="idSchema[propName]"
-        :id-prefix="idPrefix"
         :form-data="(innerFormData || {})[propName]"
         :was-property-key-modified="wasPropertyKeyModified"
         :registry="registry"
@@ -52,8 +50,7 @@ const PROPS = {
   label: String,
   description: String,
   uiSchema: { type: Object, default: () => ({}) },
-  idPrefix: String,
-  idSchema: { type: Object, default: () => ({}) },
+  id: String,
   errorSchema: { type: Object, default: () => ({}) },
   formData: {
     type: [String, Number, Boolean, Array, Object], // TODO: check if it's true

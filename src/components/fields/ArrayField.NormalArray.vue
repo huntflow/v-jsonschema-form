@@ -1,11 +1,11 @@
 <template>
   <component
     :is="fieldTemplateCls"
+    :id="id"
     :can-add="canAdd"
     class="field field-array"
     :class="'field-array-of-' + itemsSchema.type"
     :disabled="disabled"
-    :id-schema="idSchema"
     :ui-schema="uiSchema"
     :readonly="readonly"
     :required="required"
@@ -19,7 +19,7 @@
     <template v-if="label" #title>
       <component
         :is="registry.fields.TitleField"
-        :id="idSchema.$id + '__title'"
+        :id="id + '__title'"
         :title="label"
         :required="required"
       />
@@ -28,13 +28,14 @@
     <template v-if="description" #description>
       <component
         :is="registry.fields.DescriptionField"
-        :id="idSchema.$id + '__description'"
+        :id="id + '__description'"
         :description="description"
       />
     </template>
 
     <array-field-item
       v-for="(keyedItem, index) in keyedFormData"
+      :id="`${id}_${index}`"
       :key="keyedItem.key"
       :registry="registry"
       :index="index"
@@ -42,7 +43,6 @@
       :can-move-up="index > 0"
       :can-move-down="index < formData.length - 1"
       :item-schema="getItemSchema(keyedItem.item)"
-      :item-id-schema="getItemIdSchema(keyedItem.item, index)"
       :item-ui-schema="uiSchema.items"
       :item-error-schema="errorSchema ? errorSchema[index] : undefined"
       :item-data="keyedItem.item"
@@ -54,7 +54,6 @@
 
 <script>
 import pick from 'lodash/pick';
-import { toIdSchema } from '../../utils';
 import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultNormalArrayFieldTemplate from './ArrayField.NormalArray.DefaultTemplate';
@@ -63,13 +62,12 @@ const PROPS = {
   name: String,
   label: String,
   description: String,
-  idPrefix: String,
+  id: String,
   keyedFormData: Array,
   schema: Object,
   uiSchema: Object,
   formData: Array,
   errorSchema: Object,
-  idSchema: Object,
   rawErrors: Array,
   rawErrorInfos: Array,
   registry: { type: Object, required: true },
@@ -109,10 +107,6 @@ export default {
     },
     getItemErrorSchema(index) {
       return this.errorSchema ? this.errorSchema[index] : undefined;
-    },
-    getItemIdSchema(item, index) {
-      const itemIdPrefix = this.idSchema.$id + '_' + index;
-      return toIdSchema(this.getItemSchema(item), itemIdPrefix, this.idPrefix);
     }
   }
 };

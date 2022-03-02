@@ -31,7 +31,6 @@ const PROPS = {
   titleFieldCls: Object,
   descriptionFieldCls: Object,
   formData: [String, Number, Boolean, Array, Object], // TODO: check if it's true
-  idSchema: Object,
   schema: Object,
   uiSchema: Object,
   orderedProperties: { type: Array, required: true },
@@ -52,10 +51,10 @@ export default {
       return this.disabled || this.readonly;
     },
     fieldTitleId() {
-      return this.idSchema.$id + '__title';
+      return `${this.id}__title`;
     },
     fieldDescriptionId() {
-      return this.idSchema.$id + '__description';
+      return `${this.id}__description`;
     },
     canExpand() {
       if (!this.schema.additionalProperties) {
