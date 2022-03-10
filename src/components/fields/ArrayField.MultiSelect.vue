@@ -14,8 +14,6 @@
     :description="description"
     :placeholder="placeholder"
     :autofocus="autofocus"
-    :raw-errors="rawErrors"
-    :raw-error-infos="rawErrorInfos"
     v-on="$listeners"
   />
 </template>
@@ -32,8 +30,6 @@ const PROPS = {
   uiSchema: Object,
   formData: Array,
   registry: { type: Object, required: true },
-  rawErrors: Array,
-  rawErrorInfos: Array,
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
   required: { type: Boolean, default: false },

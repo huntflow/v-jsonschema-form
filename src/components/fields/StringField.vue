@@ -13,8 +13,8 @@
     :autofocus="autofocus"
     :registry="registry"
     :placeholder="placeholder"
-    :raw-errors="rawErrors"
-    :raw-error-infos="rawErrorInfos"
+    :raw-errors="errorsMessages"
+    :raw-error-infos="errors"
     v-on="$listeners"
   />
 </template>
@@ -31,8 +31,7 @@ const PROPS = {
   id: String,
   formData: [String, Number],
   registry: { type: Object, required: true },
-  rawErrors: { type: Array },
-  rawErrorInfos: { type: Array },
+  errors: { type: Array, default: () => [] },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
@@ -72,6 +71,10 @@ export default {
     },
     placeholder() {
       return getUiOptions(this.uiSchema).placeholder || '';
+    },
+    errorsMessages() {
+      // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
+      return this.errors.map(({ message }) => message);
     }
   },
   methods: {

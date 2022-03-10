@@ -1,8 +1,7 @@
-import toPath from 'lodash/toPath';
 import Ajv from 'ajv';
 import get from 'lodash/get';
-// import ajvErrors from 'ajv-errors';
-import jsonpointer from 'json-pointer';
+import ajvErrors from 'ajv-errors';
+import jsonPointer from 'json-pointer';
 
 export function compileSchema({
   schema,
@@ -18,6 +17,8 @@ export function compileSchema({
     useDefaults: 'empty',
     multipleOfPrecision: 8
   });
+
+  ajvErrors(ajv);
 
   ajv.addKeyword({
     keyword: 'valid_against_value',
@@ -128,57 +129,9 @@ function toErrorSchema(errors) {
     return {};
   }
   return errors.reduce((errorSchema, error) => {
-    const { property, message } = error;
-    const path = toPath(property);
-    let parent = errorSchema;
-
-    // If the property is at the root (.level1) then toPath creates
-    // an empty array element at the first index. Remove it.
-    if (path.length > 0 && path[0] === '') {
-      path.splice(0, 1);
-    }
-
-    for (const segment of path.slice(0)) {
-      if (!(segment in parent)) {
-        parent[segment] = {};
-      }
-      parent = parent[segment];
-    }
-
-    if (Array.isArray(parent.__errors)) {
-      // We store the list of errors for this node in a property named __errors
-      // to avoid name collision with a possible sub schema field named
-      // "errors" (see `validate.createErrorHandler`).
-      parent.__errors = parent.__errors.concat(message);
-      parent.__errorInfos = parent.__errorInfos.concat(error);
-    } else {
-      if (message) {
-        parent.__errors = [message];
-        parent.__errorInfos = [error];
-      }
-    }
+    jsonPointer.set(errorSchema, `${error.instancePath}/-`, error);
     return errorSchema;
   }, {});
-}
-
-export function toErrorList(errorSchema, fieldName = 'root') {
-  // XXX: We should transform fieldName as a full field path string.
-  let errorList = [];
-  if ('__errors' in errorSchema) {
-    errorList = errorList.concat(
-      errorSchema.__errors.map((stack) => {
-        return {
-          stack: `${fieldName}: ${stack}`
-        };
-      })
-    );
-  }
-  return Object.keys(errorSchema).reduce((acc, key) => {
-    if (key !== '__errors') {
-      acc = acc.concat(toErrorList(errorSchema[key], key));
-    }
-    return acc;
-  }, errorList);
 }
 
 /**
@@ -190,25 +143,29 @@ function transformAjvErrors(errors = []) {
     return [];
   }
 
-  return errors.map((e) => {
-    const { instancePath, keyword, message, params, schemaPath } = e;
-    // new ajv version responds with a bit different error format
-    // that's why we need to do extra steps
-    const pathArr = jsonpointer.parse(instancePath);
-    const propertyArr = e.params?.missingProperty
-      ? [...pathArr, e.params?.missingProperty]
-      : pathArr;
+  return errors.reduce((res, { instancePath, keyword, message, params, schemaPath }) => {
+    if (params.failingKeyword) {
+      // кажется что нет смысла это логировать, пока увидел keyword `then`, но вряд-ли это можно считать ошибкой
+      // console.log(`failing keyword ${params.failingKeyword} by path ${schemaPath}`);
+      return res;
+    }
 
-    const property = propertyArr.join('.');
+    const fullInstancePath = params.missingProperty
+      ? `${instancePath}/${params.missingProperty}`
+      : instancePath;
 
-    // put data in expected format
-    return {
+    const property = jsonPointer.parse(fullInstancePath).join('.');
+
+    res.push({
       name: keyword,
       property,
       message,
       params, // specific to ajv
       stack: `${property} ${message}`.trim(),
+      instancePath: fullInstancePath,
       schemaPath
-    };
-  });
+    });
+
+    return res;
+  }, []);
 }

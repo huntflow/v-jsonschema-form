@@ -23,7 +23,7 @@
         :required="isRequired(propName)"
         :schema="resolvedSchema.properties[propName]"
         :ui-schema="scopedProps.uiSchema || uiSchema[propName]"
-        :error-schema="errorSchema[propName]"
+        :errors="errors[propName]"
         :form-data="(innerFormData || {})[propName]"
         :registry="registry"
         :disabled="disabled"
@@ -47,7 +47,7 @@ const PROPS = {
   description: String,
   uiSchema: { type: Object, default: () => ({}) },
   id: String,
-  errorSchema: { type: Object, default: () => ({}) },
+  errors: { type: Object, default: () => ({}) },
   formData: {
     type: [String, Number, Boolean, Array, Object], // TODO: check if it's true
     default: () => ({})
@@ -105,17 +105,9 @@ export default {
     isRequired(name) {
       return this.requiredFields.includes(name);
     },
-    handlePropertyChange(name, value, errorSchema) {
+    handlePropertyChange(name, value) {
       this.innerFormData[name] = value;
-      this.$emit(
-        'change',
-        { ...this.innerFormData },
-        errorSchema &&
-          this.errorSchema && {
-            ...this.errorSchema,
-            [name]: errorSchema
-          }
-      );
+      this.$emit('change', { ...this.innerFormData });
     }
   }
 };

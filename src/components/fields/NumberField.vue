@@ -2,6 +2,8 @@
   <component
     :is="stringFieldCls"
     v-bind="$props"
+    :raw-errors="errorsMessages"
+    :raw-error-infos="errors"
     :form-data="formDataNumericValue"
     v-on="eventListeners"
     @change="handleChange"
@@ -27,8 +29,7 @@ const PROPS = {
   readonly: { type: Boolean, default: false },
   autofocus: { type: Boolean, default: false },
   registry: { type: Object, required: true },
-  rawErrors: { type: Array },
-  rawErrorInfos: { type: Array }
+  errors: { type: Array, default: () => [] }
 };
 
 export default {
@@ -62,6 +63,10 @@ export default {
         }
       }
       return value;
+    },
+    errorsMessages() {
+      // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
+      return this.errors.map(({ message }) => message);
     }
   },
   methods: {

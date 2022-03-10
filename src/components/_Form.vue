@@ -15,8 +15,8 @@
     <component
       :is="ErrorList"
       v-if="shouldShowErrorList"
-      :error-schema="errorSchemaState"
-      :errors="errorsState"
+      :error-schema="errorSchema"
+      :errors="errors"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
     />
@@ -24,7 +24,7 @@
       :is="getRegistry().fields.SchemaField"
       :id="idPrefix"
       :disabled="disabled"
-      :error-schema="errorSchemaState"
+      :errors="errorSchema"
       :form-data="formDataState"
       :registry="getRegistry()"
       :schema="resolvedSchema"
@@ -38,7 +38,7 @@
 <script>
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
-import { compileSchema, toErrorList } from '@/validate';
+import { compileSchema } from '@/validate';
 import { getDefaultRegistry } from '@/utils';
 import { PROPS } from './form-props';
 import { VALIDATION_MODE } from '@/constants';
@@ -55,8 +55,8 @@ export default {
   data() {
     return {
       formDataState: undefined,
-      errorsState: [],
-      errorSchemaState: {},
+      errors: [],
+      errorSchema: {},
       submitted: false
     };
   },
@@ -72,7 +72,7 @@ export default {
       return this.resolveSchemaShallowly(this.schema, this.formDataState);
     },
     shouldShowErrorList() {
-      return this.showErrorList !== false && this.errorsState && this.errorsState.length > 0;
+      return this.showErrorList !== false && this.errors && this.errors.length > 0;
     },
     schemaFieldEventListeners() {
       return pick(this.$listeners, ['focus', 'blur']);
@@ -99,12 +99,12 @@ export default {
         const { errors, errorSchema } = mustValidate
           ? this.doValidate(this.formDataState)
           : {
-              errors: this.errorsState || [],
-              errorSchema: this.errorSchemaState || {}
+              errors: this.errors || [],
+              errorSchema: this.errorSchema || {}
             };
 
-        this.errorsState = errors;
-        this.errorSchemaState = errorSchema;
+        this.errors = errors;
+        this.errorSchema = errorSchema;
       },
       immediate: true
     },
@@ -137,8 +137,8 @@ export default {
       if (!this.noValidate) {
         const { errors, errorSchema } = this.doValidate(newFormData);
         if (Object.keys(errors).length > 0) {
-          this.errorsState = errors;
-          this.errorSchemaState = errorSchema;
+          this.errors = errors;
+          this.errorSchema = errorSchema;
 
           this.$emit('error', errors);
           console.error('Form validation failed', errors);
@@ -148,31 +148,28 @@ export default {
       }
 
       this.formDataState = newFormData;
-      this.errorsState = [];
-      this.errorSchemaState = {};
+      this.errors = [];
+      this.errorSchema = {};
 
       const submitPayload = {
         schema: this.resolvedSchema,
         uiSchema: this.uiSchema,
         formData: this.formDataState,
         edit: this.isEdit,
-        errors: this.errorsState,
-        errorSchema: this.errorSchemaState,
+        errors: this.errors,
+        errorSchema: this.errorSchema,
         status: 'submitted'
       };
 
       this.$emit('submit', submitPayload, event);
     },
-    handleChange(formData, newErrorSchema) {
+    handleChange(formData) {
       this.formDataState = this.enrichFormData(formData);
 
       if (this.mustValidate) {
         const { errors, errorSchema } = this.doValidate(this.formDataState);
-        this.errorsState = errors;
-        this.errorSchemaState = errorSchema;
-      } else if (!this.noValidate && newErrorSchema) {
-        this.errorsState = newErrorSchema;
-        this.errorSchemaState = toErrorList(newErrorSchema);
+        this.errors = errors;
+        this.errorSchema = errorSchema;
       }
     },
     getRegistry() {

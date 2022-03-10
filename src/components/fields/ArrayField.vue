@@ -8,15 +8,13 @@
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :form-data="formData"
-    :error-schema="errorSchema"
+    :errors="errors"
     :name="name"
     :required="required"
     :disabled="disabled"
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    :raw-errors="rawErrors"
-    :raw-error-infos="rawErrorInfos"
     v-on="fixedArrayEventListeners"
     @change-for-index="handleChangeForIndex"
     @add="handleAddClick"
@@ -37,8 +35,6 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    :raw-errors="rawErrors"
-    :raw-error-infos="rawErrorInfos"
     v-on="multiselectArrayEventListeners"
     @reorder="handleReorderClick"
   />
@@ -52,15 +48,13 @@
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :form-data="formData"
-    :error-schema="errorSchema"
+    :errors="errors"
     :name="name"
     :required="required"
     :disabled="disabled"
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    :raw-errors="rawErrors"
-    :raw-error-infos="rawErrorInfos"
     v-on="normalArrayEventListeners"
     @change-for-index="handleChangeForIndex"
     @add="handleAddClick"
@@ -82,12 +76,10 @@ const PROPS = {
   description: String,
   name: String,
   id: String,
-  rawErrors: Array,
-  rawErrorInfos: Array,
   uiSchema: { type: Object, default: () => ({}) },
   formData: { type: Array, default: () => [] },
   schema: Object,
-  errorSchema: Object,
+  errors: { type: Array, default: () => [] },
   registry: { type: Object, required: true },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
@@ -177,7 +169,7 @@ export default {
       this.$emit('change', keyedToPlainFormData(newKeyedFormData));
     },
 
-    handleChangeForIndex(index, value, errorSchema) {
+    handleChangeForIndex(index, value) {
       const newFormData = (this.formData ?? []).map((item, i) => {
         // We need to treat undefined items as nulls to have validation.
         // See https://github.com/tdegrunt/jsonschema/issues/206
@@ -185,36 +177,14 @@ export default {
         return index === i ? jsonValue : item;
       });
 
-      this.$emit(
-        'change',
-        newFormData,
-        errorSchema &&
-          this.errorSchema && {
-            ...this.errorSchema,
-            [index]: errorSchema
-          }
-      );
+      this.$emit('change', newFormData);
     },
 
     handleDropIndexClick(index) {
-      // refs #195: revalidate to ensure properly reindexing errors
-      let newErrorSchema;
-      if (this.errorSchema) {
-        newErrorSchema = {};
-        const errorSchema = this.errorSchema;
-        for (let i in errorSchema) {
-          i = parseInt(i);
-          if (i < index) {
-            newErrorSchema[i] = errorSchema[i];
-          } else if (i > index) {
-            newErrorSchema[i - 1] = errorSchema[i];
-          }
-        }
-      }
       const newKeyedFormData = this.keyedFormData.filter((_, i) => i !== index);
       this.keyedFormData = newKeyedFormData;
       this.updatedKeyedFormData = true;
-      this.$emit('change', keyedToPlainFormData(newKeyedFormData), newErrorSchema);
+      this.$emit('change', keyedToPlainFormData(newKeyedFormData));
     },
 
     handleReorderClick(index, newIndex) {
@@ -228,24 +198,9 @@ export default {
         return _newKeyedFormData;
       };
 
-      let newErrorSchema;
-      if (this.errorSchema) {
-        newErrorSchema = {};
-        const errorSchema = this.errorSchema;
-        for (let i in errorSchema) {
-          if (i == index) {
-            newErrorSchema[newIndex] = errorSchema[index];
-          } else if (i == newIndex) {
-            newErrorSchema[index] = errorSchema[newIndex];
-          } else {
-            newErrorSchema[i] = errorSchema[i];
-          }
-        }
-      }
-
       const newKeyedFormData = reOrderArray();
       this.keyedFormData = newKeyedFormData;
-      this.$emit('change', keyedToPlainFormData(newKeyedFormData), newErrorSchema);
+      this.$emit('change', keyedToPlainFormData(newKeyedFormData));
     }
   }
 };

@@ -40,7 +40,7 @@
       :item-schema="getItemSchema(keyedItem.item, index)"
       :item-ui-schema="getItemUiSchema(index)"
       :item-data="keyedItem.item"
-      :item-error-schema="errorSchema ? errorSchema[index] : undefined"
+      :errors="errors[index]"
       :autofocus="autofocus && index === 0"
       v-on="arrayFieldItemEventListeners"
     />
@@ -59,10 +59,9 @@ const PROPS = {
   schema: Object,
   uiSchema: {},
   formData: {},
-  errorSchema: {},
+  errors: { type: Array, default: () => [] },
   id: String,
   registry: { type: Object, required: true },
-  rawErrors: Array,
   autofocus: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
@@ -110,9 +109,6 @@ export default {
     getItemSchema(item, index) {
       const additional = index >= this.itemSchemas.length;
       return additional ? this.resolvedSchema.additionalItems : this.itemSchemas[index];
-    },
-    getItemErrorSchema(index) {
-      return this.errorSchema ? this.errorSchema[index] : undefined;
     },
     getItemUiSchema(index) {
       const additional = index >= this.itemSchemas.length;

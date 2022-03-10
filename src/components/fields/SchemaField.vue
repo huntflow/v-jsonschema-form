@@ -19,10 +19,8 @@
       :description="description"
       :autofocus="hasAutofocus"
       :disabled="isDisabled"
-      :error-schema="fieldErrorSchema"
+      :errors="errors"
       :form-data="formData"
-      :raw-errors="errorSchema.__errors"
-      :raw-error-infos="errorSchema.__errorInfos"
       :readonly="isReadOnly"
       :registry="registry"
       :required="required"
@@ -44,7 +42,7 @@ const PROPS = {
   id: String,
   schema: Object,
   uiSchema: { type: Object, default: () => ({}) },
-  errorSchema: { type: Object, default: () => ({}) },
+  errors: { type: [Array, Object] },
   formData: [String, Number, Boolean, Array, Object],
   registry: { type: Object, required: true },
   disabled: { type: Boolean, default: false },
@@ -64,11 +62,6 @@ export default {
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);
     },
-    fieldErrorSchema() {
-      // eslint-disable-next-line no-unused-vars
-      const { __errors, ...fieldErrorSchema } = this.errorSchema;
-      return fieldErrorSchema;
-    },
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);
     },
@@ -86,9 +79,6 @@ export default {
     },
     description() {
       return this.uiSchema['ui:description'] || this.resolvedSchema.description;
-    },
-    errors() {
-      return (this.errorSchema.__errors || []).filter(Boolean);
     },
     fieldCls() {
       return getFieldComponent(this.resolvedSchema, this.uiSchema, this.registry.fields);

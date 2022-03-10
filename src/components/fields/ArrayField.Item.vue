@@ -16,14 +16,12 @@
       :schema="resolvedSchema"
       :ui-schema="itemUiSchema"
       :form-data="itemData"
-      :error-schema="itemErrorSchema"
+      :errors="errors"
       :required="isRequired"
       :registry="registry"
       :disabled="disabled"
       :readonly="readonly"
       :autofocus="autofocus"
-      :raw-errors="rawErrors"
-      :raw-error-infos="rawErrorInfos"
       v-on="schemaFieldEventListeners"
       @change="handleChangeForIndex(index, ...arguments)"
     />
@@ -43,9 +41,7 @@ const PROPS = {
   itemData: {},
   itemUiSchema: Object,
   id: String,
-  itemErrorSchema: Object,
-  rawErrors: { type: Array },
-  rawErrorInfos: { type: Array },
+  errors: Object,
   uiSchema: { type: Object },
   registry: { type: Object, required: true },
   autofocus: { type: Boolean, default: false },

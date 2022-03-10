@@ -11,8 +11,8 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    :raw-errors="rawErrors"
-    :raw-error-infos="rawErrorInfos"
+    :raw-errors="errorsMessages"
+    :raw-error-infos="errors"
     v-on="$listeners"
   />
 </template>
@@ -28,8 +28,10 @@ const PROPS = {
   uiSchema: Object,
   id: String,
   formData: Boolean,
-  rawErrors: Array,
-  rawErrorInfos: Array,
+  errors: {
+    type: Array,
+    default: () => []
+  },
   registry: { type: Object, required: true },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
@@ -57,6 +59,10 @@ export default {
         widget: getWidget(this.schema, widget, widgets),
         options: { ...options, enumOptions: this.enumOptions }
       };
+    },
+    errorsMessages() {
+      // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
+      return this.errors.map(({ message }) => message);
     }
   }
 };

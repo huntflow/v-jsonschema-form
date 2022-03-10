@@ -11,8 +11,6 @@
     :required="required"
     :schema="schema"
     :form-data="formData"
-    :raw-errors="rawErrors"
-    :raw-error-infos="rawErrorInfos"
     :registry="registry"
     @add="$emit('add')"
   >
@@ -44,7 +42,7 @@
       :can-move-down="index < formData.length - 1"
       :item-schema="resolvedSchema.items"
       :item-ui-schema="uiSchema.items"
-      :item-error-schema="errorSchema ? errorSchema[index] : undefined"
+      :errors="errors[index]"
       :item-data="keyedItem.item"
       :autofocus="autofocus && index === 0"
       v-on="arrayFieldItemEvents"
@@ -67,9 +65,7 @@ const PROPS = {
   schema: Object,
   uiSchema: Object,
   formData: Array,
-  errorSchema: Object,
-  rawErrors: Array,
-  rawErrorInfos: Array,
+  errors: { type: Array, default: () => [] },
   registry: { type: Object, required: true },
   autofocus: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
@@ -99,11 +95,6 @@ export default {
     },
     itemsSchema() {
       return this.resolveSchemaShallowly(this.resolvedSchema.items, this.formData);
-    }
-  },
-  methods: {
-    getItemErrorSchema(index) {
-      return this.errorSchema ? this.errorSchema[index] : undefined;
     }
   }
 };
