@@ -30,6 +30,7 @@
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :form-data="formData"
+    :errors="errors"
     :required="required"
     :disabled="disabled"
     :readonly="readonly"

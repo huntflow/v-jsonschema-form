@@ -14,6 +14,8 @@
     :description="description"
     :placeholder="placeholder"
     :autofocus="autofocus"
+    :raw-errors="errorsMessages"
+    :raw-error-infos="errors"
     v-on="$listeners"
   />
 </template>
@@ -29,6 +31,7 @@ const PROPS = {
   id: String,
   uiSchema: Object,
   formData: Array,
+  errors: { type: Array, default: () => [] },
   registry: { type: Object, required: true },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
@@ -55,6 +58,10 @@ export default {
         enumOptions
       };
       return { widget, options };
+    },
+    errorsMessages() {
+      // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
+      return this.errors.map(({ message }) => message);
     }
   }
 };
