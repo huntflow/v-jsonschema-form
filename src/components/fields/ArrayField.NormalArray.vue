@@ -13,6 +13,7 @@
     :form-data="formData"
     :registry="registry"
     @add="$emit('add')"
+    @change="$emit('change', $event)"
   >
     <template v-if="label" #title>
       <component
