@@ -12,6 +12,7 @@
     :schema="schema"
     :form-data="formData"
     :registry="registry"
+    :raw-error-infos="errors"
     @add="$emit('add')"
     @change="$emit('change', $event)"
   >
