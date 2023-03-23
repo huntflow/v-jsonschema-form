@@ -61,6 +61,7 @@
     @add="handleAddClick"
     @reorder="handleReorderClick"
     @drop="handleDropIndexClick"
+    @change="$emit('change', $event)"
   />
 </template>
 
