@@ -86,6 +86,7 @@ const PROPS = {
 
 export default {
   props: PROPS,
+  emits: ['change', 'focus', 'blur'],
   computed: {
     isDisabled() {
       return this.disabled || this.readonly;

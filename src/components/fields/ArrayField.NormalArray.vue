@@ -47,13 +47,16 @@
       :errors="errors[index]"
       :item-data="keyedItem.item"
       :autofocus="autofocus && index === 0"
-      v-on="arrayFieldItemEvents"
+      @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
+      @change-for-index="$emit('change-for-index', $event)"
+      @reorder="$emit('reorder', $event)"
+      @drop="$emit('drop', $event)"
     />
   </component>
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultNormalArrayFieldTemplate from './ArrayField.NormalArray.DefaultTemplate';
@@ -77,15 +80,13 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldNormalArray',
-  inject: ['resolveSchemaShallowly'],
   components: {
     'array-field-item': ArrayFieldItem
   },
+  inject: ['resolveSchemaShallowly'],
   props: PROPS,
+  emits: ['add', 'change', 'focus', 'blur', 'change-for-index', 'reorder', 'drop'],
   computed: {
-    arrayFieldItemEvents() {
-      return pick(this.$listeners, ['focus', 'blur', 'change-for-index', 'reorder', 'drop']);
-    },
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);
     },

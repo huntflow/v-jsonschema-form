@@ -29,15 +29,15 @@
         :disabled="disabled"
         :readonly="readonly"
         v-bind="scopedProps"
-        v-on="schemaFieldEventListeners"
-        @change="handlePropertyChange(propName, ...arguments)"
+        @focus="$emit('focus', $event)"
+        @blur="$emit('blur', $event)"
+        @change="handlePropertyChange(propName, $event)"
       />
     </template>
   </component>
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import DefaultObjectFieldTemplate from './ObjectField.DefaultTemplate.vue';
 import { orderProperties } from '../../utils';
 
@@ -61,17 +61,15 @@ const PROPS = {
 
 export default {
   name: 'ObjectField',
-  props: PROPS,
   inject: ['resolveSchemaShallowly'],
+  props: PROPS,
+  emits: ['focus', 'blur', 'change'],
   data() {
     return {
       innerFormData: {} // TODO: используется для того чтобы можно было обновить несколько вложенных полей одновременно, допустим если в инпутах заполняются данные при mounted
     };
   },
   computed: {
-    schemaFieldEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur']);
-    },
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.innerFormData);
     },

@@ -29,6 +29,7 @@ export default {
     'add-button': AddButton
   },
   props: PROPS,
+  emits: ['add'],
   computed: {
     isDisabled() {
       return this.disabled || this.readonly;

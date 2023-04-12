@@ -13,17 +13,20 @@ const schema = {
   allOf: [
     {
       if: {
+        type: 'object',
         properties: {
           field_a: { const: '1' }
         }
       },
       then: {
+        type: 'object',
         properties: { dependency_a_1: { type: 'string' } },
         required: ['dependency_a_1']
       }
     },
     {
       if: {
+        type: 'object',
         properties: {
           field_a: {
             valid_against_value: {
@@ -34,11 +37,13 @@ const schema = {
         }
       },
       then: {
+        type: 'object',
         properties: { dependency_a_3: { type: 'string' } }
       }
     },
     {
       if: {
+        type: 'object',
         properties: {
           field_a: {
             valid_against_value: {
@@ -49,16 +54,19 @@ const schema = {
         }
       },
       then: {
+        type: 'object',
         properties: { dependency_a_4: { type: 'string' } }
       }
     },
     {
       if: {
+        type: 'object',
         properties: {
           field_b: { const: '1' }
         }
       },
       then: {
+        type: 'object',
         properties: { dependency_b_1: { type: 'string' } }
       }
     }

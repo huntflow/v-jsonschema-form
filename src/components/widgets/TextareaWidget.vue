@@ -31,6 +31,7 @@ const PROPS = {
 export default {
   inheritAttrs: false,
   props: PROPS,
+  emits: ['focus', 'blur', 'change'],
   methods: {
     handleBlur(event) {
       this.$emit('blur', this.id, event.target.value);

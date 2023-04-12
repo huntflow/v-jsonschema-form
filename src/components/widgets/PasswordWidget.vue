@@ -7,7 +7,9 @@
     :readonly="readonly"
     :required="required"
     :value="value"
-    v-on="$listeners"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
+    @change="$emit('change', $event)"
   />
 </template>
 
@@ -28,6 +30,7 @@ export default {
     'base-input': BaseInput
   },
   inheritAttrs: false,
-  props: PROPS
+  props: PROPS,
+  emits: ['change', 'focus', 'blur']
 };
 </script>

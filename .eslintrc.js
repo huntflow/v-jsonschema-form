@@ -4,7 +4,7 @@ module.exports = {
   env: {
     node: true
   },
-  extends: ['eslint:recommended', 'plugin:vue/recommended', '@vue/prettier'],
+  extends: ['eslint:recommended', 'plugin:vue/recommended', 'plugin:prettier-vue/recommended'],
 
   rules: {
     'no-prototype-builtins': 0,
@@ -17,14 +17,5 @@ module.exports = {
     sourceType: 'module'
   },
 
-  globals: {},
-
-  overrides: [
-    {
-      files: '**/*.test.[jt]s',
-      env: {
-        jest: true
-      }
-    }
-  ]
+  globals: {}
 };

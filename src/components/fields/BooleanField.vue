@@ -13,7 +13,9 @@
     :registry="registry"
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
-    v-on="$listeners"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
+    @change="$emit('change', $event)"
   />
 </template>
 
@@ -42,6 +44,7 @@ const PROPS = {
 export default {
   name: 'BooleanField',
   props: PROPS,
+  emits: ['focus', 'blur', 'change'],
   computed: {
     enumOptions() {
       return optionsList({

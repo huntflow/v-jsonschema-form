@@ -8,7 +8,8 @@
     :has-toolbar="has.toolbar"
     :disabled="disabled"
     :readonly="readonly"
-    v-on="arrayItemEventListeners"
+    @drop="$emit('drop', $event)"
+    @reorder="$emit('reorder', $event)"
   >
     <component
       :is="registry.fields.SchemaField"
@@ -22,14 +23,14 @@
       :disabled="disabled"
       :readonly="readonly"
       :autofocus="autofocus"
-      v-on="schemaFieldEventListeners"
+      @blur="$emit('blur', $event)"
+      @focus="$emit('focus', $event)"
       @change="handleChangeForIndex(index, ...arguments)"
     />
   </default-array-item>
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import DefaultArrayItem from './ArrayField.DefaultArrayItem';
 
 const PROPS = {
@@ -56,15 +57,10 @@ export default {
   },
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
+  emits: ['change-for-index', 'drop', 'reorder', 'blur', 'focus'],
   computed: {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.itemSchema, this.itemData);
-    },
-    arrayItemEventListeners() {
-      return pick(this.$listeners, ['drop', 'reorder']);
-    },
-    schemaFieldEventListeners() {
-      return pick(this.$listeners, ['blur', 'focus']);
     },
     isRequired() {
       if (Array.isArray(this.resolvedSchema.type)) {

@@ -1,3 +1,5 @@
+import fields from './components/fields';
+import widgets from './components/widgets';
 export const ADDITIONAL_PROPERTY_FLAG = '__additional_property';
 
 const widgetMap = {
@@ -54,10 +56,8 @@ const widgetMap = {
 
 export function getDefaultRegistry() {
   return {
-    // eslint-disable-next-line no-undef
-    fields: require('./components/fields').default,
-    // eslint-disable-next-line no-undef
-    widgets: require('./components/widgets').default,
+    fields,
+    widgets,
     formContext: {}
   };
 }

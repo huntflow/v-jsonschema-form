@@ -36,6 +36,7 @@ export default {
     'description-field': DescriptionField
   },
   props: PROPS,
+  emits: ['change', 'focus', 'blur'],
   computed: {
     isDisabled() {
       return this.disabled || this.readonly;

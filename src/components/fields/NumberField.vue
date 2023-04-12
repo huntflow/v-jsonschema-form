@@ -5,13 +5,13 @@
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
     :form-data="formDataNumericValue"
-    v-on="eventListeners"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
     @change="handleChange"
   />
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import { asNumber } from '../../utils';
 const trailingCharMatcherWithPrefix = /\.([0-9]*0)*$/;
 const trailingCharMatcher = /[0.]0*$/;
@@ -35,6 +35,7 @@ const PROPS = {
 export default {
   name: 'NumberField',
   props: PROPS,
+  emits: ['focus', 'blur', 'change'],
   data() {
     return {
       // TODO: seems there's an issue in the react library..
@@ -42,9 +43,6 @@ export default {
     };
   },
   computed: {
-    eventListeners() {
-      return pick(this.$listeners, ['focus', 'blur']);
-    },
     stringFieldCls() {
       return this.registry.fields.StringField;
     },

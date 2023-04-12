@@ -16,7 +16,9 @@
     :autofocus="autofocus"
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
-    v-on="$listeners"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
+    @change="$emit('change', $event)"
   />
 </template>
 
@@ -43,6 +45,7 @@ export default {
   name: 'ArrayFieldMultiSelect',
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
+  emits: ['focus', 'blur', 'change'],
   computed: {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);
