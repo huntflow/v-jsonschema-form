@@ -30,6 +30,7 @@ const PROPS = {
 
 export default {
   inheritAttrs: false,
+  emits: ['focus', 'blur', 'change'],
   props: PROPS,
   methods: {
     handleBlur(event) {

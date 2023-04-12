@@ -7,7 +7,7 @@
         class="btn-add col-xs-12"
         tab-index="0"
         :disabled="disabled"
-        v-on="$listeners"
+	@click="$emit('click', $event)"
       />
     </p>
   </div>

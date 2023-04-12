@@ -42,7 +42,11 @@
       :item-data="keyedItem.item"
       :errors="errors[index]"
       :autofocus="autofocus && index === 0"
-      v-on="arrayFieldItemEventListeners"
+      @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
+      @change-for-index="$emit('change-for-index', $event)"
+      @reorder="$emit('reorder', $event)"
+      @drop="$emit('drop', $event)"
     />
   </component>
 </template>
@@ -76,11 +80,9 @@ export default {
   components: {
     'array-field-item': ArrayFieldItem
   },
+  emits: ['add', 'focus', 'blur', 'change-for-index', 'reorder', 'drop'],
   props: PROPS,
   computed: {
-    arrayFieldItemEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur', 'change-for-index', 'reorder', 'drop']);
-    },
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);
     },

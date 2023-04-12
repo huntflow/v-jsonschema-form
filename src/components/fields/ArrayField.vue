@@ -15,11 +15,12 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    v-on="fixedArrayEventListeners"
     @change-for-index="handleChangeForIndex"
     @add="handleAddClick"
     @reorder="handleReorderClick"
     @drop="handleDropIndexClick"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
   />
 
   <multiselect-array
@@ -36,8 +37,10 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    v-on="multiselectArrayEventListeners"
     @reorder="handleReorderClick"
+    @change="$emit('change', $event)"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
   />
 
   <normal-array
@@ -56,12 +59,13 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    v-on="normalArrayEventListeners"
     @change-for-index="handleChangeForIndex"
     @add="handleAddClick"
     @reorder="handleReorderClick"
     @drop="handleDropIndexClick"
     @change="$emit('change', $event)"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
   />
 </template>
 
@@ -98,6 +102,7 @@ export default {
     'multiselect-array': MultiSelect
   },
   inheritAttrs: false,
+  emits: ['change', 'blur', 'focus', 'change'],
   props: PROPS,
   data() {
     return {
@@ -106,15 +111,6 @@ export default {
     };
   },
   computed: {
-    fixedArrayEventListeners() {
-      return pick(this.$listeners, ['blur', 'focus']);
-    },
-    multiselectArrayEventListeners() {
-      return pick(this.$listeners, ['blur', 'focus', 'change']);
-    },
-    normalArrayEventListeners() {
-      return pick(this.$listeners, ['blur', 'focus']);
-    },
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);
     },

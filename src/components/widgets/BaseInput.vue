@@ -26,6 +26,7 @@ const PROPS = {
 
 export default {
   inheritAttrs: false,
+  emits: ['change', 'focus', 'blur'],
   props: PROPS,
   methods: {
     handleChange(event) {

@@ -31,6 +31,7 @@ export default {
     'base-input': BaseInput
   },
   inheritAttrs: false,
+  emits: ['change', 'focus', 'blur'],
   props: PROPS
 };
 </script>

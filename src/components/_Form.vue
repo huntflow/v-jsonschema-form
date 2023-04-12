@@ -29,7 +29,8 @@
       :registry="getRegistry()"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
-      v-on="schemaFieldEventListeners"
+      @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
       @change="handleChange"
     />
   </form>
@@ -73,9 +74,6 @@ export default {
     },
     shouldShowErrorList() {
       return this.showErrorList !== false && this.errors && this.errors.length > 0;
-    },
-    schemaFieldEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur']);
     },
     isStartValidateOnSubmit() {
       return this.startValidateMode === VALIDATION_MODE.onSubmit;

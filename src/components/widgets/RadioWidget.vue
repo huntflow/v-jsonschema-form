@@ -10,6 +10,7 @@ const PROPS = {
 };
 
 export default {
+  emits: ['change'],
   props: PROPS,
   methods: {
     isDisabled(option) {
@@ -31,7 +32,8 @@ export default {
       h('span', {}, [
         h('input', {
           on: {
-            ...this.$listeners,
+	    focus: (evt) => this.$emit('focus', evt),
+	    blur: (evt) => this.$emit('change', evt),
             change: () => this.$emit('change', option.value)
           },
           attrs: {

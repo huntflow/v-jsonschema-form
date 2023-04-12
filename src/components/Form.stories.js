@@ -1,4 +1,4 @@
-import { storiesOf } from '@storybook/vue';
+//import { storiesOf } from '@storybook/vue';
 import JsonForm from './Form';
 import simpleData from './Form.stories.data/simple';
 import nestedData from './Form.stories.data/nested';
@@ -11,6 +11,48 @@ import ifThen from './Form.stories.data/if-then';
 import autofocus from './Form.stories.data/autofocus';
 import customFormat from './Form.stories.data/custom-format';
 
+export default {
+  title: 'Form',
+  component: JsonForm,
+  render: (args) => ({
+    components: {
+      JsonForm
+    },
+    setup() {
+      console.log({
+	...args
+      });
+      
+      return { ...args };
+    },
+    template: '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate :omit-missing-fields="omitMissingFields"></json-form>'
+  })
+};
+
+export const AutoFocus = {
+  args: {
+    ...autofocus,
+    omitMissingFields: false
+  }
+};
+
+export const AutoFocusWithoutMissingFields = {
+  args: {
+    ...autofocus,
+    omitMissingFields: true
+  }
+};
+
+export const IfThen = {
+  args: {
+    ...ifThen,
+    omitMissingFields: false
+  }
+};
+
+
+
+/*
 const components = {
   'json-form': JsonForm
 };
@@ -192,3 +234,4 @@ storiesOf('JsonForm', JsonForm)
       return anyOfData;
     }
   }));
+*/

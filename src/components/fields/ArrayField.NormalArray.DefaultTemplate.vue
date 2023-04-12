@@ -28,6 +28,7 @@ export default {
   components: {
     'add-button': AddButton
   },
+  emits: ['add'],
   props: PROPS,
   computed: {
     isDisabled() {

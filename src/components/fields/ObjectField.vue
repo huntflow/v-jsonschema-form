@@ -29,7 +29,8 @@
         :disabled="disabled"
         :readonly="readonly"
         v-bind="scopedProps"
-        v-on="schemaFieldEventListeners"
+	@focus="$emit('focus', $event)"
+	@blur="$emit('blur', $event)"
         @change="handlePropertyChange(propName, ...arguments)"
       />
     </template>
@@ -61,6 +62,7 @@ const PROPS = {
 
 export default {
   name: 'ObjectField',
+  emits: ['focus', 'blur', 'change'],
   props: PROPS,
   inject: ['resolveSchemaShallowly'],
   data() {
@@ -69,9 +71,6 @@ export default {
     };
   },
   computed: {
-    schemaFieldEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur']);
-    },
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.innerFormData);
     },

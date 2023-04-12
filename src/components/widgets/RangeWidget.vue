@@ -1,6 +1,12 @@
 <template>
   <div className="field-range-wrapper">
-    <base-input type="range" v-bind="componentProps" v-on="$listeners" />
+    <base-input
+      type="range"
+      v-bind="componentProps"
+      @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
+      @change="$emit('change', $event)"
+    />
     <span className="range-view">{{ value }}</span>
   </div>
 </template>

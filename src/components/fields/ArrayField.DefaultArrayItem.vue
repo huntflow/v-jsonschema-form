@@ -60,6 +60,7 @@ export default {
   components: {
     'icon-button': IconButton
   },
+  emits: ['reorder', 'drop'],
   props: PROPS,
   data() {
     return {

@@ -1,5 +1,12 @@
 <template>
-  <base-form ref="vjsf" v-bind="$props" :schema="enrichedSchema" v-on="$listeners" />
+  <base-form
+    ref="vjsf"
+    v-bind="$props"
+    :schema="enrichedSchema"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
+    @change="$emit('change', $event)"
+  />
 </template>
 
 <script>

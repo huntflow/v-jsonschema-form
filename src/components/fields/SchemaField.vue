@@ -26,7 +26,9 @@
       :required="required"
       :schema="resolvedSchema"
       :ui-schema="{ ...uiSchema, class: undefined }"
-      v-on="fieldEventListeners"
+      @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
+      @change="$emit('change', $event)"
     />
   </component>
 </template>
@@ -56,9 +58,6 @@ export default {
   props: PROPS,
   inject: ['resolveSchemaShallowly'],
   computed: {
-    fieldEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur', 'change']);
-    },
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);
     },
@@ -85,11 +84,6 @@ export default {
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:FieldTemplate'] || this.registry.FieldTemplate || DefaultTemplate;
-    }
-  },
-  methods: {
-    handleEvent(event, ...args) {
-      this.$emit(event, ...args);
     }
   }
 };
