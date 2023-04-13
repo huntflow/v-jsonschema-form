@@ -33,7 +33,7 @@ export default {
         h('input', {
           on: {
             focus: (evt) => this.$emit('focus', evt),
-            blur: (evt) => this.$emit('change', evt),
+            blur: (evt) => this.$emit('blur', evt),
             change: () => this.$emit('change', option.value)
           },
           attrs: {
