@@ -10,9 +10,9 @@
     :rows="options.rows"
     v-bind="options"
     :value="typeof value === 'undefined' ? '' : value"
+    @focus="handleFocus"
     @blur="handleBlur"
     @change="handleChange"
-    @focus="handleFocus"
   />
 </template>
 

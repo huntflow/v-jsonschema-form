@@ -7,9 +7,9 @@
     :required="required"
     :value="value"
     v-bind="options"
-    @change="handleChange"
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
+    @change="handleChange"
   />
 </template>
 
@@ -27,12 +27,11 @@ const PROPS = {
 export default {
   inheritAttrs: false,
   props: PROPS,
-  emits: ['change', 'focus', 'blur'],
+  emits: ['focus', 'blur', 'change'],
   methods: {
     handleChange(event) {
       const value = event.target.value;
       const inputValue = value === '' ? this.options && this.options.emptyValue : value;
-
       this.$emit('change', inputValue);
     }
   }

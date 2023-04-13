@@ -38,9 +38,9 @@
     :autofocus="autofocus"
     :registry="registry"
     @reorder="handleReorderClick"
-    @change="$emit('change', $event)"
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
+    @change="$emit('change', $event)"
   />
 
   <normal-array
@@ -63,9 +63,9 @@
     @add="handleAddClick"
     @reorder="handleReorderClick"
     @drop="handleDropIndexClick"
-    @change="$emit('change', $event)"
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
+    @change="$emit('change', $event)"
   />
 </template>
 
@@ -102,7 +102,7 @@ export default {
   inject: ['resolveSchemaShallowly'],
   inheritAttrs: false,
   props: PROPS,
-  emits: ['change', 'blur', 'focus'],
+  emits: ['focus', 'blur', 'change'],
   data() {
     return {
       keyedFormData: [],

@@ -7,9 +7,9 @@
     :readonly="readonly"
     :required="required"
     :value="value"
-    @change="$emit('change', $event)"
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
+    @change="$emit('change', $event)"
   />
 </template>
 
@@ -31,6 +31,6 @@ export default {
   },
   inheritAttrs: false,
   props: PROPS,
-  emits: ['change', 'focus', 'blur']
+  emits: ['focus', 'blur', 'change']
 };
 </script>

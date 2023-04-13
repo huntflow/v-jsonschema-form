@@ -10,8 +10,8 @@
         :disabled="isDisabled"
         :autoFocus="autofocus"
         @focus="$emit('focus', $event)"
-        @change="$emit('change', $event.target.checked)"
         @blur="$emit('blur', $event)"
+        @change="$emit('change', $event.target.checked)"
       />
       <span>{{ label }}</span>
     </label>
@@ -36,7 +36,7 @@ export default {
     'description-field': DescriptionField
   },
   props: PROPS,
-  emits: ['change', 'focus', 'blur'],
+  emits: ['focus', 'blur', 'change'],
   computed: {
     isDisabled() {
       return this.disabled || this.readonly;

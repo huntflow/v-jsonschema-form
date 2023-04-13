@@ -10,9 +10,9 @@
       :required="required"
       :value="value"
       :options="options"
-      @change="$emit('change', $event)"
       @focus="$emit('focus', $event)"
       @blur="$emit('blur', $event)"
+      @change="$emit('change', $event)"
     />
   </div>
 </template>

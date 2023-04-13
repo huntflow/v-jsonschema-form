@@ -25,6 +25,7 @@ export default {
   components: {
     'icon-button': IconButton
   },
-  props: PROPS
+  props: PROPS,
+  emits: ['click']
 };
 </script>

@@ -31,6 +31,6 @@ export default {
   },
   inheritAttrs: false,
   props: PROPS,
-  emits: ['change', 'focus', 'blur']
+  emits: ['focus', 'blur', 'change']
 };
 </script>

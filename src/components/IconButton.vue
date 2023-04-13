@@ -19,6 +19,7 @@ const PROPS = {
 
 export default {
   name: 'IconButton',
-  props: PROPS
+  props: PROPS,
+  emits: ['click']
 };
 </script>

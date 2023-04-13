@@ -15,9 +15,9 @@
     :placeholder="placeholder"
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
-    @change="$emit('change', $event)"
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
+    @change="$emit('change', $event)"
   />
 </template>
 

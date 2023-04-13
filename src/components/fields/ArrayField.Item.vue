@@ -23,8 +23,8 @@
       :disabled="disabled"
       :readonly="readonly"
       :autofocus="autofocus"
-      @blur="$emit('blur', $event)"
       @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
       @change="handleChangeForIndex(index, ...arguments)"
     />
   </default-array-item>
@@ -57,7 +57,7 @@ export default {
   },
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
-  emits: ['change-for-index', 'drop', 'reorder', 'blur', 'focus'],
+  emits: ['drop', 'reorder', 'focus', 'blur', 'change-for-index'],
   computed: {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.itemSchema, this.itemData);
