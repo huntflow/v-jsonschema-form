@@ -1,0 +1,25 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`mount component 1`] = `
+"<form>
+  <!--v-if-->
+  <div>
+    <fieldset id=\\"root\\">
+      <legend id=\\"root__title\\" required=\\"false\\">A registration form</legend>
+      <p id=\\"root__description\\" class=\\"field-description\\">A simple form example.</p>
+      <div>
+        <div>root_firstName TODO: remove later <input type=\\"text\\" autofocus=\\"\\" required=\\"\\" emptyvalue=\\"\\" enumoptions=\\"false\\"></div>
+      </div>
+      <div>
+        <div>root_lastName TODO: remove later <input type=\\"text\\" required=\\"\\" enumoptions=\\"false\\"></div>
+      </div>
+      <div><input type=\\"number\\"></div>
+      <div><textarea id=\\"root_bio\\" class=\\"form-control\\" autofocus=\\"false\\" placeholder=\\"\\" enumoptions=\\"false\\"></textarea></div>
+      <div><input type=\\"password\\"></div>
+      <div>
+        <div>root_telephone TODO: remove later <input type=\\"text\\" inputtype=\\"tel\\" enumoptions=\\"false\\"></div>
+      </div>
+    </fieldset>
+  </div>
+</form>"
+`;

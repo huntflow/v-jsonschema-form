@@ -7,7 +7,7 @@
         class="btn-add col-xs-12"
         tab-index="0"
         :disabled="disabled"
-        v-on="$listeners"
+        @click="$emit('click', $event)"
       />
     </p>
   </div>
@@ -25,6 +25,7 @@ export default {
   components: {
     'icon-button': IconButton
   },
-  props: PROPS
+  props: PROPS,
+  emits: ['click']
 };
 </script>

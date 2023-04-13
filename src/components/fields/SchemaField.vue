@@ -26,15 +26,15 @@
       :required="required"
       :schema="resolvedSchema"
       :ui-schema="{ ...uiSchema, class: undefined }"
-      v-on="fieldEventListeners"
+      @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
+      @change="$emit('change', $event)"
     />
   </component>
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import { getSchemaType } from '../../utils';
-
 import DefaultTemplate from './SchemaField.DefaultTemplate.vue';
 
 const PROPS = {
@@ -53,12 +53,10 @@ const PROPS = {
 
 export default {
   name: 'SchemaField',
-  props: PROPS,
   inject: ['resolveSchemaShallowly'],
+  props: PROPS,
+  emits: ['focus', 'blur', 'change'],
   computed: {
-    fieldEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur', 'change']);
-    },
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);
     },
@@ -85,11 +83,6 @@ export default {
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:FieldTemplate'] || this.registry.FieldTemplate || DefaultTemplate;
-    }
-  },
-  methods: {
-    handleEvent(event, ...args) {
-      this.$emit(event, ...args);
     }
   }
 };

@@ -20,6 +20,7 @@ const PROPS = {
 
 export default {
   props: PROPS,
+  emits: ['change'],
   methods: {
     isDisabled(option) {
       const itemDisabled =

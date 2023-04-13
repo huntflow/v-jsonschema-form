@@ -15,7 +15,9 @@
     :placeholder="placeholder"
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
-    v-on="$listeners"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
+    @change="$emit('change', $event)"
   />
 </template>
 
@@ -42,6 +44,7 @@ export default {
   name: 'StringField',
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
+  emits: ['focus', 'blur', 'change'],
   computed: {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);
@@ -75,11 +78,6 @@ export default {
     errorsMessages() {
       // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
       return this.errors.map(({ message }) => message);
-    }
-  },
-  methods: {
-    handleEvent(event, ...args) {
-      this.$emit(event, ...args);
     }
   }
 };

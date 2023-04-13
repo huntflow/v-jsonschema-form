@@ -10,9 +10,9 @@
     :rows="options.rows"
     v-bind="options"
     :value="typeof value === 'undefined' ? '' : value"
+    @focus="handleFocus"
     @blur="handleBlur"
     @change="handleChange"
-    @focus="handleFocus"
   />
 </template>
 
@@ -31,6 +31,7 @@ const PROPS = {
 export default {
   inheritAttrs: false,
   props: PROPS,
+  emits: ['focus', 'blur', 'change'],
   methods: {
     handleBlur(event) {
       this.$emit('blur', this.id, event.target.value);

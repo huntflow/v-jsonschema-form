@@ -1,5 +1,11 @@
 <template>
-  <button type="button" class="btn" :class="'btn-' + type" :disabled="disabled" v-on="$listeners">
+  <button
+    type="button"
+    class="btn"
+    :class="'btn-' + type"
+    :disabled="disabled"
+    @click="$emit('click', $event)"
+  >
     <i class="glyphicon" :class="'glyphicon-' + icon" />
   </button>
 </template>
@@ -13,6 +19,7 @@ const PROPS = {
 
 export default {
   name: 'IconButton',
-  props: PROPS
+  props: PROPS,
+  emits: ['click']
 };
 </script>

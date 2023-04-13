@@ -29,14 +29,14 @@
       :registry="getRegistry()"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
-      v-on="schemaFieldEventListeners"
+      @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
       @change="handleChange"
     />
   </form>
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import { compileSchema } from '@/validate';
 import { getDefaultRegistry } from '@/utils';
@@ -46,12 +46,13 @@ import { getDefaults, resolveSchemaShallowly, removeEmptySchemaFields } from '@/
 
 export default {
   name: 'VjsfForm',
-  props: PROPS,
   provide() {
     return {
       resolveSchemaShallowly: this.resolveSchemaShallowly
     };
   },
+  props: PROPS,
+  emits: ['focus', 'blur', 'change'],
   data() {
     return {
       formDataState: undefined,
@@ -73,9 +74,6 @@ export default {
     },
     shouldShowErrorList() {
       return this.showErrorList !== false && this.errors && this.errors.length > 0;
-    },
-    schemaFieldEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur']);
     },
     isStartValidateOnSubmit() {
       return this.startValidateMode === VALIDATION_MODE.onSubmit;
@@ -123,7 +121,7 @@ export default {
     },
     focusFirstFieldBySelector(selector) {
       this.$nextTick(() => {
-        const firstField = this.$el.querySelector(selector);
+        const firstField = this.$refs.form.querySelector(selector);
         if (firstField) {
           firstField.focus();
         }

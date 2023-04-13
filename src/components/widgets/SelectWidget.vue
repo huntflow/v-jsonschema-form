@@ -8,8 +8,8 @@
     :required="required"
     :disabled="isDisabled"
     :autoFocus="autofocus"
-    @blur="handleBlur"
     @focus="handleFocus"
+    @blur="handleBlur"
     @change="handleChange"
   >
     <option v-if="!multiple && schema.default === undefined" value="">
@@ -86,6 +86,7 @@ const PROPS = {
 
 export default {
   props: PROPS,
+  emits: ['focus', 'blur', 'change'],
   computed: {
     isDisabled() {
       return this.disabled || this.readonly;

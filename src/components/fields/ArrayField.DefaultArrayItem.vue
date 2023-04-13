@@ -61,6 +61,7 @@ export default {
     'icon-button': IconButton
   },
   props: PROPS,
+  emits: ['reorder', 'drop'],
   data() {
     return {
       btnStyle: {
