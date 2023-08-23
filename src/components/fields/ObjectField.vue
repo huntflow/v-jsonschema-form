@@ -79,11 +79,7 @@ export default {
       return this.resolvedSchema.required || [];
     },
     objectFieldTemplateCls() {
-      return (
-        this.uiSchema['ui:ObjectFieldTemplate'] ||
-        this.registry.ObjectFieldTemplate ||
-        DefaultObjectFieldTemplate
-      );
+      return this.uiSchema['ui:ObjectFieldTemplate'] || DefaultObjectFieldTemplate;
     },
     schemaFieldCls() {
       return this.registry.fields.SchemaField;

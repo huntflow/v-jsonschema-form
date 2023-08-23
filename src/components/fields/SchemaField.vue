@@ -84,7 +84,7 @@ export default {
       return getFieldComponent(this.resolvedSchema, this.uiSchema, this.registry.fields);
     },
     fieldTemplateCls() {
-      return this.uiSchema['ui:FieldTemplate'] || this.registry.FieldTemplate || DefaultTemplate;
+      return this.uiSchema['ui:FieldTemplate'] || DefaultTemplate;
     }
   },
   methods: {

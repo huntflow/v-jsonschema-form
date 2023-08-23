@@ -1,5 +1,3 @@
-export const ADDITIONAL_PROPERTY_FLAG = '__additional_property';
-
 const widgetMap = {
   boolean: {
     checkbox: 'CheckboxWidget',
