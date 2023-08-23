@@ -13,12 +13,6 @@ export default {
     BaseForm
   },
   props: PROPS,
-  data() {
-    return {
-      dereferencedSchema: null,
-      isDereference: false
-    };
-  },
   computed: {
     enrichedSchema() {
       return getEnrichedSchema(this.schema);
