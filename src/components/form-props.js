@@ -1,5 +1,4 @@
 import { VALIDATION_MODE } from '../constants';
-import DefaultErrorList from './ErrorList.vue';
 
 export const PROPS = {
   id: String,
@@ -24,7 +23,6 @@ export const PROPS = {
   },
   disabled: { type: Boolean, default: false },
   noHtml5Validate: { type: Boolean, default: false },
-  ErrorList: { type: Object, default: () => DefaultErrorList },
   omitExtraData: { type: Boolean, default: false },
   fields: { type: Object, default: () => ({}) },
   widgets: { type: Object, default: () => ({}) },

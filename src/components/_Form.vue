@@ -13,20 +13,12 @@
     @submit="handleSubmit"
   >
     <component
-      :is="ErrorList"
-      v-if="shouldShowErrorList"
-      :error-schema="errorSchema"
-      :errors="errors"
-      :schema="resolvedSchema"
-      :ui-schema="uiSchema"
-    />
-    <component
-      :is="getRegistry().fields.SchemaField"
+      :is="registry.fields.SchemaField"
       :id="idPrefix"
       :disabled="disabled"
       :errors="errorSchema"
       :form-data="formDataState"
-      :registry="getRegistry()"
+      :registry="registry"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
       v-on="schemaFieldEventListeners"
@@ -55,7 +47,6 @@ export default {
   data() {
     return {
       formDataState: undefined,
-      errors: [],
       errorSchema: {},
       submitted: false
     };
@@ -71,9 +62,6 @@ export default {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formDataState);
     },
-    shouldShowErrorList() {
-      return this.showErrorList !== false && this.errors && this.errors.length > 0;
-    },
     schemaFieldEventListeners() {
       return pick(this.$listeners, ['focus', 'blur']);
     },
@@ -88,6 +76,15 @@ export default {
     },
     mustValidate() {
       return this.canValidateByMode && !this.noValidate && this.liveValidate;
+    },
+    registry() {
+      // For BC, accept passed SchemaField and TitleField props and pass them to
+      // the "fields" registry one.
+      const { fields, widgets } = getDefaultRegistry();
+      return {
+        fields: { ...fields, ...this.fields },
+        widgets: { ...widgets, ...this.widgets }
+      };
     }
   },
   watch: {
@@ -96,14 +93,12 @@ export default {
         this.formDataState = this.enrichFormData(formData);
 
         const mustValidate = typeof formData !== 'undefined' && this.mustValidate;
-        const { errors, errorSchema } = mustValidate
+        const { errorSchema } = mustValidate
           ? this.doValidate(this.formDataState)
           : {
-              errors: this.errors || [],
               errorSchema: this.errorSchema || {}
             };
 
-        this.errors = errors;
         this.errorSchema = errorSchema;
       },
       immediate: true
@@ -137,7 +132,6 @@ export default {
       if (!this.noValidate) {
         const { errors, errorSchema } = this.doValidate(newFormData);
         if (Object.keys(errors).length > 0) {
-          this.errors = errors;
           this.errorSchema = errorSchema;
 
           this.$emit('error', errors);
@@ -148,7 +142,6 @@ export default {
       }
 
       this.formDataState = newFormData;
-      this.errors = [];
       this.errorSchema = {};
 
       const submitPayload = {
@@ -156,7 +149,6 @@ export default {
         uiSchema: this.uiSchema,
         formData: this.formDataState,
         edit: this.isEdit,
-        errors: this.errors,
         errorSchema: this.errorSchema,
         status: 'submitted'
       };
@@ -167,19 +159,9 @@ export default {
       this.formDataState = this.enrichFormData(formData);
 
       if (this.mustValidate) {
-        const { errors, errorSchema } = this.doValidate(this.formDataState);
-        this.errors = errors;
+        const { errorSchema } = this.doValidate(this.formDataState);
         this.errorSchema = errorSchema;
       }
-    },
-    getRegistry() {
-      // For BC, accept passed SchemaField and TitleField props and pass them to
-      // the "fields" registry one.
-      const { fields, widgets } = getDefaultRegistry();
-      return {
-        fields: { ...fields, ...this.fields },
-        widgets: { ...widgets, ...this.widgets }
-      };
     },
     enrichFormData(formData) {
       // непонятно нужно ли нам учитывать дефолтные значения с флагом omitMissingFields (режим просмотра)
