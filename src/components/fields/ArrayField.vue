@@ -112,7 +112,11 @@ export default {
       return pick(this.$listeners, ['blur', 'focus']);
     },
     resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formState);
+      const schema = this.resolveSchemaShallowly(this.schema, this.formState);
+      if (schema.items) {
+        schema.items = this.resolveSchemaShallowly(schema.items, this.formState);
+      }
+      return schema;
     },
     isFixedArray() {
       return isFixedItems(this.resolvedSchema);

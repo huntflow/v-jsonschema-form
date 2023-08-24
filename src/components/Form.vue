@@ -1,5 +1,5 @@
 <template>
-  <base-form ref="vjsf" v-bind="$props" :schema="enrichedSchema" v-on="$listeners" />
+  <base-form ref="vjsf" :key="key" v-bind="$props" :schema="enrichedSchema" v-on="$listeners" />
 </template>
 
 <script>
@@ -16,6 +16,9 @@ export default {
   computed: {
     enrichedSchema() {
       return getEnrichedSchema(this.schema);
+    },
+    key() {
+      return JSON.stringify(this.schema);
     }
   },
   methods: {
