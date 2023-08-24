@@ -10,7 +10,6 @@
     :readonly="readonly"
     :required="required"
     :schema="schema"
-    :form-data="formState"
     :registry="registry"
     :raw-error-infos="errors"
     @add="$emit('add')"
@@ -37,11 +36,12 @@
       v-for="(keyedItem, index) in keyedFormData"
       :id="`${id}_${index}`"
       :key="keyedItem.key"
+      :pointer="`${pointer}/${index}`"
       :registry="registry"
       :index="index"
       :can-remove="true"
       :can-move-up="index > 0"
-      :can-move-down="index < formState.length - 1"
+      :can-move-down="index < formData.length - 1"
       :ui-schema="uiSchema"
       :item-schema="schema.items"
       :item-ui-schema="uiSchema.items"
@@ -64,6 +64,14 @@ const PROPS = {
   label: String,
   description: String,
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: Array,
+    required: true
+  },
   keyedFormData: Array,
   schema: Object,
   uiSchema: Object,
@@ -77,20 +85,16 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldNormalArray',
-  inject: ['getFormData'],
   components: {
     'array-field-item': ArrayFieldItem
   },
   props: PROPS,
   computed: {
-    formState() {
-      return this.getFormData();
-    },
     arrayFieldItemEvents() {
       return pick(this.$listeners, ['focus', 'blur', 'reorder', 'drop']);
     },
     canAdd() {
-      return canAddArrayItem(this.uiSchema, this.schema, this.formState);
+      return canAddArrayItem(this.uiSchema, this.schema, this.formData);
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultNormalArrayFieldTemplate;

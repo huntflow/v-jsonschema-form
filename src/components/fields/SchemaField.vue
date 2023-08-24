@@ -14,6 +14,8 @@
     <component
       :is="fieldCls"
       :id="id"
+      :pointer="pointer"
+      :form-data="formData"
       :name="name"
       :label="title"
       :description="description"
@@ -39,6 +41,14 @@ const PROPS = {
     default: null
   },
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: [Number, String, Array, Object],
+    default: undefined
+  },
   schema: Object,
   uiSchema: { type: Object, default: () => ({}) },
   errors: { type: [Array, Object] },
@@ -52,24 +62,13 @@ const PROPS = {
 export default {
   name: 'SchemaField',
   props: PROPS,
-  inject: ['resolveSchemaShallowly', 'getFormDataByPath', 'setFormDataByPath'],
-  provide() {
-    return {
-      getFormDataByPath: this.getStateByPath,
-      getFormData: this.getState,
-      setFormDataByPath: this.setStateByPath,
-      setFormData: this.setState
-    };
-  },
+  inject: ['resolveSchemaShallowly', 'setFormDataByPath'],
   computed: {
-    formState() {
-      return this.getState();
-    },
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);
     },
     resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formState);
+      return this.resolveSchemaShallowly(this.schema, this.formData);
     },
     isHidden() {
       return this.uiSchema['ui:widget'] === 'hidden';
@@ -94,19 +93,8 @@ export default {
     }
   },
   methods: {
-    getStateByPath(path) {
-      const fullPath = [this.name, path].filter(Boolean).join('.');
-      return this.getFormDataByPath(fullPath);
-    },
-    getState() {
-      return this.getFormDataByPath(this.name);
-    },
-    setStateByPath(path, value) {
-      const fullPath = [this.name, path].filter(Boolean).join('.');
-      this.setFormDataByPath(fullPath, value);
-    },
     setState(value) {
-      this.setFormDataByPath(this.name, value);
+      this.setFormDataByPath(this.pointer, value);
     }
   }
 };

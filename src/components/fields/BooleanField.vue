@@ -28,6 +28,11 @@ const PROPS = {
   schema: Object,
   uiSchema: Object,
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: Boolean,
   errors: {
     type: Array,
     default: () => []
@@ -41,12 +46,9 @@ const PROPS = {
 
 export default {
   name: 'BooleanField',
-  inject: ['getFormData', 'setFormData'],
+  inject: ['setFormDataByPath'],
   props: PROPS,
   computed: {
-    formState() {
-      return this.getFormData();
-    },
     enumOptions() {
       return optionsList({
         enum: this.schema.enum || [true, false],
@@ -71,7 +73,7 @@ export default {
   },
   methods: {
     handleChange(value) {
-      this.setFormData(value);
+      this.setFormDataByPath(this.pointer, value);
     }
   }
 };

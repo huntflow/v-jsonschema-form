@@ -6,7 +6,7 @@
     :schema="resolvedSchema"
     :label="label"
     :description="description"
-    :value="formState"
+    :value="formData"
     :required="required"
     :disabled="disabled"
     :readonly="readonly"
@@ -29,6 +29,14 @@ const PROPS = {
   description: String,
   uiSchema: Object,
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: [String, Number],
+    default: undefined
+  },
   registry: { type: Object, required: true },
   errors: { type: Array, default: () => [] },
   required: { type: Boolean, default: false },
@@ -39,14 +47,11 @@ const PROPS = {
 
 export default {
   name: 'StringField',
-  inject: ['resolveSchemaShallowly', 'getFormData', 'setFormData'],
+  inject: ['resolveSchemaShallowly', 'setFormDataByPath'],
   props: PROPS,
   computed: {
-    formState() {
-      return this.getFormData();
-    },
     resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formState);
+      return this.resolveSchemaShallowly(this.schema, this.formData);
     },
     enumOptions() {
       return isSelect(this.resolvedSchema) && optionsList(this.resolvedSchema);
@@ -81,7 +86,7 @@ export default {
   },
   methods: {
     handleChange(value) {
-      this.setFormData(value);
+      this.setFormDataByPath(this.pointer, value);
     }
   }
 };

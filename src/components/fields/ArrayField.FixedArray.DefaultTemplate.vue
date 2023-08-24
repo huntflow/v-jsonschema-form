@@ -16,10 +16,6 @@ import AddButton from '../AddButton';
 
 const PROPS = {
   id: String,
-  formData: {
-    type: Array,
-    required: true
-  },
   schema: Object,
   uiSchema: Object,
   canAdd: { type: Boolean, default: false },

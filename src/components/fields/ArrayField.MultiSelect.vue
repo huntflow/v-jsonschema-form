@@ -6,7 +6,7 @@
     :options="widgetWithOptions.options"
     :schema="schema"
     :registry="registry"
-    :value="formState"
+    :value="formData"
     :disabled="disabled"
     :readonly="readonly"
     :required="required"
@@ -29,6 +29,14 @@ const PROPS = {
   placeholder: String,
   schema: Object,
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: Array,
+    required: true
+  },
   uiSchema: Object,
   errors: { type: Array, default: () => [] },
   registry: { type: Object, required: true },
@@ -40,12 +48,8 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldMultiSelect',
-  inject: ['getFormData'],
   props: PROPS,
   computed: {
-    formState() {
-      return this.getFormData();
-    },
     widgetCls() {
       return getWidget(this.schema, this.widgetWithOptions.widget, this.registry.widgets);
     },

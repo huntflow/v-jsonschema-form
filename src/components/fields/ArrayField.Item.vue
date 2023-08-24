@@ -14,6 +14,8 @@
       :is="registry.fields.SchemaField"
       :id="id"
       :name="`${index}`"
+      :pointer="pointer"
+      :form-data="itemData"
       :schema="resolvedSchema"
       :ui-schema="itemUiSchema"
       :errors="errors"
@@ -40,6 +42,10 @@ const PROPS = {
   itemData: {},
   itemUiSchema: Object,
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
   errors: Object,
   uiSchema: { type: Object },
   registry: { type: Object, required: true },

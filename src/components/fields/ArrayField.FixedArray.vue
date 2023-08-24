@@ -2,7 +2,6 @@
   <component
     :is="fieldTemplateCls"
     :id="id"
-    :form-data="formState"
     :schema="schema"
     :ui-schema="uiSchema"
     :can-add="canAdd"
@@ -32,6 +31,7 @@
       v-for="(keyedItem, index) in keyedFormData"
       :id="`${id}_${index}`"
       :key="keyedItem.key"
+      :pointer="`${pointer}/${index}`"
       :registry="registry"
       :index="index"
       :can-remove="index >= itemSchemas.length"
@@ -62,6 +62,14 @@ const PROPS = {
   uiSchema: {},
   errors: { type: Array, default: () => [] },
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: Array,
+    required: true
+  },
   registry: { type: Object, required: true },
   autofocus: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
@@ -73,31 +81,28 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldFixedArray',
-  inject: ['resolveSchemaShallowly', 'getFormData'],
+  inject: ['resolveSchemaShallowly'],
   components: {
     ArrayFieldItem
   },
   props: PROPS,
   computed: {
-    formState() {
-      return this.getFormData();
-    },
     arrayFieldItemEventListeners() {
       return pick(this.$listeners, ['focus', 'blur', 'reorder', 'drop']);
     },
     canAdd() {
-      return canAddArrayItem(this.uiSchema, this.schema, this.formState);
+      return canAddArrayItem(this.uiSchema, this.schema, this.formData);
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultFixedArrayFieldTemplate;
     },
     itemSchemas() {
       return this.schema.items.map((item, index) =>
-        this.resolveSchemaShallowly(item, this.formState[index])
+        this.resolveSchemaShallowly(item, this.formData[index])
       );
     },
     formDataItems() {
-      let items = this.formState;
+      let items = this.formData;
       if (!items || items.length < this.itemSchemas.length) {
         // to make sure at least all fixed items are generated
         items = items || [];

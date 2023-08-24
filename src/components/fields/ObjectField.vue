@@ -9,7 +9,6 @@
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :ordered-properties="orderedProperties"
-    :form-data="formState"
     :disabled="disabled"
     :readonly="readonly"
     :required="required"
@@ -19,12 +18,13 @@
         :is="schemaFieldCls"
         :id="`${id}_${propName}`"
         :key="propName"
+        :pointer="`${pointer}/${propName}`"
+        :form-data="formData[propName]"
         :name="propName"
         :required="isRequired(propName)"
         :schema="resolvedSchema.properties[propName]"
         :ui-schema="scopedProps.uiSchema || uiSchema[propName]"
         :errors="errors[propName]"
-        :form-data="formState[propName]"
         :registry="registry"
         :disabled="disabled"
         :readonly="readonly"
@@ -46,6 +46,14 @@ const PROPS = {
   description: String,
   uiSchema: { type: Object, default: () => ({}) },
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: Object,
+    required: true
+  },
   errors: { type: Object, default: () => ({}) },
   schema: Object,
   registry: { type: Object, required: true },
@@ -57,16 +65,13 @@ const PROPS = {
 export default {
   name: 'ObjectField',
   props: PROPS,
-  inject: ['resolveSchemaShallowly', 'getFormData'],
+  inject: ['resolveSchemaShallowly'],
   computed: {
-    formState() {
-      return this.getFormData();
-    },
     schemaFieldEventListeners() {
       return pick(this.$listeners, ['focus', 'blur']);
     },
     resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formState);
+      return this.resolveSchemaShallowly(this.schema, this.formData);
     },
     requiredFields() {
       return this.resolvedSchema.required || [];

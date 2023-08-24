@@ -2,6 +2,8 @@
   <fixed-array
     v-if="isFixedArray"
     :id="id"
+    :pointer="pointer"
+    :form-data="formData"
     :label="label"
     :description="description"
     :keyed-form-data="keyedFormData"
@@ -23,6 +25,8 @@
   <multi-select-array
     v-else-if="isMultiSelectArray"
     :id="id"
+    :pointer="pointer"
+    :form-data="formData"
     :label="label"
     :description="description"
     :schema="resolvedSchema"
@@ -40,6 +44,8 @@
   <normal-array
     v-else
     :id="id"
+    :pointer="pointer"
+    :form-data="formData"
     :label="label"
     :description="description"
     :keyed-form-data="keyedFormData"
@@ -73,6 +79,14 @@ const PROPS = {
   description: String,
   name: String,
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: Array,
+    default: () => []
+  },
   uiSchema: { type: Object, default: () => ({}) },
   schema: Object,
   errors: { type: Array, default: () => [] },
@@ -85,7 +99,7 @@ const PROPS = {
 
 export default {
   name: 'ArrayField',
-  inject: ['resolveSchemaShallowly', 'getFormData', 'setFormData', 'setFormDataByPath'],
+  inject: ['resolveSchemaShallowly', 'setFormDataByPath'],
   components: {
     NormalArray,
     FixedArray,
@@ -99,9 +113,6 @@ export default {
     };
   },
   computed: {
-    formState() {
-      return this.getFormData();
-    },
     fixedArrayEventListeners() {
       return pick(this.$listeners, ['blur', 'focus']);
     },
@@ -112,9 +123,9 @@ export default {
       return pick(this.$listeners, ['blur', 'focus']);
     },
     resolvedSchema() {
-      const schema = this.resolveSchemaShallowly(this.schema, this.formState);
+      const schema = this.resolveSchemaShallowly(this.schema, this.formData);
       if (schema.items) {
-        schema.items = this.resolveSchemaShallowly(schema.items, this.formState);
+        schema.items = this.resolveSchemaShallowly(schema.items, this.formData);
       }
       return schema;
     },
@@ -122,10 +133,10 @@ export default {
       return isFixedItems(this.resolvedSchema);
     },
     isMultiSelectArray() {
-      return isMultiSelect(this.resolvedSchema, this.formState);
+      return isMultiSelect(this.resolvedSchema, this.formData);
     },
     keyedFormData() {
-      return this.formState.map((item, index) => {
+      return this.formData.map((item, index) => {
         return {
           key: this.keys[index],
           item
@@ -134,11 +145,10 @@ export default {
     }
   },
   created() {
-    this.keys = this.formState.map(() => generateRowId());
+    this.keys = this.formData.map(() => generateRowId());
   },
   methods: {
     getNewFormDataRow() {
-      debugger;
       let itemSchema = this.resolvedSchema.items;
       if (this.isFixedArray && allowAdditionalItems(this.resolvedSchema)) {
         itemSchema = this.resolvedSchema.additionalItems;
@@ -148,14 +158,14 @@ export default {
 
     handleAddClick() {
       this.keys.push(generateRowId());
-      this.setFormData((state) => {
+      this.setFormDataByPath(this.pointer, (state) => {
         state.push(this.getNewFormDataRow());
       });
     },
 
     handleDropIndexClick(index) {
       this.keys.splice(index, 1);
-      this.setFormData((state) => {
+      this.setFormDataByPath(this.pointer, (state) => {
         state.splice(index, 1);
       });
     },
@@ -165,7 +175,7 @@ export default {
       this.$set(this.keys, from, this.keys[to]);
       this.$set(this.keys, to, tempKey);
 
-      this.setFormData((state) => {
+      this.setFormDataByPath(this.pointer, (state) => {
         const temp = state[from];
         this.$set(state, from, state[to]);
         this.$set(state, to, temp);

@@ -15,6 +15,8 @@
     <component
       :is="registry.fields.SchemaField"
       :id="idPrefix"
+      pointer=""
+      :form-data="formDataState"
       :disabled="disabled"
       :errors="errorSchema"
       :registry="registry"
@@ -29,8 +31,7 @@
 <script>
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
-import toPath from 'lodash/toPath';
+import jsonPointer from 'json-pointer';
 
 import { compileSchema } from '@/validate';
 import { getDefaultRegistry } from '@/utils';
@@ -44,7 +45,6 @@ export default {
   provide() {
     return {
       resolveSchemaShallowly: this.resolveSchemaShallowly,
-      getFormDataByPath: this.getFormDataByPath,
       setFormDataByPath: this.setFormDataByPath
     };
   },
@@ -188,16 +188,16 @@ export default {
       return getErrorData();
     },
     getFormDataByPath(path) {
-      if (!path) {
-        return this.formDataState;
+      if (jsonPointer.has(this.formDataState, path)) {
+        return jsonPointer.get(this.formDataState, path);
       }
-      return get(this.formDataState, path);
+      return undefined;
     },
     setFormDataByPath(path, value) {
-      const paths = toPath(path);
+      const paths = jsonPointer.parse(path);
       const last = paths.pop();
 
-      const formData = this.getFormDataByPath(paths.join('.'));
+      const formData = this.getFormDataByPath(jsonPointer.compile(paths));
       if (typeof value === 'function') {
         // Для производительных действий над массивами: удаление/добавление/перемещение
         value(this.getFormDataByPath(path));

@@ -193,7 +193,7 @@ storiesOf('JsonForm', JsonForm)
       return anyOfData;
     }
   }))
-  .add('More children', () => ({
+  .add('moreChildren', () => ({
     components,
     template:
       '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData"></json-form>',
