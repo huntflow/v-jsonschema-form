@@ -5,7 +5,7 @@
     :options="widgetWithOptions.options"
     :schema="schema"
     :label="label"
-    :value="formData"
+    :value="formState"
     :required="required"
     :disabled="disabled"
     :readonly="readonly"
@@ -14,6 +14,7 @@
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
     v-on="$listeners"
+    @change="handleChange"
   />
 </template>
 
@@ -27,7 +28,6 @@ const PROPS = {
   schema: Object,
   uiSchema: Object,
   id: String,
-  formData: Boolean,
   errors: {
     type: Array,
     default: () => []
@@ -41,8 +41,12 @@ const PROPS = {
 
 export default {
   name: 'BooleanField',
+  inject: ['getFormData', 'setFormData'],
   props: PROPS,
   computed: {
+    formState() {
+      return this.getFormData();
+    },
     enumOptions() {
       return optionsList({
         enum: this.schema.enum || [true, false],
@@ -63,6 +67,11 @@ export default {
     errorsMessages() {
       // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
       return this.errors.map(({ message }) => message);
+    }
+  },
+  methods: {
+    handleChange(value) {
+      this.setFormData(value);
     }
   }
 };

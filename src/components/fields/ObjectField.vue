@@ -9,7 +9,7 @@
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :ordered-properties="orderedProperties"
-    :form-data="innerFormData"
+    :form-data="formState"
     :disabled="disabled"
     :readonly="readonly"
     :required="required"
@@ -24,13 +24,12 @@
         :schema="resolvedSchema.properties[propName]"
         :ui-schema="scopedProps.uiSchema || uiSchema[propName]"
         :errors="errors[propName]"
-        :form-data="(innerFormData || {})[propName]"
+        :form-data="formState[propName]"
         :registry="registry"
         :disabled="disabled"
         :readonly="readonly"
         v-bind="scopedProps"
         v-on="schemaFieldEventListeners"
-        @change="handlePropertyChange(propName, ...arguments)"
       />
     </template>
   </component>
@@ -48,10 +47,6 @@ const PROPS = {
   uiSchema: { type: Object, default: () => ({}) },
   id: String,
   errors: { type: Object, default: () => ({}) },
-  formData: {
-    type: [String, Number, Boolean, Array, Object], // TODO: check if it's true
-    default: () => ({})
-  },
   schema: Object,
   registry: { type: Object, required: true },
   disabled: { type: Boolean, default: false },
@@ -62,18 +57,16 @@ const PROPS = {
 export default {
   name: 'ObjectField',
   props: PROPS,
-  inject: ['resolveSchemaShallowly'],
-  data() {
-    return {
-      innerFormData: {} // TODO: используется для того чтобы можно было обновить несколько вложенных полей одновременно, допустим если в инпутах заполняются данные при mounted
-    };
-  },
+  inject: ['resolveSchemaShallowly', 'getFormData'],
   computed: {
+    formState() {
+      return this.getFormData();
+    },
     schemaFieldEventListeners() {
       return pick(this.$listeners, ['focus', 'blur']);
     },
     resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.innerFormData);
+      return this.resolveSchemaShallowly(this.schema, this.formState);
     },
     requiredFields() {
       return this.resolvedSchema.required || [];
@@ -89,21 +82,9 @@ export default {
       return orderProperties(properties, this.uiSchema['ui:order']);
     }
   },
-  watch: {
-    formData: {
-      immediate: true,
-      handler(formData) {
-        this.innerFormData = formData;
-      }
-    }
-  },
   methods: {
     isRequired(name) {
       return this.requiredFields.includes(name);
-    },
-    handlePropertyChange(name, value) {
-      this.innerFormData[name] = value;
-      this.$emit('change', { ...this.innerFormData });
     }
   }
 };

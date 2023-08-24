@@ -17,7 +17,6 @@
       :id="idPrefix"
       :disabled="disabled"
       :errors="errorSchema"
-      :form-data="formDataState"
       :registry="registry"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
@@ -30,6 +29,9 @@
 <script>
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
+import toPath from 'lodash/toPath';
+
 import { compileSchema } from '@/validate';
 import { getDefaultRegistry } from '@/utils';
 import { PROPS } from './form-props';
@@ -41,7 +43,9 @@ export default {
   props: PROPS,
   provide() {
     return {
-      resolveSchemaShallowly: this.resolveSchemaShallowly
+      resolveSchemaShallowly: this.resolveSchemaShallowly,
+      getFormDataByPath: this.getFormDataByPath,
+      setFormDataByPath: this.setFormDataByPath
     };
   },
   data() {
@@ -82,7 +86,7 @@ export default {
       // the "fields" registry one.
       const { fields, widgets } = getDefaultRegistry();
       return {
-        fields: { ...fields, ...this.fields },
+        fields,
         widgets: { ...widgets, ...this.widgets }
       };
     }
@@ -182,6 +186,24 @@ export default {
       const { validate, getErrorData } = this.compiledSchemaData;
       validate(cloneDeep(formData));
       return getErrorData();
+    },
+    getFormDataByPath(path) {
+      if (!path) {
+        return this.formDataState;
+      }
+      return get(this.formDataState, path);
+    },
+    setFormDataByPath(path, value) {
+      const paths = toPath(path);
+      const last = paths.pop();
+
+      const formData = this.getFormDataByPath(paths.join('.'));
+      if (typeof value === 'function') {
+        // Для производительных действий над массивами: удаление/добавление/перемещение
+        value(this.getFormDataByPath(path));
+      } else {
+        this.$set(formData, last, value);
+      }
     }
   }
 };

@@ -4,9 +4,9 @@
     :id="id"
     multiple
     :options="widgetWithOptions.options"
-    :schema="resolvedSchema"
+    :schema="schema"
     :registry="registry"
-    :value="formData"
+    :value="formState"
     :disabled="disabled"
     :readonly="readonly"
     :required="required"
@@ -30,7 +30,6 @@ const PROPS = {
   schema: Object,
   id: String,
   uiSchema: Object,
-  formData: Array,
   errors: { type: Array, default: () => [] },
   registry: { type: Object, required: true },
   disabled: { type: Boolean, default: false },
@@ -41,17 +40,17 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldMultiSelect',
-  inject: ['resolveSchemaShallowly'],
+  inject: ['getFormData'],
   props: PROPS,
   computed: {
-    resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formData);
+    formState() {
+      return this.getFormData();
     },
     widgetCls() {
-      return getWidget(this.resolvedSchema, this.widgetWithOptions.widget, this.registry.widgets);
+      return getWidget(this.schema, this.widgetWithOptions.widget, this.registry.widgets);
     },
     widgetWithOptions() {
-      const itemsSchema = this.resolveSchemaShallowly(this.resolvedSchema.items, this.formData);
+      const itemsSchema = this.schema.items;
       const enumOptions = optionsList(itemsSchema);
       const { widget = 'select', ...options } = {
         ...getUiOptions(this.uiSchema),

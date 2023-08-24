@@ -6,7 +6,7 @@
     :schema="resolvedSchema"
     :label="label"
     :description="description"
-    :value="formData"
+    :value="formState"
     :required="required"
     :disabled="disabled"
     :readonly="readonly"
@@ -15,7 +15,7 @@
     :placeholder="placeholder"
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
-    v-on="$listeners"
+    @change="handleChange"
   />
 </template>
 
@@ -29,7 +29,6 @@ const PROPS = {
   description: String,
   uiSchema: Object,
   id: String,
-  formData: [String, Number],
   registry: { type: Object, required: true },
   errors: { type: Array, default: () => [] },
   required: { type: Boolean, default: false },
@@ -40,11 +39,14 @@ const PROPS = {
 
 export default {
   name: 'StringField',
-  inject: ['resolveSchemaShallowly'],
+  inject: ['resolveSchemaShallowly', 'getFormData', 'setFormData'],
   props: PROPS,
   computed: {
+    formState() {
+      return this.getFormData();
+    },
     resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formData);
+      return this.resolveSchemaShallowly(this.schema, this.formState);
     },
     enumOptions() {
       return isSelect(this.resolvedSchema) && optionsList(this.resolvedSchema);
@@ -78,8 +80,8 @@ export default {
     }
   },
   methods: {
-    handleEvent(event, ...args) {
-      this.$emit(event, ...args);
+    handleChange(value) {
+      this.setFormData(value);
     }
   }
 };

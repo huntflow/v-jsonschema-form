@@ -55,8 +55,7 @@ export function getDefaultRegistry() {
     // eslint-disable-next-line no-undef
     fields: require('./components/fields').default,
     // eslint-disable-next-line no-undef
-    widgets: require('./components/widgets').default,
-    formContext: {}
+    widgets: require('./components/widgets').default
   };
 }
 

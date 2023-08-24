@@ -7,7 +7,7 @@
     :required="required"
     :value="value"
     v-bind="options"
-    @change="handleChange"
+    @input="handleChange"
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
   />

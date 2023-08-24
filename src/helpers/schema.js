@@ -12,7 +12,7 @@ jsonSchemaTraverse.arrayKeywords.prefixItems = true;
 
 const CONDITIONAL_KEYWORDS = [/*'not', 'anyOf', 'oneOf',*/ 'allOf', 'if'];
 
-const KEYWORDS_FOR_RESOLVING = ['$ref'].concat(CONDITIONAL_KEYWORDS);
+const KEYWORDS_FOR_RESOLVING = ['$ref', 'items'].concat(CONDITIONAL_KEYWORDS);
 
 export function resolveSchemaShallowly(schema, { getSchema, data }) {
   if (!KEYWORDS_FOR_RESOLVING.some((keyword) => keyword in schema)) {
@@ -40,6 +40,9 @@ export function resolveSchemaShallowly(schema, { getSchema, data }) {
     delete resultSchema.if;
     delete resultSchema.then;
     delete resultSchema.else;
+  }
+  if (resultSchema.items) {
+    resultSchema.items = resolveSchemaShallowly(resultSchema.items, { getSchema, data });
   }
   delete resultSchema.$id;
   return resultSchema;

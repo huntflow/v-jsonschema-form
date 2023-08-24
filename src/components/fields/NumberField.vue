@@ -23,7 +23,6 @@ const PROPS = {
   description: String,
   uiSchema: Object,
   id: String,
-  formData: Number,
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
@@ -34,14 +33,17 @@ const PROPS = {
 
 export default {
   name: 'NumberField',
+  inject: ['getFormData', 'setFormData'],
   props: PROPS,
   data() {
     return {
-      // TODO: seems there's an issue in the react library..
-      lastValue: this.formData
+      lastValue: null
     };
   },
   computed: {
+    formState() {
+      return this.getFormData();
+    },
     eventListeners() {
       return pick(this.$listeners, ['focus', 'blur']);
     },
@@ -49,14 +51,14 @@ export default {
       return this.registry.fields.StringField;
     },
     formDataNumericValue() {
-      let value = this.formData;
+      let value = this.formState;
       if (typeof this.lastValue === 'string' && typeof value === 'number') {
         // Construct a regular expression that checks for a string that consists
-        // of the formData value suffixed with zero or one '.' characters and zero
+        // of the formState value suffixed with zero or one '.' characters and zero
         // or more '0' characters
         const re = new RegExp(`${value}`.replace('.', '\\.') + '\\.?0*$');
 
-        // If the cached "lastValue" is a match, use that instead of the formData
+        // If the cached "lastValue" is a match, use that instead of the formState
         // value to prevent the input value from changing in the UI
         if (this.lastValue.match(re)) {
           value = this.lastValue;
@@ -68,6 +70,9 @@ export default {
       // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
       return this.errors.map(({ message }) => message);
     }
+  },
+  created() {
+    this.lastValue = this.formState;
   },
   methods: {
     handleChange(value) {
@@ -86,7 +91,7 @@ export default {
           ? asNumber(value.replace(trailingCharMatcher, ''))
           : asNumber(value);
 
-      this.$emit('change', processed);
+      this.setFormData(processed);
     }
   }
 };

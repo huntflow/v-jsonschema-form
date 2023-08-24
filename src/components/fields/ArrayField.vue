@@ -7,7 +7,6 @@
     :keyed-form-data="keyedFormData"
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
-    :form-data="formData"
     :errors="errors"
     :name="name"
     :required="required"
@@ -16,20 +15,18 @@
     :autofocus="autofocus"
     :registry="registry"
     v-on="fixedArrayEventListeners"
-    @change-for-index="handleChangeForIndex"
     @add="handleAddClick"
     @reorder="handleReorderClick"
     @drop="handleDropIndexClick"
   />
 
-  <multiselect-array
+  <multi-select-array
     v-else-if="isMultiSelectArray"
     :id="id"
     :label="label"
     :description="description"
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
-    :form-data="formData"
     :errors="errors"
     :required="required"
     :disabled="disabled"
@@ -48,7 +45,6 @@
     :keyed-form-data="keyedFormData"
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
-    :form-data="formData"
     :errors="errors"
     :name="name"
     :required="required"
@@ -57,20 +53,19 @@
     :autofocus="autofocus"
     :registry="registry"
     v-on="normalArrayEventListeners"
-    @change-for-index="handleChangeForIndex"
     @add="handleAddClick"
     @reorder="handleReorderClick"
     @drop="handleDropIndexClick"
-    @change="$emit('change', $event)"
   />
 </template>
 
 <script>
 import pick from 'lodash/pick';
 import shortid from 'shortid';
+
 import NormalArray from './ArrayField.NormalArray';
 import FixedArray from './ArrayField.FixedArray';
-import MultiSelect from './ArrayField.MultiSelect';
+import MultiSelectArray from './ArrayField.MultiSelect';
 import { isMultiSelect, isFixedItems, allowAdditionalItems } from '../../utils';
 
 const PROPS = {
@@ -79,7 +74,6 @@ const PROPS = {
   name: String,
   id: String,
   uiSchema: { type: Object, default: () => ({}) },
-  formData: { type: Array, default: () => [] },
   schema: Object,
   errors: { type: Array, default: () => [] },
   registry: { type: Object, required: true },
@@ -91,68 +85,56 @@ const PROPS = {
 
 export default {
   name: 'ArrayField',
-  inject: ['resolveSchemaShallowly'],
+  inject: ['resolveSchemaShallowly', 'getFormData', 'setFormData', 'setFormDataByPath'],
   components: {
-    'normal-array': NormalArray,
-    'fixed-array': FixedArray,
-    'multiselect-array': MultiSelect
+    NormalArray,
+    FixedArray,
+    MultiSelectArray
   },
   inheritAttrs: false,
   props: PROPS,
   data() {
     return {
-      keyedFormData: [],
-      updatedKeyedFormData: false
+      keys: []
     };
   },
   computed: {
+    formState() {
+      return this.getFormData();
+    },
     fixedArrayEventListeners() {
       return pick(this.$listeners, ['blur', 'focus']);
     },
     multiselectArrayEventListeners() {
-      return pick(this.$listeners, ['blur', 'focus', 'change']);
+      return pick(this.$listeners, ['blur', 'focus']);
     },
     normalArrayEventListeners() {
       return pick(this.$listeners, ['blur', 'focus']);
     },
     resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formData);
+      return this.resolveSchemaShallowly(this.schema, this.formState);
     },
     isFixedArray() {
       return isFixedItems(this.resolvedSchema);
     },
     isMultiSelectArray() {
-      return isMultiSelect(this.resolvedSchema, this.formData);
+      return isMultiSelect(this.resolvedSchema, this.formState);
+    },
+    keyedFormData() {
+      return this.formState.map((item, index) => {
+        return {
+          key: this.keys[index],
+          item
+        };
+      });
     }
   },
-  watch: {
-    $props: {
-      handler(newProps) {
-        if (this.updatedKeyedFormData) {
-          this.updatedKeyedFormData = false;
-          return;
-        }
-
-        const nextFormData = newProps.formData ?? [];
-        const previousKeyedFormData = this.keyedFormData;
-        const newKeyedFormData =
-          nextFormData.length === previousKeyedFormData.length
-            ? previousKeyedFormData.map((previousKeyedFormDatum, index) => {
-                return {
-                  key: previousKeyedFormDatum.key,
-                  item: nextFormData[index]
-                };
-              })
-            : generateKeyedFormData(nextFormData);
-
-        this.keyedFormData = newKeyedFormData;
-      },
-      deep: true, // TODO: check if it's really needed
-      immediate: true
-    }
+  created() {
+    this.keys = this.formState.map(() => generateRowId());
   },
   methods: {
     getNewFormDataRow() {
+      debugger;
       let itemSchema = this.resolvedSchema.items;
       if (this.isFixedArray && allowAdditionalItems(this.resolvedSchema)) {
         itemSchema = this.resolvedSchema.additionalItems;
@@ -161,68 +143,34 @@ export default {
     },
 
     handleAddClick() {
-      const newKeyedFormDataRow = {
-        key: generateRowId(),
-        item: this.getNewFormDataRow()
-      };
-      const newKeyedFormData = [...this.keyedFormData, newKeyedFormDataRow];
-      this.keyedFormData = newKeyedFormData;
-      this.updatedKeyedFormData = true;
-      this.$emit('change', keyedToPlainFormData(newKeyedFormData));
-    },
-
-    handleChangeForIndex(index, value) {
-      const newFormData = (this.formData ?? []).map((item, i) => {
-        // We need to treat undefined items as nulls to have validation.
-        // See https://github.com/tdegrunt/jsonschema/issues/206
-        const jsonValue = typeof value === 'undefined' ? null : value;
-        return index === i ? jsonValue : item;
+      this.keys.push(generateRowId());
+      this.setFormData((state) => {
+        state.push(this.getNewFormDataRow());
       });
-
-      this.$emit('change', newFormData);
     },
 
     handleDropIndexClick(index) {
-      const newKeyedFormData = this.keyedFormData.filter((_, i) => i !== index);
-      this.keyedFormData = newKeyedFormData;
-      this.updatedKeyedFormData = true;
-      this.$emit('change', keyedToPlainFormData(newKeyedFormData));
+      this.keys.splice(index, 1);
+      this.setFormData((state) => {
+        state.splice(index, 1);
+      });
     },
 
-    handleReorderClick(index, newIndex) {
-      const reOrderArray = () => {
-        // Copy item
-        let _newKeyedFormData = this.keyedFormData.slice();
+    handleReorderClick(from, to) {
+      const tempKey = this.keys[from];
+      this.$set(this.keys, from, this.keys[to]);
+      this.$set(this.keys, to, tempKey);
 
-        // Moves item from index to newIndex
-        _newKeyedFormData.splice(index, 1);
-        _newKeyedFormData.splice(newIndex, 0, this.keyedFormData[index]);
-        return _newKeyedFormData;
-      };
-
-      const newKeyedFormData = reOrderArray();
-      this.keyedFormData = newKeyedFormData;
-      this.$emit('change', keyedToPlainFormData(newKeyedFormData));
+      this.setFormData((state) => {
+        const temp = state[from];
+        this.$set(state, from, state[to]);
+        this.$set(state, to, temp);
+      });
     }
   }
 };
 
 function generateRowId() {
   return shortid.generate();
-}
-
-function generateKeyedFormData(formData) {
-  return !Array.isArray(formData)
-    ? []
-    : formData.map((item) => {
-        return {
-          key: generateRowId(),
-          item
-        };
-      });
-}
-
-function keyedToPlainFormData(keyedFormData) {
-  return keyedFormData.map((keyedItem) => keyedItem.item);
 }
 </script>

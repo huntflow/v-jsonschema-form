@@ -20,50 +20,56 @@
       :autofocus="hasAutofocus"
       :disabled="isDisabled"
       :errors="errors"
-      :form-data="formData"
       :readonly="isReadOnly"
       :registry="registry"
       :required="required"
       :schema="resolvedSchema"
-      :ui-schema="{ ...uiSchema, class: undefined }"
-      v-on="fieldEventListeners"
+      :ui-schema="uiSchema"
     />
   </component>
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import { getSchemaType } from '../../utils';
-
 import DefaultTemplate from './SchemaField.DefaultTemplate.vue';
 
 const PROPS = {
-  name: String,
+  name: {
+    type: String,
+    default: null
+  },
   id: String,
   schema: Object,
   uiSchema: { type: Object, default: () => ({}) },
   errors: { type: [Array, Object] },
-  formData: [String, Number, Boolean, Array, Object],
   registry: { type: Object, required: true },
-  disabled: { type: Boolean, default: false },
-  required: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false },
-  autofocus: { type: Boolean, default: false }
+  disabled: Boolean,
+  required: Boolean,
+  readonly: Boolean,
+  autofocus: Boolean
 };
 
 export default {
   name: 'SchemaField',
   props: PROPS,
-  inject: ['resolveSchemaShallowly'],
+  inject: ['resolveSchemaShallowly', 'getFormDataByPath', 'setFormDataByPath'],
+  provide() {
+    return {
+      getFormDataByPath: this.getStateByPath,
+      getFormData: this.getState,
+      setFormDataByPath: this.setStateByPath,
+      setFormData: this.setState
+    };
+  },
   computed: {
-    fieldEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur', 'change']);
+    formState() {
+      return this.getState();
     },
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);
     },
     resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formData);
+      return this.resolveSchemaShallowly(this.schema, this.formState);
     },
     isHidden() {
       return this.uiSchema['ui:widget'] === 'hidden';
@@ -88,8 +94,19 @@ export default {
     }
   },
   methods: {
-    handleEvent(event, ...args) {
-      this.$emit(event, ...args);
+    getStateByPath(path) {
+      const fullPath = [this.name, path].filter(Boolean).join('.');
+      return this.getFormDataByPath(fullPath);
+    },
+    getState() {
+      return this.getFormDataByPath(this.name);
+    },
+    setStateByPath(path, value) {
+      const fullPath = [this.name, path].filter(Boolean).join('.');
+      this.setFormDataByPath(fullPath, value);
+    },
+    setState(value) {
+      this.setFormDataByPath(this.name, value);
     }
   }
 };

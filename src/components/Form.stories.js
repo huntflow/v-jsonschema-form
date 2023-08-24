@@ -10,6 +10,7 @@ import anyOfData from './Form.stories.data/anyOf';
 import ifThen from './Form.stories.data/if-then';
 import autofocus from './Form.stories.data/autofocus';
 import customFormat from './Form.stories.data/custom-format';
+import moreChildren from './Form.stories.data/more-children';
 
 const components = {
   'json-form': JsonForm
@@ -190,5 +191,13 @@ storiesOf('JsonForm', JsonForm)
       '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
     data() {
       return anyOfData;
+    }
+  }))
+  .add('More children', () => ({
+    components,
+    template:
+      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData"></json-form>',
+    data() {
+      return moreChildren;
     }
   }));

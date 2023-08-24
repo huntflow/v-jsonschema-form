@@ -24,7 +24,6 @@ export const PROPS = {
   disabled: { type: Boolean, default: false },
   noHtml5Validate: { type: Boolean, default: false },
   omitExtraData: { type: Boolean, default: false },
-  fields: { type: Object, default: () => ({}) },
   widgets: { type: Object, default: () => ({}) },
   omitMissingFields: { type: Boolean, default: false },
   customFormats: { type: Object, default: () => ({}) },

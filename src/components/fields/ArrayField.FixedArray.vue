@@ -2,7 +2,8 @@
   <component
     :is="fieldTemplateCls"
     :id="id"
-    :schema="resolvedSchema"
+    :form-data="formState"
+    :schema="schema"
     :ui-schema="uiSchema"
     :can-add="canAdd"
     :disabled="disabled"
@@ -49,6 +50,7 @@
 
 <script>
 import pick from 'lodash/pick';
+
 import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultFixedArrayFieldTemplate from './ArrayField.FixedArray.DefaultTemplate';
@@ -58,7 +60,6 @@ const PROPS = {
   keyedFormData: Array,
   schema: Object,
   uiSchema: {},
-  formData: {},
   errors: { type: Array, default: () => [] },
   id: String,
   registry: { type: Object, required: true },
@@ -72,31 +73,31 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldFixedArray',
-  inject: ['resolveSchemaShallowly'],
+  inject: ['resolveSchemaShallowly', 'getFormData'],
   components: {
-    'array-field-item': ArrayFieldItem
+    ArrayFieldItem
   },
   props: PROPS,
   computed: {
-    arrayFieldItemEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur', 'change-for-index', 'reorder', 'drop']);
+    formState() {
+      return this.getFormData();
     },
-    resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formData);
+    arrayFieldItemEventListeners() {
+      return pick(this.$listeners, ['focus', 'blur', 'reorder', 'drop']);
     },
     canAdd() {
-      return canAddArrayItem(this.uiSchema, this.resolvedSchema, this.formData);
+      return canAddArrayItem(this.uiSchema, this.schema, this.formState);
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultFixedArrayFieldTemplate;
     },
     itemSchemas() {
-      return this.resolvedSchema.items.map((item, index) =>
-        this.resolveSchemaShallowly(item, this.formData[index])
+      return this.schema.items.map((item, index) =>
+        this.resolveSchemaShallowly(item, this.formState[index])
       );
     },
     formDataItems() {
-      let items = this.formData;
+      let items = this.formState;
       if (!items || items.length < this.itemSchemas.length) {
         // to make sure at least all fixed items are generated
         items = items || [];
@@ -108,7 +109,7 @@ export default {
   methods: {
     getItemSchema(item, index) {
       const additional = index >= this.itemSchemas.length;
-      return additional ? this.resolvedSchema.additionalItems : this.itemSchemas[index];
+      return additional ? this.schema.additionalItems : this.itemSchemas[index];
     },
     getItemUiSchema(index) {
       const additional = index >= this.itemSchemas.length;
