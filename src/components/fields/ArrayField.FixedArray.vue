@@ -2,8 +2,6 @@
   <component
     :is="fieldTemplateCls"
     :id="id"
-    :schema="schema"
-    :ui-schema="uiSchema"
     :can-add="canAdd"
     :disabled="disabled"
     :readonly="readonly"

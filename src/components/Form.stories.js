@@ -1,5 +1,6 @@
 import { storiesOf } from '@storybook/vue';
 import JsonForm from './Form';
+import ErrorList from './ErrorList.vue';
 import simpleData from './Form.stories.data/simple';
 import nestedData from './Form.stories.data/nested';
 import arraysData from './Form.stories.data/arrays';
@@ -13,190 +14,260 @@ import customFormat from './Form.stories.data/custom-format';
 import moreChildren from './Form.stories.data/more-children';
 
 const components = {
-  'json-form': JsonForm
+  JsonForm,
+  ErrorList
 };
 
 storiesOf('JsonForm', JsonForm)
   .add('autofocus', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return autofocus;
     }
   }))
   .add('autofocus (exclude missing fields)', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return autofocus;
     }
   }))
   .add('custom format', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" :custom-formats="customFormats" live-validate></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" :custom-formats="customFormats" live-validate>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return customFormat;
     }
   }))
   .add('custom format (exclude missing fields)', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" :custom-formats="customFormats" live-validate omit-missing-fields></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" :custom-formats="customFormats" live-validate omit-missing-fields>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return customFormat;
     }
   }))
   .add('If then', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return ifThen;
     }
   }))
   .add('If then (exclude missing fields)', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return ifThen;
     }
   }))
   .add('Simple', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return simpleData;
     }
   }))
   .add('Simple (exclude missing fields)', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return simpleData;
     }
   }))
   .add('Start validate after form submitted', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate start-validate-mode="onSubmit"></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate start-validate-mode="onSubmit">
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return simpleData;
     }
   }))
   .add('Start validate after form submitted (exclude missing fields)', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate start-validate-mode="onSubmit" omit-missing-fields></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate start-validate-mode="onSubmit" omit-missing-fields>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return simpleData;
     }
   }))
   .add('Nested', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return nestedData;
     }
   }))
   .add('Nested (exclude missing fields)', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return nestedData;
     }
   }))
   .add('Arrays', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return arraysData;
     }
   }))
   .add('Arrays (exclude missing fields)', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return arraysData;
     }
   }))
   .add('Ordering', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return orderingData;
     }
   }))
   .add('Ordering (exclude missing fields)', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return orderingData;
     }
   }))
   .add('References', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return referencesData;
     }
   }))
   .add('References (exclude missing fields)', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return referencesData;
     }
   }))
   .add('Numbers', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return numbersData;
     }
   }))
   .add('Numbers (exclude missing fields)', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return numbersData;
     }
   }))
   .add('Any of', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return anyOfData;
     }
   }))
   .add('Any of (exclude missing fields)', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData" live-validate omit-missing-fields>
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return anyOfData;
     }
   }))
   .add('moreChildren', () => ({
     components,
-    template:
-      '<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData"></json-form>',
+    template: `<json-form :schema="schema" :ui-schema="uiSchema" :form-data="formData">
+        <template #before-content="{ errors }">
+          <error-list v-if="errors.length" :errors="errors" />
+        </template>
+      </json-form>`,
     data() {
       return moreChildren;
     }

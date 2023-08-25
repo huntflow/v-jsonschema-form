@@ -16,8 +16,6 @@ import AddButton from '../AddButton';
 
 const PROPS = {
   id: String,
-  schema: Object,
-  uiSchema: Object,
   canAdd: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false }

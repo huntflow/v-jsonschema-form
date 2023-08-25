@@ -12,6 +12,7 @@
     :target="target"
     @submit="handleSubmit"
   >
+    <slot name="before-content" :errors="errors" :error-schema="errorSchema" />
     <component
       :is="registry.fields.SchemaField"
       :id="idPrefix"
@@ -25,6 +26,7 @@
       v-on="schemaFieldEventListeners"
       @change="handleChange"
     />
+    <slot name="after-content" :errors="errors" :error-schema="errorSchema" />
   </form>
 </template>
 
@@ -51,6 +53,7 @@ export default {
   data() {
     return {
       formDataState: undefined,
+      errors: [],
       errorSchema: {},
       submitted: false
     };
@@ -97,12 +100,14 @@ export default {
         this.formDataState = this.enrichFormData(formData);
 
         const mustValidate = typeof formData !== 'undefined' && this.mustValidate;
-        const { errorSchema } = mustValidate
+        const { errors, errorSchema } = mustValidate
           ? this.doValidate(this.formDataState)
           : {
+              errors: this.errors || [],
               errorSchema: this.errorSchema || {}
             };
 
+        this.errors = errors;
         this.errorSchema = errorSchema;
       },
       immediate: true
@@ -136,6 +141,7 @@ export default {
       if (!this.noValidate) {
         const { errors, errorSchema } = this.doValidate(newFormData);
         if (Object.keys(errors).length > 0) {
+          this.errors = errors;
           this.errorSchema = errorSchema;
 
           this.$emit('error', errors);
@@ -146,6 +152,7 @@ export default {
       }
 
       this.formDataState = newFormData;
+      this.errors = [];
       this.errorSchema = {};
 
       const submitPayload = {
@@ -153,6 +160,7 @@ export default {
         uiSchema: this.uiSchema,
         formData: this.formDataState,
         edit: this.isEdit,
+        errors: this.errors,
         errorSchema: this.errorSchema,
         status: 'submitted'
       };
@@ -163,7 +171,8 @@ export default {
       this.formDataState = this.enrichFormData(formData);
 
       if (this.mustValidate) {
-        const { errorSchema } = this.doValidate(this.formDataState);
+        const { errors, errorSchema } = this.doValidate(this.formDataState);
+        this.errors = errors;
         this.errorSchema = errorSchema;
       }
     },

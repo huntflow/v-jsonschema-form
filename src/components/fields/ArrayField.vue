@@ -124,10 +124,16 @@ export default {
     },
     resolvedSchema() {
       const schema = this.resolveSchemaShallowly(this.schema, this.formData);
-      if (schema.items) {
-        schema.items = this.resolveSchemaShallowly(schema.items, this.formData);
+      if (Array.isArray(schema.items)) {
+        return schema;
       }
-      return schema;
+      return {
+        ...schema,
+        items: {
+          ...schema.items,
+          default: this.resolveSchemaShallowly(schema.items, this.formData[0]).default
+        }
+      };
     },
     isFixedArray() {
       return isFixedItems(this.resolvedSchema);

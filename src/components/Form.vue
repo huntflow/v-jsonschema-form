@@ -1,5 +1,13 @@
 <template>
-  <base-form ref="vjsf" v-bind="$props" :schema="enrichedSchema" v-on="$listeners" />
+  <base-form ref="vjsf" v-bind="$props" :schema="enrichedSchema" v-on="$listeners">
+    <template #before-content="scopedProps">
+      <slot name="before-content" v-bind="scopedProps" />
+    </template>
+
+    <template #after-content="scopedProps">
+      <slot name="after-content" v-bind="scopedProps" />
+    </template>
+  </base-form>
 </template>
 
 <script>
