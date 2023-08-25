@@ -62,7 +62,7 @@ const PROPS = {
 export default {
   name: 'SchemaField',
   props: PROPS,
-  inject: ['resolveSchemaShallowly', 'setFormDataByPath'],
+  inject: ['resolveSchemaShallowly'],
   computed: {
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);
@@ -90,11 +90,6 @@ export default {
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:FieldTemplate'] || DefaultTemplate;
-    }
-  },
-  methods: {
-    setState(value) {
-      this.setFormDataByPath(this.pointer, value);
     }
   }
 };

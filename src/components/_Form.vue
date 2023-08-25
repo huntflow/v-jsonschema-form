@@ -45,7 +45,7 @@ export default {
   provide() {
     return {
       resolveSchemaShallowly: this.resolveSchemaShallowly,
-      setFormDataByPath: this.setFormDataByPath
+      setFormDataByPointer: this.setFormDataByPointer
     };
   },
   data() {
@@ -193,14 +193,14 @@ export default {
       }
       return undefined;
     },
-    setFormDataByPath(path, value) {
-      const paths = jsonPointer.parse(path);
+    setFormDataByPointer(pointer, value) {
+      const paths = jsonPointer.parse(pointer);
       const last = paths.pop();
 
       const formData = this.getFormDataByPath(jsonPointer.compile(paths));
       if (typeof value === 'function') {
         // Для производительных действий над массивами: удаление/добавление/перемещение
-        value(this.getFormDataByPath(path));
+        value(this.getFormDataByPath(pointer));
       } else {
         this.$set(formData, last, value);
       }

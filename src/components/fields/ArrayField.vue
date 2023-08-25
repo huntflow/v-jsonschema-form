@@ -99,7 +99,7 @@ const PROPS = {
 
 export default {
   name: 'ArrayField',
-  inject: ['resolveSchemaShallowly', 'setFormDataByPath'],
+  inject: ['resolveSchemaShallowly', 'setFormDataByPointer'],
   components: {
     NormalArray,
     FixedArray,
@@ -158,14 +158,14 @@ export default {
 
     handleAddClick() {
       this.keys.push(generateRowId());
-      this.setFormDataByPath(this.pointer, (state) => {
+      this.setFormDataByPointer(this.pointer, (state) => {
         state.push(this.getNewFormDataRow());
       });
     },
 
     handleDropIndexClick(index) {
       this.keys.splice(index, 1);
-      this.setFormDataByPath(this.pointer, (state) => {
+      this.setFormDataByPointer(this.pointer, (state) => {
         state.splice(index, 1);
       });
     },
@@ -175,7 +175,7 @@ export default {
       this.$set(this.keys, from, this.keys[to]);
       this.$set(this.keys, to, tempKey);
 
-      this.setFormDataByPath(this.pointer, (state) => {
+      this.setFormDataByPointer(this.pointer, (state) => {
         const temp = state[from];
         this.$set(state, from, state[to]);
         this.$set(state, to, temp);

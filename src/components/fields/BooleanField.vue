@@ -46,7 +46,7 @@ const PROPS = {
 
 export default {
   name: 'BooleanField',
-  inject: ['setFormDataByPath'],
+  inject: ['setFormDataByPointer'],
   props: PROPS,
   computed: {
     enumOptions() {
@@ -73,7 +73,7 @@ export default {
   },
   methods: {
     handleChange(value) {
-      this.setFormDataByPath(this.pointer, value);
+      this.setFormDataByPointer(this.pointer, value);
     }
   }
 };

@@ -47,7 +47,7 @@ const PROPS = {
 
 export default {
   name: 'StringField',
-  inject: ['resolveSchemaShallowly', 'setFormDataByPath'],
+  inject: ['resolveSchemaShallowly', 'setFormDataByPointer'],
   props: PROPS,
   computed: {
     resolvedSchema() {
@@ -86,7 +86,7 @@ export default {
   },
   methods: {
     handleChange(value) {
-      this.setFormDataByPath(this.pointer, value);
+      this.setFormDataByPointer(this.pointer, value);
     }
   }
 };
