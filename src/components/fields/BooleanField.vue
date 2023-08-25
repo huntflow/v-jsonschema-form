@@ -5,7 +5,7 @@
     :options="widgetWithOptions.options"
     :schema="schema"
     :label="label"
-    :value="formState"
+    :value="formData"
     :required="required"
     :disabled="disabled"
     :readonly="readonly"

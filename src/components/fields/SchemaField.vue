@@ -46,7 +46,7 @@ const PROPS = {
     required: true
   },
   formData: {
-    type: [Number, String, Array, Object],
+    type: [Number, String, Array, Object, Boolean],
     default: undefined
   },
   schema: Object,
