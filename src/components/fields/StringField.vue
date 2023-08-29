@@ -15,7 +15,7 @@
     :placeholder="placeholder"
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
-    v-on="$listeners"
+    @change="handleChange"
   />
 </template>
 
@@ -29,7 +29,14 @@ const PROPS = {
   description: String,
   uiSchema: Object,
   id: String,
-  formData: [String, Number],
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: [String, Number],
+    default: undefined
+  },
   registry: { type: Object, required: true },
   errors: { type: Array, default: () => [] },
   required: { type: Boolean, default: false },
@@ -40,7 +47,7 @@ const PROPS = {
 
 export default {
   name: 'StringField',
-  inject: ['resolveSchemaShallowly'],
+  inject: ['resolveSchemaShallowly', 'setFormDataByPointer'],
   props: PROPS,
   computed: {
     resolvedSchema() {
@@ -78,8 +85,8 @@ export default {
     }
   },
   methods: {
-    handleEvent(event, ...args) {
-      this.$emit(event, ...args);
+    handleChange(value) {
+      this.setFormDataByPointer(this.pointer, value);
     }
   }
 };

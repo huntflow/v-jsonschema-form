@@ -14,41 +14,49 @@
     <component
       :is="fieldCls"
       :id="id"
+      :pointer="pointer"
+      :form-data="formData"
       :name="name"
       :label="title"
       :description="description"
       :autofocus="hasAutofocus"
       :disabled="isDisabled"
       :errors="errors"
-      :form-data="formData"
       :readonly="isReadOnly"
       :registry="registry"
       :required="required"
       :schema="resolvedSchema"
-      :ui-schema="{ ...uiSchema, class: undefined }"
-      v-on="fieldEventListeners"
+      :ui-schema="uiSchema"
     />
   </component>
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import { getSchemaType } from '../../utils';
-
 import DefaultTemplate from './SchemaField.DefaultTemplate.vue';
 
 const PROPS = {
-  name: String,
+  name: {
+    type: String,
+    default: null
+  },
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: [Number, String, Array, Object, Boolean],
+    default: undefined
+  },
   schema: Object,
   uiSchema: { type: Object, default: () => ({}) },
   errors: { type: [Array, Object] },
-  formData: [String, Number, Boolean, Array, Object],
   registry: { type: Object, required: true },
-  disabled: { type: Boolean, default: false },
-  required: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false },
-  autofocus: { type: Boolean, default: false }
+  disabled: Boolean,
+  required: Boolean,
+  readonly: Boolean,
+  autofocus: Boolean
 };
 
 export default {
@@ -56,9 +64,6 @@ export default {
   props: PROPS,
   inject: ['resolveSchemaShallowly'],
   computed: {
-    fieldEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur', 'change']);
-    },
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);
     },
@@ -84,12 +89,7 @@ export default {
       return getFieldComponent(this.resolvedSchema, this.uiSchema, this.registry.fields);
     },
     fieldTemplateCls() {
-      return this.uiSchema['ui:FieldTemplate'] || this.registry.FieldTemplate || DefaultTemplate;
-    }
-  },
-  methods: {
-    handleEvent(event, ...args) {
-      this.$emit(event, ...args);
+      return this.uiSchema['ui:FieldTemplate'] || DefaultTemplate;
     }
   }
 };

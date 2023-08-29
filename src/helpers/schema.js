@@ -14,35 +14,35 @@ const CONDITIONAL_KEYWORDS = [/*'not', 'anyOf', 'oneOf',*/ 'allOf', 'if'];
 
 const KEYWORDS_FOR_RESOLVING = ['$ref'].concat(CONDITIONAL_KEYWORDS);
 
-export function resolveSchemaShallowly(schema, { getSchema, data }) {
+export function resolveSchemaShallowly(schema, { getSchema, data, skipCopy = false }) {
   if (!KEYWORDS_FOR_RESOLVING.some((keyword) => keyword in schema)) {
     return schema;
   }
-  const resultSchema = cloneDeep(schema);
+  const resolvedSchema = skipCopy ? schema : cloneDeep(schema);
 
-  if (resultSchema.$ref) {
-    merge(resultSchema, getSchema(resultSchema.$ref).schema);
-    delete resultSchema.$ref;
+  if (resolvedSchema.$ref) {
+    merge(resolvedSchema, getSchema(resolvedSchema.$ref).schema);
+    delete resolvedSchema.$ref;
   }
-  if (resultSchema.allOf) {
-    resultSchema.allOf.forEach((cond) => {
-      merge(resultSchema, resolveSchemaShallowly(cond, { getSchema, data }));
+  if (resolvedSchema.allOf) {
+    resolvedSchema.allOf.forEach((cond) => {
+      merge(resolvedSchema, resolveSchemaShallowly(cond, { getSchema, data, skipCopy: true }));
     });
-    delete resultSchema.allOf;
+    delete resolvedSchema.allOf;
   }
-  if (resultSchema.if) {
-    const validate = getSchema(resultSchema.if.$id);
+  if (resolvedSchema.if) {
+    const validate = getSchema(resolvedSchema.if.$id);
     if (validate(data)) {
-      merge(resultSchema, resultSchema.then);
+      merge(resolvedSchema, resolvedSchema.then);
     } else {
-      merge(resultSchema, resultSchema.else);
+      merge(resolvedSchema, resolvedSchema.else);
     }
-    delete resultSchema.if;
-    delete resultSchema.then;
-    delete resultSchema.else;
+    delete resolvedSchema.if;
+    delete resolvedSchema.then;
+    delete resolvedSchema.else;
   }
-  delete resultSchema.$id;
-  return resultSchema;
+  delete resolvedSchema.$id;
+  return resolvedSchema;
 }
 
 export function removeEmptySchemaFields(schema, { data = {} }) {

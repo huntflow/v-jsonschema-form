@@ -12,32 +12,29 @@
     :target="target"
     @submit="handleSubmit"
   >
+    <slot name="before-content" :errors="errors" :error-schema="errorSchema" />
     <component
-      :is="ErrorList"
-      v-if="shouldShowErrorList"
-      :error-schema="errorSchema"
-      :errors="errors"
-      :schema="resolvedSchema"
-      :ui-schema="uiSchema"
-    />
-    <component
-      :is="getRegistry().fields.SchemaField"
+      :is="registry.fields.SchemaField"
       :id="idPrefix"
+      pointer=""
+      :form-data="formDataState"
       :disabled="disabled"
       :errors="errorSchema"
-      :form-data="formDataState"
-      :registry="getRegistry()"
+      :registry="registry"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
       v-on="schemaFieldEventListeners"
       @change="handleChange"
     />
+    <slot name="after-content" :errors="errors" :error-schema="errorSchema" />
   </form>
 </template>
 
 <script>
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
+import jsonPointer from 'json-pointer';
+
 import { compileSchema } from '@/validate';
 import { getDefaultRegistry } from '@/utils';
 import { PROPS } from './form-props';
@@ -49,7 +46,8 @@ export default {
   props: PROPS,
   provide() {
     return {
-      resolveSchemaShallowly: this.resolveSchemaShallowly
+      resolveSchemaShallowly: this.resolveSchemaShallowly,
+      setFormDataByPointer: this.setFormDataByPointer
     };
   },
   data() {
@@ -71,9 +69,6 @@ export default {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formDataState);
     },
-    shouldShowErrorList() {
-      return this.showErrorList !== false && this.errors && this.errors.length > 0;
-    },
     schemaFieldEventListeners() {
       return pick(this.$listeners, ['focus', 'blur']);
     },
@@ -88,6 +83,15 @@ export default {
     },
     mustValidate() {
       return this.canValidateByMode && !this.noValidate && this.liveValidate;
+    },
+    registry() {
+      // For BC, accept passed SchemaField and TitleField props and pass them to
+      // the "fields" registry one.
+      const { fields, widgets } = getDefaultRegistry();
+      return {
+        fields,
+        widgets: { ...widgets, ...this.widgets }
+      };
     }
   },
   watch: {
@@ -172,15 +176,6 @@ export default {
         this.errorSchema = errorSchema;
       }
     },
-    getRegistry() {
-      // For BC, accept passed SchemaField and TitleField props and pass them to
-      // the "fields" registry one.
-      const { fields, widgets } = getDefaultRegistry();
-      return {
-        fields: { ...fields, ...this.fields },
-        widgets: { ...widgets, ...this.widgets }
-      };
-    },
     enrichFormData(formData) {
       // непонятно нужно ли нам учитывать дефолтные значения с флагом omitMissingFields (режим просмотра)
       return this.omitMissingFields ? formData : getDefaults(this.compiledSchemaData, formData);
@@ -200,6 +195,24 @@ export default {
       const { validate, getErrorData } = this.compiledSchemaData;
       validate(cloneDeep(formData));
       return getErrorData();
+    },
+    getFormDataByPath(path) {
+      if (jsonPointer.has(this.formDataState, path)) {
+        return jsonPointer.get(this.formDataState, path);
+      }
+      return undefined;
+    },
+    setFormDataByPointer(pointer, value) {
+      const paths = jsonPointer.parse(pointer);
+      const last = paths.pop();
+
+      const formData = this.getFormDataByPath(jsonPointer.compile(paths));
+      if (typeof value === 'function') {
+        // Для производительных действий над массивами: удаление/добавление/перемещение
+        value(this.getFormDataByPath(pointer));
+      } else {
+        this.$set(formData, last, value);
+      }
     }
   }
 };

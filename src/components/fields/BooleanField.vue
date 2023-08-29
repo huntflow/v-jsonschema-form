@@ -14,6 +14,7 @@
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
     v-on="$listeners"
+    @change="handleChange"
   />
 </template>
 
@@ -27,6 +28,10 @@ const PROPS = {
   schema: Object,
   uiSchema: Object,
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
   formData: Boolean,
   errors: {
     type: Array,
@@ -41,6 +46,7 @@ const PROPS = {
 
 export default {
   name: 'BooleanField',
+  inject: ['setFormDataByPointer'],
   props: PROPS,
   computed: {
     enumOptions() {
@@ -63,6 +69,11 @@ export default {
     errorsMessages() {
       // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
       return this.errors.map(({ message }) => message);
+    }
+  },
+  methods: {
+    handleChange(value) {
+      this.setFormDataByPointer(this.pointer, value);
     }
   }
 };

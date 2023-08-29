@@ -1,5 +1,3 @@
-export const ADDITIONAL_PROPERTY_FLAG = '__additional_property';
-
 const widgetMap = {
   boolean: {
     checkbox: 'CheckboxWidget',
@@ -57,8 +55,7 @@ export function getDefaultRegistry() {
     // eslint-disable-next-line no-undef
     fields: require('./components/fields').default,
     // eslint-disable-next-line no-undef
-    widgets: require('./components/widgets').default,
-    formContext: {}
+    widgets: require('./components/widgets').default
   };
 }
 

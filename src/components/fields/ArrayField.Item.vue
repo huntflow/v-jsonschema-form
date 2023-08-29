@@ -13,9 +13,11 @@
     <component
       :is="registry.fields.SchemaField"
       :id="id"
+      :name="`${index}`"
+      :pointer="pointer"
+      :form-data="itemData"
       :schema="resolvedSchema"
       :ui-schema="itemUiSchema"
-      :form-data="itemData"
       :errors="errors"
       :required="isRequired"
       :registry="registry"
@@ -23,7 +25,6 @@
       :readonly="readonly"
       :autofocus="autofocus"
       v-on="schemaFieldEventListeners"
-      @change="handleChangeForIndex(index, ...arguments)"
     />
   </default-array-item>
 </template>
@@ -41,6 +42,10 @@ const PROPS = {
   itemData: {},
   itemUiSchema: Object,
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
   errors: Object,
   uiSchema: { type: Object },
   registry: { type: Object, required: true },
@@ -89,11 +94,6 @@ export default {
       result.toolbar = Object.keys(result).some((key) => result[key]);
 
       return result;
-    }
-  },
-  methods: {
-    handleChangeForIndex(index, ...args) {
-      this.$emit('change-for-index', index, ...args);
     }
   }
 };

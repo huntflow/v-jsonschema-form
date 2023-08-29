@@ -4,13 +4,9 @@
     :id="id"
     :can-add="canAdd"
     class="field field-array"
-    :class="'field-array-of-' + itemsSchema.type"
     :disabled="disabled"
-    :ui-schema="uiSchema"
     :readonly="readonly"
     :required="required"
-    :schema="schema"
-    :form-data="formData"
     :registry="registry"
     :raw-error-infos="errors"
     @add="$emit('add')"
@@ -37,12 +33,14 @@
       v-for="(keyedItem, index) in keyedFormData"
       :id="`${id}_${index}`"
       :key="keyedItem.key"
+      :pointer="`${pointer}/${index}`"
       :registry="registry"
       :index="index"
       :can-remove="true"
       :can-move-up="index > 0"
       :can-move-down="index < formData.length - 1"
-      :item-schema="resolvedSchema.items"
+      :ui-schema="uiSchema"
+      :item-schema="schema.items"
       :item-ui-schema="uiSchema.items"
       :errors="errors[index]"
       :item-data="keyedItem.item"
@@ -63,10 +61,17 @@ const PROPS = {
   label: String,
   description: String,
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: Array,
+    required: true
+  },
   keyedFormData: Array,
   schema: Object,
   uiSchema: Object,
-  formData: Array,
   errors: { type: Array, default: () => [] },
   registry: { type: Object, required: true },
   autofocus: { type: Boolean, default: false },
@@ -77,26 +82,19 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldNormalArray',
-  inject: ['resolveSchemaShallowly'],
   components: {
     'array-field-item': ArrayFieldItem
   },
   props: PROPS,
   computed: {
     arrayFieldItemEvents() {
-      return pick(this.$listeners, ['focus', 'blur', 'change-for-index', 'reorder', 'drop']);
-    },
-    resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formData);
+      return pick(this.$listeners, ['focus', 'blur', 'reorder', 'drop']);
     },
     canAdd() {
-      return canAddArrayItem(this.uiSchema, this.resolvedSchema, this.formData);
+      return canAddArrayItem(this.uiSchema, this.schema, this.formData);
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultNormalArrayFieldTemplate;
-    },
-    itemsSchema() {
-      return this.resolveSchemaShallowly(this.resolvedSchema.items, this.formData);
     }
   }
 };

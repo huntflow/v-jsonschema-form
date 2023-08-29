@@ -2,8 +2,6 @@
   <component
     :is="fieldTemplateCls"
     :id="id"
-    :schema="resolvedSchema"
-    :ui-schema="uiSchema"
     :can-add="canAdd"
     :disabled="disabled"
     :readonly="readonly"
@@ -31,6 +29,7 @@
       v-for="(keyedItem, index) in keyedFormData"
       :id="`${id}_${index}`"
       :key="keyedItem.key"
+      :pointer="`${pointer}/${index}`"
       :registry="registry"
       :index="index"
       :can-remove="index >= itemSchemas.length"
@@ -49,6 +48,7 @@
 
 <script>
 import pick from 'lodash/pick';
+
 import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultFixedArrayFieldTemplate from './ArrayField.FixedArray.DefaultTemplate';
@@ -58,9 +58,16 @@ const PROPS = {
   keyedFormData: Array,
   schema: Object,
   uiSchema: {},
-  formData: {},
   errors: { type: Array, default: () => [] },
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: Array,
+    required: true
+  },
   registry: { type: Object, required: true },
   autofocus: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
@@ -74,24 +81,21 @@ export default {
   name: 'ArrayFieldFixedArray',
   inject: ['resolveSchemaShallowly'],
   components: {
-    'array-field-item': ArrayFieldItem
+    ArrayFieldItem
   },
   props: PROPS,
   computed: {
     arrayFieldItemEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur', 'change-for-index', 'reorder', 'drop']);
-    },
-    resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formData);
+      return pick(this.$listeners, ['focus', 'blur', 'reorder', 'drop']);
     },
     canAdd() {
-      return canAddArrayItem(this.uiSchema, this.resolvedSchema, this.formData);
+      return canAddArrayItem(this.uiSchema, this.schema, this.formData);
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultFixedArrayFieldTemplate;
     },
     itemSchemas() {
-      return this.resolvedSchema.items.map((item, index) =>
+      return this.schema.items.map((item, index) =>
         this.resolveSchemaShallowly(item, this.formData[index])
       );
     },
@@ -108,7 +112,7 @@ export default {
   methods: {
     getItemSchema(item, index) {
       const additional = index >= this.itemSchemas.length;
-      return additional ? this.resolvedSchema.additionalItems : this.itemSchemas[index];
+      return additional ? this.schema.additionalItems : this.itemSchemas[index];
     },
     getItemUiSchema(index) {
       const additional = index >= this.itemSchemas.length;
