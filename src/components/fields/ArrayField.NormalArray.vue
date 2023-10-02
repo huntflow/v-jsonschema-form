@@ -9,6 +9,10 @@
     :required="required"
     :registry="registry"
     :raw-error-infos="errors"
+    :pointer="pointer"
+    :schema="schema"
+    :ui-schema="uiSchema"
+    :form-data="formData"
     @add="$emit('add')"
     @change="$emit('change', $event)"
   >

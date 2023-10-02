@@ -1,5 +1,6 @@
 <template>
-  <default-array-item
+  <component
+    :is="fieldTemplateCls"
     class="array-item"
     :index="index"
     :has-move-up="has.moveUp"
@@ -26,7 +27,7 @@
       :autofocus="autofocus"
       v-on="schemaFieldEventListeners"
     />
-  </default-array-item>
+  </component>
 </template>
 
 <script>
@@ -62,6 +63,9 @@ export default {
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
   computed: {
+    fieldTemplateCls() {
+      return this.itemUiSchema?.['ui:ArrayItemFieldTemplate'] || DefaultArrayItem;
+    },
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.itemSchema, this.itemData);
     },
