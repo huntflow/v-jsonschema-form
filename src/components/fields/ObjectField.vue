@@ -12,6 +12,8 @@
     :disabled="disabled"
     :readonly="readonly"
     :required="required"
+    :form-data="formData"
+    :pointer="pointer"
   >
     <template v-for="propName in orderedProperties" #[propName]="scopedProps">
       <component

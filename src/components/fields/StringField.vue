@@ -15,6 +15,7 @@
     :placeholder="placeholder"
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
+    :pointer="pointer"
     @change="handleChange"
   />
 </template>

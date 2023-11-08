@@ -5,6 +5,7 @@
     :can-add="canAdd"
     :disabled="disabled"
     :readonly="readonly"
+    :pointer="pointer"
     class="field field-array field-array-fixed-items"
     @add="$emit('add')"
   >

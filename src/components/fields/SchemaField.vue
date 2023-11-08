@@ -10,6 +10,10 @@
     :readonly="isReadOnly"
     :required="required"
     :schema="resolvedSchema"
+    :ui-schema="uiSchema"
+    :form-data="formData"
+    :pointer="pointer"
+    :errors="errors"
   >
     <component
       :is="fieldCls"

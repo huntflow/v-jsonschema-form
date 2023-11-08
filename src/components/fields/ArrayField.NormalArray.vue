@@ -40,6 +40,7 @@
       :pointer="`${pointer}/${index}`"
       :registry="registry"
       :index="index"
+      :total-count="formData.length"
       :can-remove="true"
       :can-move-up="index > 0"
       :can-move-down="index < formData.length - 1"

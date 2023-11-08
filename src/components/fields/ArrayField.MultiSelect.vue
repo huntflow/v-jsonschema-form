@@ -16,6 +16,7 @@
     :autofocus="autofocus"
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
+    :pointer="pointer"
     v-on="$listeners"
   />
 </template>
