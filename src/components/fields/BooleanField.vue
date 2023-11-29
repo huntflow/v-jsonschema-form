@@ -13,6 +13,7 @@
     :registry="registry"
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
+    :pointer="pointer"
     v-on="$listeners"
     @change="handleChange"
   />

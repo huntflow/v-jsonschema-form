@@ -1,13 +1,16 @@
 <template>
-  <default-array-item
+  <component
+    :is="fieldTemplateCls"
     class="array-item"
     :index="index"
+    :total-count="totalCount"
     :has-move-up="has.moveUp"
     :has-move-down="has.moveDown"
     :has-remove="has.remove"
     :has-toolbar="has.toolbar"
     :disabled="disabled"
     :readonly="readonly"
+    :pointer="pointer"
     v-on="arrayItemEventListeners"
   >
     <component
@@ -26,7 +29,7 @@
       :autofocus="autofocus"
       v-on="schemaFieldEventListeners"
     />
-  </default-array-item>
+  </component>
 </template>
 
 <script>
@@ -35,6 +38,7 @@ import DefaultArrayItem from './ArrayField.DefaultArrayItem';
 
 const PROPS = {
   index: Number,
+  totalCount: Number,
   canRemove: { default: true },
   canMoveUp: { default: true },
   canMoveDown: { default: true },
@@ -62,6 +66,9 @@ export default {
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
   computed: {
+    fieldTemplateCls() {
+      return this.itemUiSchema?.['ui:ArrayItemFieldTemplate'] || DefaultArrayItem;
+    },
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.itemSchema, this.itemData);
     },
