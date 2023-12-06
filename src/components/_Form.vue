@@ -213,6 +213,7 @@ export default {
       } else {
         this.$set(formData, last, value);
       }
+      this.$emit('change', this.formDataState);
       if (this.mustValidate) {
         const { errors, errorSchema } = this.doValidate(this.formDataState);
         this.errors = errors;
