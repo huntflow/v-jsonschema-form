@@ -213,6 +213,11 @@ export default {
       } else {
         this.$set(formData, last, value);
       }
+      if (this.mustValidate) {
+        const { errors, errorSchema } = this.doValidate(this.formDataState);
+        this.errors = errors;
+        this.errorSchema = errorSchema;
+      }
     }
   }
 };
