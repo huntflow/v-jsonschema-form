@@ -145,7 +145,7 @@ export default {
           this.errorSchema = errorSchema;
 
           this.$emit('error', errors);
-          console.error('Form validation failed', errors);
+          console.warn('Form validation failed', errors);
           this.focusFirstFieldBySelector(this.invalidFieldsSelector);
           return;
         }
