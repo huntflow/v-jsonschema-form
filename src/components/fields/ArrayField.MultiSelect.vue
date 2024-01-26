@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { getWidget, getUiOptions, optionsList } from '../../utils';
+import { getWidget, getUiOptions } from '../../utils';
 
 const PROPS = {
   label: String,
@@ -56,11 +56,7 @@ export default {
     },
     widgetWithOptions() {
       const itemsSchema = this.schema.items;
-      const enumOptions = optionsList(itemsSchema);
-      const { widget = 'select', ...options } = {
-        ...getUiOptions(this.uiSchema),
-        enumOptions
-      };
+      const { widget = 'select', ...options } = getUiOptions(this.uiSchema);
       return { widget, options };
     },
     errorsMessages() {

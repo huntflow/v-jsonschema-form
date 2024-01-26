@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { getWidget, getUiOptions, isSelect, optionsList, hasWidget } from '../../utils';
+import { getWidget, getUiOptions, isSelect, hasWidget } from '../../utils';
 
 const PROPS = {
   schema: Object,
@@ -54,13 +54,10 @@ export default {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);
     },
-    enumOptions() {
-      return isSelect(this.resolvedSchema) && optionsList(this.resolvedSchema);
-    },
     widgetCls() {
       const { format } = this.resolvedSchema;
       const { widgets } = this.registry;
-      let defaultWidget = this.enumOptions ? 'select' : 'text';
+      let defaultWidget = this.resolvedSchema.enum ? 'select' : 'text';
       if (format && hasWidget(this.resolvedSchema, format, widgets)) {
         defaultWidget = format;
       }
@@ -75,7 +72,7 @@ export default {
         placeholder,
         ...options
       } = getUiOptions(this.uiSchema);
-      return { ...options, enumOptions: this.enumOptions };
+      return options;
     },
     placeholder() {
       return getUiOptions(this.uiSchema).placeholder || '';

@@ -258,16 +258,6 @@ export function allowAdditionalItems(schema) {
   return isObject(schema.additionalItems);
 }
 
-export function optionsList(schema) {
-  if (schema.enum) {
-    return schema.enum.map((value, i) => {
-      const label = (schema.enumNames && schema.enumNames[i]) || String(value);
-      return { label, value };
-    });
-  }
-  return [];
-}
-
 // In the case where we have to implicitly create a schema, it is useful to know what type to use
 //  based on the data we are defining
 export const guessType = function guessType(value) {
