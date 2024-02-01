@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { getWidget, getUiOptions, optionsList } from '../../utils';
+import { getWidget, getUiOptions } from '../../utils';
 
 const PROPS = {
   name: String,
@@ -50,21 +50,13 @@ export default {
   inject: ['setFormDataByPointer'],
   props: PROPS,
   computed: {
-    enumOptions() {
-      return optionsList({
-        enum: this.schema.enum || [true, false],
-        enumNames:
-          this.schema.enumNames ||
-          (this.schema.enum && this.schema.enum[0] === false ? ['no', 'yes'] : ['yes', 'no'])
-      });
-    },
     widgetWithOptions() {
       const { widgets } = this.registry;
       // eslint-disable-next-line no-unused-vars
       const { widget = 'checkbox', placeholder, ...options } = getUiOptions(this.uiSchema);
       return {
         widget: getWidget(this.schema, widget, widgets),
-        options: { ...options, enumOptions: this.enumOptions }
+        options
       };
     },
     errorsMessages() {
