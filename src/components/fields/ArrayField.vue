@@ -131,7 +131,7 @@ export default {
         ...schema,
         items: {
           ...schema.items,
-          default: this.resolveSchemaShallowly(schema.items, this.formData[0]).default
+          default: this.resolveSchemaShallowly(schema.items, this.formData?.[0]).default
         }
       };
     },
@@ -142,6 +142,9 @@ export default {
       return isMultiSelect(this.resolvedSchema, this.formData);
     },
     keyedFormData() {
+      if (!this.formData) {
+        return [];
+      }
       return this.formData.map((item, index) => {
         return {
           key: this.keys[index],
@@ -151,7 +154,7 @@ export default {
     }
   },
   created() {
-    this.keys = this.formData.map(() => generateRowId());
+    this.keys = this.formData?.map(() => generateRowId()) || [];
   },
   methods: {
     getNewFormDataRow() {
