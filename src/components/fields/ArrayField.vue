@@ -22,25 +22,6 @@
     @drop="handleDropIndexClick"
   />
 
-  <multi-select-array
-    v-else-if="isMultiSelectArray"
-    :id="id"
-    :pointer="pointer"
-    :form-data="formData"
-    :label="label"
-    :description="description"
-    :schema="resolvedSchema"
-    :ui-schema="uiSchema"
-    :errors="errors"
-    :required="required"
-    :disabled="disabled"
-    :readonly="readonly"
-    :autofocus="autofocus"
-    :registry="registry"
-    v-on="multiselectArrayEventListeners"
-    @reorder="handleReorderClick"
-  />
-
   <normal-array
     v-else
     :id="id"
@@ -71,8 +52,7 @@ import shortid from 'shortid';
 
 import NormalArray from './ArrayField.NormalArray';
 import FixedArray from './ArrayField.FixedArray';
-import MultiSelectArray from './ArrayField.MultiSelect';
-import { isMultiSelect, isFixedItems, allowAdditionalItems } from '../../utils';
+import { isFixedItems, allowAdditionalItems } from '../../utils';
 
 const PROPS = {
   label: String,
@@ -102,8 +82,7 @@ export default {
   inject: ['resolveSchemaShallowly', 'setFormDataByPointer'],
   components: {
     NormalArray,
-    FixedArray,
-    MultiSelectArray
+    FixedArray
   },
   inheritAttrs: false,
   props: PROPS,
@@ -114,9 +93,6 @@ export default {
   },
   computed: {
     fixedArrayEventListeners() {
-      return pick(this.$listeners, ['blur', 'focus']);
-    },
-    multiselectArrayEventListeners() {
       return pick(this.$listeners, ['blur', 'focus']);
     },
     normalArrayEventListeners() {
@@ -137,9 +113,6 @@ export default {
     },
     isFixedArray() {
       return isFixedItems(this.resolvedSchema);
-    },
-    isMultiSelectArray() {
-      return isMultiSelect(this.resolvedSchema, this.formData);
     },
     keyedFormData() {
       if (!this.formData) {

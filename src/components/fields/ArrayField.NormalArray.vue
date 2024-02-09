@@ -1,5 +1,24 @@
 <template>
   <component
+    v-if="widgetCls"
+    :is="widgetCls"
+    :id="id"
+    :options="widgetWithOptions.options"
+    :schema="schema"
+    :registry="registry"
+    :value="formData"
+    :disabled="disabled"
+    :readonly="readonly"
+    :required="required"
+    :label="label"
+    :description="description"
+    :autofocus="autofocus"
+    :raw-error-infos="errors"
+    :pointer="pointer"
+    v-on="$listeners"
+  />
+  <component
+    v-else
     :is="fieldTemplateCls"
     :id="id"
     :can-add="canAdd"
@@ -57,6 +76,7 @@
 
 <script>
 import pick from 'lodash/pick';
+import { getWidget, getUiOptions } from '../../utils';
 import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultNormalArrayFieldTemplate from './ArrayField.NormalArray.DefaultTemplate';
@@ -92,6 +112,14 @@ export default {
   },
   props: PROPS,
   computed: {
+    widgetCls() {
+      const widgetCls = this.widgetWithOptions.widget && getWidget(this.schema, this.widgetWithOptions.widget, this.registry.widgets);
+      return widgetCls;
+    },
+    widgetWithOptions() {
+      const { widget, ...options } = getUiOptions(this.uiSchema);
+      return { widget, options };
+    },
     arrayFieldItemEvents() {
       return pick(this.$listeners, ['focus', 'blur', 'reorder', 'drop']);
     },
