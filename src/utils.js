@@ -236,13 +236,6 @@ export function isSelect(schema) {
   return !!Array.isArray(schema.enum);
 }
 
-export function isMultiSelect(schema) {
-  if (!schema.uniqueItems || !schema.items) {
-    return false;
-  }
-  return isSelect(schema.items);
-}
-
 export function isFixedItems(schema) {
   return (
     Array.isArray(schema.items) &&
