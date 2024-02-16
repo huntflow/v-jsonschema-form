@@ -5,6 +5,7 @@
     :id="id"
     :options="widgetWithOptions.options"
     :schema="schema"
+    :ui-schema="uiSchema"
     :registry="registry"
     :value="formData"
     :disabled="disabled"
