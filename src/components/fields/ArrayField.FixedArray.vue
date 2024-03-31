@@ -40,7 +40,7 @@
       :item-schema="getItemSchema(keyedItem.item, index)"
       :item-ui-schema="getItemUiSchema(index)"
       :item-data="keyedItem.item"
-      :errors="errors[index]"
+      :error-schema="(errorSchema || [])[index]"
       :autofocus="autofocus && index === 0"
       v-on="arrayFieldItemEventListeners"
     />
@@ -59,7 +59,7 @@ const PROPS = {
   keyedFormData: Array,
   schema: Object,
   uiSchema: {},
-  errors: { type: Array, default: () => [] },
+  errorSchema: { type: Array, default: () => [] },
   id: String,
   pointer: {
     type: String,

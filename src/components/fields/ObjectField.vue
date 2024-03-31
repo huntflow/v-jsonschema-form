@@ -26,7 +26,7 @@
         :required="isRequired(propName)"
         :schema="resolvedSchema.properties[propName]"
         :ui-schema="scopedProps.uiSchema || uiSchema[propName]"
-        :errors="errors[propName]"
+        :error-schema="(errorSchema || {})[propName]"
         :registry="registry"
         :disabled="disabled"
         :readonly="readonly"
@@ -56,7 +56,7 @@ const PROPS = {
     type: Object,
     required: true
   },
-  errors: { type: Object, default: () => ({}) },
+  errorSchema: { type: Object, default: () => ({}) },
   schema: Object,
   registry: { type: Object, required: true },
   disabled: { type: Boolean, default: false },

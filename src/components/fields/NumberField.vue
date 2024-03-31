@@ -25,7 +25,7 @@ const PROPS = {
   readonly: { type: Boolean, default: false },
   autofocus: { type: Boolean, default: false },
   registry: { type: Object, required: true },
-  errors: { type: Array, default: () => [] }
+  errorSchema: { type: Array, default: () => [] }
 };
 
 export default {

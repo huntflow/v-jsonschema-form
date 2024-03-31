@@ -21,7 +21,7 @@
       :form-data="itemData"
       :schema="resolvedSchema"
       :ui-schema="itemUiSchema"
-      :errors="errors"
+      :error-schema="errorSchema"
       :required="isRequired"
       :registry="registry"
       :disabled="disabled"
@@ -50,7 +50,7 @@ const PROPS = {
     type: String,
     required: true
   },
-  errors: Object,
+  errorSchema: Object,
   uiSchema: { type: Object },
   registry: { type: Object, required: true },
   autofocus: { type: Boolean, default: false },

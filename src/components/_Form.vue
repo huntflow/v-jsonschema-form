@@ -12,21 +12,21 @@
     :target="target"
     @submit="handleSubmit"
   >
-    <slot name="before-content" :errors="errors" :error-schema="errorSchema" />
+    <slot name="before-content" :error-schema="errorSchemaInternal" />
     <component
       :is="registry.fields.SchemaField"
       :id="idPrefix"
       pointer=""
       :form-data="formDataState"
       :disabled="disabled"
-      :errors="errorSchema"
+      :error-schema="errorSchemaInternal"
       :registry="registry"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
       v-on="schemaFieldEventListeners"
       @change="handleChange"
     />
-    <slot name="after-content" :errors="errors" :error-schema="errorSchema" />
+    <slot name="after-content" :error-schema="errorSchemaInternal" />
   </form>
 </template>
 
@@ -53,8 +53,7 @@ export default {
   data() {
     return {
       formDataState: undefined,
-      errors: [],
-      errorSchema: {},
+      errorSchemaInternal: this.errorSchema || {},
       submitted: false
     };
   },
@@ -95,20 +94,21 @@ export default {
     }
   },
   watch: {
+    errorSchema(value) {
+      // ошибки от бэка считаем приоритетными,
+      // и в случае чего отображаем их
+      this.errorSchemaInternal = value || {};
+    },
     formData: {
       handler(formData) {
         this.formDataState = this.enrichFormData(formData);
 
         const mustValidate = typeof formData !== 'undefined' && this.mustValidate;
-        const { errors, errorSchema } = mustValidate
+        const { errorSchema } = mustValidate
           ? this.doValidate(this.formDataState)
-          : {
-              errors: this.errors || [],
-              errorSchema: this.errorSchema || {}
-            };
+          : { errorSchema: this.errorSchemaInternal || {} };
 
-        this.errors = errors;
-        this.errorSchema = errorSchema;
+        this.errorSchemaInternal = errorSchema;
       },
       immediate: true
     },
@@ -141,8 +141,7 @@ export default {
       if (!this.noValidate) {
         const { errors, errorSchema } = this.doValidate(newFormData);
         if (Object.keys(errors).length > 0) {
-          this.errors = errors;
-          this.errorSchema = errorSchema;
+          this.errorSchemaInternal = errorSchema;
 
           this.$emit('error', errors);
           console.warn('Form validation failed', errors);
@@ -152,16 +151,17 @@ export default {
       }
 
       this.formDataState = newFormData;
-      this.errors = [];
-      this.errorSchema = {};
+      this.errorSchemaInternal = {};
 
       const submitPayload = {
+        // TODO: есть подозрение, что не все свойства используются
+        // напр. errors, errorSchema тут и пустые (и таковыми были)
         schema: this.resolvedSchema,
         uiSchema: this.uiSchema,
         formData: this.formDataState,
         edit: this.isEdit,
-        errors: this.errors,
-        errorSchema: this.errorSchema,
+        errors: [],
+        errorSchema: {},
         status: 'submitted'
       };
 
@@ -171,9 +171,8 @@ export default {
       this.formDataState = this.enrichFormData(formData);
 
       if (this.mustValidate) {
-        const { errors, errorSchema } = this.doValidate(this.formDataState);
-        this.errors = errors;
-        this.errorSchema = errorSchema;
+        const { errorSchema } = this.doValidate(this.formDataState);
+        this.errorSchemaInternal = errorSchema;
       }
     },
     enrichFormData(formData) {
@@ -215,9 +214,8 @@ export default {
       }
       this.$emit('change', this.formDataState);
       if (this.mustValidate) {
-        const { errors, errorSchema } = this.doValidate(this.formDataState);
-        this.errors = errors;
-        this.errorSchema = errorSchema;
+        const { errorSchema } = this.doValidate(this.formDataState);
+        this.errorSchemaInternal = errorSchema;
       }
     }
   }

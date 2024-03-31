@@ -9,7 +9,7 @@
     :keyed-form-data="keyedFormData"
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
-    :errors="errors"
+    :error-schema="errorSchema"
     :name="name"
     :required="required"
     :disabled="disabled"
@@ -32,7 +32,7 @@
     :keyed-form-data="keyedFormData"
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
-    :errors="errors"
+    :error-schema="errorSchema"
     :name="name"
     :required="required"
     :disabled="disabled"
@@ -69,7 +69,7 @@ const PROPS = {
   },
   uiSchema: { type: Object, default: () => ({}) },
   schema: Object,
-  errors: { type: Array, default: () => [] },
+  errorSchema: { type: Array, default: () => [] },
   registry: { type: Object, required: true },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },

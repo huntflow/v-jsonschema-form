@@ -28,5 +28,6 @@ export const PROPS = {
   omitMissingFields: { type: Boolean, default: false },
   customFormats: { type: Object, default: () => ({}) },
   fieldsSelector: { type: String, default: '[name]' },
-  invalidFieldsSelector: { type: String, default: '[name][aria-invalid="true"]' }
+  invalidFieldsSelector: { type: String, default: '[name][aria-invalid="true"]' },
+  errorSchema: { type: Object, default: undefined }
 };
