@@ -13,7 +13,7 @@
     :ui-schema="uiSchema"
     :form-data="formData"
     :pointer="pointer"
-    :errors="errors"
+    :error-schema="errorSchema"
   >
     <component
       :is="fieldCls"
@@ -25,7 +25,7 @@
       :description="description"
       :autofocus="hasAutofocus"
       :disabled="isDisabled"
-      :errors="errors"
+      :error-schema="errorSchema"
       :readonly="isReadOnly"
       :registry="registry"
       :required="required"
@@ -55,7 +55,7 @@ const PROPS = {
   },
   schema: Object,
   uiSchema: { type: Object, default: () => ({}) },
-  errors: { type: [Array, Object] },
+  errorSchema: { type: [Array, Object] },
   registry: { type: Object, required: true },
   disabled: Boolean,
   required: Boolean,

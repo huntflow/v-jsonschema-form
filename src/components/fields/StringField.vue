@@ -13,8 +13,7 @@
     :autofocus="autofocus"
     :registry="registry"
     :placeholder="placeholder"
-    :raw-errors="errorsMessages"
-    :raw-error-infos="errors"
+    :error-schema="errorSchema"
     :pointer="pointer"
     @change="handleChange"
   />
@@ -39,7 +38,7 @@ const PROPS = {
     default: undefined
   },
   registry: { type: Object, required: true },
-  errors: { type: Array, default: () => [] },
+  errorSchema: { type: Array, default: () => [] },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
@@ -76,10 +75,6 @@ export default {
     },
     placeholder() {
       return getUiOptions(this.uiSchema).placeholder || '';
-    },
-    errorsMessages() {
-      // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
-      return this.errors.map(({ message }) => message);
     }
   },
   methods: {

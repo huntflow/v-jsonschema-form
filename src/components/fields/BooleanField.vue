@@ -11,8 +11,7 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    :raw-errors="errorsMessages"
-    :raw-error-infos="errors"
+    :error-schema="errorSchema"
     :pointer="pointer"
     v-on="$listeners"
     @change="handleChange"
@@ -34,7 +33,7 @@ const PROPS = {
     required: true
   },
   formData: Boolean,
-  errors: {
+  errorSchema: {
     type: Array,
     default: () => []
   },
@@ -58,10 +57,6 @@ export default {
         widget: getWidget(this.schema, widget, widgets),
         options
       };
-    },
-    errorsMessages() {
-      // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
-      return this.errors.map(({ message }) => message);
     }
   },
   methods: {

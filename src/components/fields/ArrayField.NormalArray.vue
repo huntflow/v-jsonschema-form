@@ -15,7 +15,7 @@
     :label="label"
     :description="description"
     :autofocus="autofocus"
-    :raw-error-infos="errors"
+    :error-schema="errorSchema"
     :pointer="pointer"
     v-on="$listeners"
   />
@@ -29,7 +29,7 @@
     :readonly="readonly"
     :required="required"
     :registry="registry"
-    :raw-error-infos="errors"
+    :error-schema="errorSchema"
     :pointer="pointer"
     :schema="schema"
     :ui-schema="uiSchema"
@@ -68,7 +68,7 @@
       :ui-schema="uiSchema"
       :item-schema="schema.items"
       :item-ui-schema="uiSchema.items"
-      :errors="errors[index]"
+      :error-schema="(errorSchema || [])[index]"
       :item-data="keyedItem.item"
       :autofocus="autofocus && index === 0"
       v-on="arrayFieldItemEvents"
@@ -99,7 +99,7 @@ const PROPS = {
   keyedFormData: Array,
   schema: Object,
   uiSchema: Object,
-  errors: { type: Array, default: () => [] },
+  errorSchema: { type: Array, default: () => [] },
   registry: { type: Object, required: true },
   autofocus: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
