@@ -17,13 +17,12 @@
     :autofocus="autofocus"
     :error-schema="errorSchema"
     :pointer="pointer"
-    v-on="$listeners"
+    @change="$emit('change', $event)"
   />
   <component
     v-else
     :is="fieldTemplateCls"
     :id="id"
-    :can-add="canAdd"
     class="field field-array"
     :disabled="disabled"
     :readonly="readonly"
@@ -34,7 +33,6 @@
     :schema="schema"
     :ui-schema="uiSchema"
     :form-data="formData"
-    @add="$emit('add')"
     @change="$emit('change', $event)"
   >
     <template v-if="label" #title>
@@ -62,27 +60,18 @@
       :registry="registry"
       :index="index"
       :total-count="formData.length"
-      :can-remove="true"
-      :can-move-up="index > 0"
-      :can-move-down="index < formData.length - 1"
       :ui-schema="uiSchema"
       :item-schema="schema.items"
       :item-ui-schema="uiSchema.items"
       :error-schema="(errorSchema || [])[index]"
       :item-data="keyedItem.item"
       :autofocus="autofocus && index === 0"
-      @focus="$emit('focus', $event)"
-      @blur="$emit('blur', $event)"
-      @change-for-index="$emit('change-for-index', $event)"
-      @reorder="$emit('reorder', $event)"
-      @drop="$emit('drop', $event)"
     />
   </component>
 </template>
 
 <script>
 import { getWidget, getUiOptions } from '../../utils';
-import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultNormalArrayFieldTemplate from './ArrayField.NormalArray.DefaultTemplate';
 
@@ -117,7 +106,7 @@ export default {
   },
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
-  emits: ['add', 'change', 'focus', 'blur', 'change-for-index', 'reorder', 'drop'],
+  emits: ['change'],
   computed: {
     widgetCls() {
       const widgetCls = this.widgetWithOptions.widget && getWidget(this.schema, this.widgetWithOptions.widget, this.registry.widgets);
@@ -126,9 +115,6 @@ export default {
     widgetWithOptions() {
       const { widget, ...options } = getUiOptions(this.uiSchema);
       return { widget, options };
-    },
-    canAdd() {
-      return canAddArrayItem(this.uiSchema, this.schema, this.formData);
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultNormalArrayFieldTemplate;

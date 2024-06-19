@@ -13,8 +13,6 @@
     :registry="registry"
     :error-schema="errorSchema"
     :pointer="pointer"
-    @focus="$emit('focus', $event)"
-    @blur="$emit('blur', $event)"
     @change="handleChange"
   />
 </template>
@@ -49,7 +47,6 @@ export default {
   name: 'BooleanField',
   inject: ['setFormDataByPointer'],
   props: PROPS,
-  emits: ['focus', 'blur', 'change'],
   computed: {
     widgetWithOptions() {
       const { widgets } = this.registry;

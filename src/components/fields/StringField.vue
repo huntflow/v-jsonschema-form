@@ -15,8 +15,6 @@
     :placeholder="placeholder"
     :error-schema="errorSchema"
     :pointer="pointer"
-    @focus="$emit('focus', $event)"
-    @blur="$emit('blur', $event)"
     @change="handleChange"
   />
 </template>
@@ -51,7 +49,7 @@ export default {
   name: 'StringField',
   inject: ['resolveSchemaShallowly', 'setFormDataByPointer'],
   props: PROPS,
-  emits: ['focus', 'blur', 'change'],
+  emits: ['change'],
   computed: {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);

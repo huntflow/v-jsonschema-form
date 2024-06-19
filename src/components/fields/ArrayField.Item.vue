@@ -3,16 +3,9 @@
     :is="fieldTemplateCls"
     class="array-item"
     :index="index"
-    :total-count="totalCount"
-    :has-move-up="has.moveUp"
-    :has-move-down="has.moveDown"
-    :has-remove="has.remove"
-    :has-toolbar="has.toolbar"
     :disabled="disabled"
     :readonly="readonly"
     :pointer="pointer"
-    @drop="$emit('drop', $event)"
-    @reorder="$emit('reorder', $event)"
   >
     <component
       :is="registry.fields.SchemaField"
@@ -28,9 +21,6 @@
       :disabled="disabled"
       :readonly="readonly"
       :autofocus="autofocus"
-      @focus="$emit('focus', $event)"
-      @blur="$emit('blur', $event)"
-      @change="handleChangeForIndex(index, ...arguments)"
     />
   </component>
 </template>
@@ -40,10 +30,6 @@ import DefaultArrayItem from './ArrayField.DefaultArrayItem';
 
 const PROPS = {
   index: Number,
-  totalCount: Number,
-  canRemove: { default: true },
-  canMoveUp: { default: true },
-  canMoveDown: { default: true },
   itemSchema: Object,
   itemData: {},
   itemUiSchema: Object,
@@ -67,7 +53,6 @@ export default {
   },
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
-  emits: ['drop', 'reorder', 'focus', 'blur', 'change-for-index'],
   computed: {
     fieldTemplateCls() {
       return this.itemUiSchema?.['ui:ArrayItemFieldTemplate'] || DefaultArrayItem;
@@ -83,21 +68,6 @@ export default {
       }
       // All non-null array item types are inherently required by design
       return this.resolvedSchema.type !== 'null';
-    },
-    has() {
-      const { orderable, removable } = {
-        orderable: true,
-        removable: true,
-        ...(this.uiSchema || {})['ui:options']
-      };
-      const result = {
-        moveUp: orderable && this.canMoveUp,
-        moveDown: orderable && this.canMoveDown,
-        remove: removable && this.canRemove
-      };
-      result.toolbar = Object.keys(result).some((key) => result[key]);
-
-      return result;
     }
   }
 };

@@ -16,12 +16,6 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    @change-for-index="handleChangeForIndex"
-    @add="handleAddClick"
-    @reorder="handleReorderClick"
-    @drop="handleDropIndexClick"
-    @focus="$emit('focus', $event)"
-    @blur="$emit('blur', $event)"
   />
 
   <normal-array
@@ -41,13 +35,6 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    @change-for-index="handleChangeForIndex"
-    @add="handleAddClick"
-    @reorder="handleReorderClick"
-    @drop="handleDropIndexClick"
-    @focus="$emit('focus', $event)"
-    @blur="$emit('blur', $event)"
-    @change="$emit('change', $event)"
   />
 </template>
 
@@ -91,7 +78,6 @@ export default {
   inject: ['resolveSchemaShallowly'],
   inheritAttrs: false,
   props: PROPS,
-  emits: ['focus', 'blur', 'change'],
   data() {
     return {
       keys: []
@@ -136,32 +122,6 @@ export default {
         itemSchema = this.resolvedSchema.additionalItems;
       }
       return itemSchema.default;
-    },
-
-    handleAddClick() {
-      this.keys.push(generateRowId());
-      this.setFormDataByPointer(this.pointer, (state) => {
-        state.push(this.getNewFormDataRow());
-      });
-    },
-
-    handleDropIndexClick(index) {
-      this.keys.splice(index, 1);
-      this.setFormDataByPointer(this.pointer, (state) => {
-        state.splice(index, 1);
-      });
-    },
-
-    handleReorderClick(from, to) {
-      const tempKey = this.keys[from];
-      this.$set(this.keys, from, this.keys[to]);
-      this.$set(this.keys, to, tempKey);
-
-      this.setFormDataByPointer(this.pointer, (state) => {
-        const temp = state[from];
-        this.$set(state, from, state[to]);
-        this.$set(state, to, temp);
-      });
     }
   }
 };

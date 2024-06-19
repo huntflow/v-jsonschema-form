@@ -31,8 +31,6 @@
       :required="required"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
-      @focus="$emit('focus', $event)"
-      @blur="$emit('blur', $event)"
       @change="$emit('change', $event)"
     />
   </component>
@@ -70,7 +68,7 @@ export default {
   name: 'SchemaField',
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
-  emits: ['focus', 'blur', 'change'],
+  emits: ['change'],
   computed: {
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);

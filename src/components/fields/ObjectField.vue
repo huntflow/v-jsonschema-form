@@ -31,8 +31,6 @@
         :disabled="disabled"
         :readonly="readonly"
         v-bind="scopedProps"
-        @focus="$emit('focus', $event)"
-        @blur="$emit('blur', $event)"
       />
     </template>
   </component>
@@ -68,7 +66,6 @@ export default {
   name: 'ObjectField',
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
-  emits: ['focus', 'blur'],
   computed: {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);

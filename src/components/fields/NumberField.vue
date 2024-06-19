@@ -5,9 +5,7 @@
     :raw-errors="errorsMessages"
     :raw-error-infos="errors"
     :form-data="formDataNumericValue"
-    @focus="$emit('focus', $event)"
-    @blur="$emit('blur', $event)"
-    @change="handleChange"
+    @change="$emit('change', $event)"
   />
 </template>
 
@@ -38,7 +36,7 @@ const PROPS = {
 export default {
   name: 'NumberField',
   props: PROPS,
-  emits: ['focus', 'blur', 'change'],
+  emits: ['change'],
   computed: {
     stringFieldCls() {
       return this.registry.fields.StringField;

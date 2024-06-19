@@ -23,8 +23,6 @@
       :registry="registry"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
-      @focus="$emit('focus', $event)"
-      @blur="$emit('blur', $event)"
       @change="handleChange"
     />
     <slot name="after-content" :error-schema="errorSchemaInternal" />
@@ -50,7 +48,7 @@ export default {
     };
   },
   props: PROPS,
-  emits: ['focus', 'blur', 'change'],
+  emits: ['change', 'submit'],
   data() {
     return {
       formDataState: undefined,

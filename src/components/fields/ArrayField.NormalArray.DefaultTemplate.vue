@@ -1,37 +1,14 @@
 <template>
   <fieldset :id="id">
-    <slot name="title" />
-    <slot name="description" />
-
-    <div :key="'array-item-list-' + id" class="row array-item-list">
-      <slot />
-    </div>
-
-    <add-button v-if="canAdd" class="array-item-add" :disabled="isDisabled" @click="$emit('add')" />
+    <slot name="default" />
   </fieldset>
 </template>
 
 <script>
-import AddButton from '../AddButton';
-
-const PROPS = {
-  id: String,
-  canAdd: { type: Boolean, default: false },
-  disabled: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false }
-};
-
 export default {
   name: 'ArrayFieldNormalArrayDefaultTemplate',
-  components: {
-    'add-button': AddButton
-  },
-  props: PROPS,
-  emits: ['add'],
-  computed: {
-    isDisabled() {
-      return this.disabled || this.readonly;
-    }
+  props: {
+    id: String
   }
 };
 </script>
