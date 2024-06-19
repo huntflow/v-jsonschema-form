@@ -18,7 +18,6 @@ const PROPS = {
     default: []
   }
 };
-
 export default {
   name: 'ErrorList',
   inheritAttrs: false,

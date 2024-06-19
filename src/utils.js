@@ -1,7 +1,3 @@
-import fields from './components/fields';
-import widgets from './components/widgets';
-export const ADDITIONAL_PROPERTY_FLAG = '__additional_property';
-
 const widgetMap = {
   boolean: {
     checkbox: 'CheckboxWidget',
@@ -56,9 +52,10 @@ const widgetMap = {
 
 export function getDefaultRegistry() {
   return {
-    fields,
-    widgets,
-    formContext: {}
+    // eslint-disable-next-line no-undef
+    fields: require('./components/fields').default,
+    // eslint-disable-next-line no-undef
+    widgets: require('./components/widgets').default
   };
 }
 
@@ -239,13 +236,6 @@ export function isSelect(schema) {
   return !!Array.isArray(schema.enum);
 }
 
-export function isMultiSelect(schema) {
-  if (!schema.uniqueItems || !schema.items) {
-    return false;
-  }
-  return isSelect(schema.items);
-}
-
 export function isFixedItems(schema) {
   return (
     Array.isArray(schema.items) &&
@@ -259,16 +249,6 @@ export function allowAdditionalItems(schema) {
     console.warn('additionalItems=true is currently not supported');
   }
   return isObject(schema.additionalItems);
-}
-
-export function optionsList(schema) {
-  if (schema.enum) {
-    return schema.enum.map((value, i) => {
-      const label = (schema.enumNames && schema.enumNames[i]) || String(value);
-      return { label, value };
-    });
-  }
-  return [];
 }
 
 // In the case where we have to implicitly create a schema, it is useful to know what type to use

@@ -11,21 +11,19 @@ const PROPS = {
 
 export default {
   props: PROPS,
-  emits: ['change'],
+  emits: ['change', 'focus', 'blur'],
   methods: {
     isDisabled(option) {
-      const itemDisabled =
-        this.options.enumDisabled && this.options.enumDisabled.indexOf(option.value) != -1;
-      return this.disabled || this.readonly || itemDisabled;
+      return this.disabled || this.readonly;
     },
     isChecked(option) {
-      return this.value === option.value;
+      return this.value === option;
     }
   },
 
   render(h) {
     const { id, options, autofocus } = this.$props;
-    const { enumOptions, inline } = options;
+    const { inline } = options;
     const name = Math.random().toString();
 
     const makeRadio = ({ index, option }) =>
@@ -34,7 +32,7 @@ export default {
           on: {
             focus: (evt) => this.$emit('focus', evt),
             blur: (evt) => this.$emit('blur', evt),
-            change: () => this.$emit('change', option.value)
+            change: () => this.$emit('change', option)
           },
           attrs: {
             type: 'radio',
@@ -43,20 +41,18 @@ export default {
             disabled: this.isDisabled(option),
             required: this.required,
             autofocus: autofocus && index === 0,
-            value: option.value
+            value: option
           }
         }),
-        h('span', {}, [option.label])
+        h('span', {}, [option])
       ]);
 
     return h('div', { attrs: { id } }, [
-      ...enumOptions.map((option, index) => {
-        const disabledCls = this.isDisabled(option) ? 'disabled' : '';
-
+      ...this.schema.enum.map((option, index) => {
         const checkbox = [makeRadio({ option, index })];
         const attrs = inline
-          ? { class: `radio-inline ${disabledCls}` }
-          : { class: `radio ${disabledCls}` };
+          ? { class: `radio-inline` }
+          : { class: `radio` };
 
         return inline
           ? h('label', { key: index, attrs }, checkbox)

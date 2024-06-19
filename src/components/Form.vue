@@ -6,7 +6,14 @@
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
     @change="$emit('change', $event)"
-  />
+  >
+    <template #before-content="scopedProps">
+      <slot name="before-content" v-bind="scopedProps" />
+    </template>
+    <template #after-content="scopedProps">
+      <slot name="after-content" v-bind="scopedProps" />
+    </template>
+  </base-form>
 </template>
 
 <script>
@@ -21,12 +28,6 @@ export default {
   },
   props: PROPS,
   emits: ['focus', 'blur', 'change'],
-  data() {
-    return {
-      dereferencedSchema: null,
-      isDereference: false
-    };
-  },
   computed: {
     enrichedSchema() {
       return getEnrichedSchema(this.schema);

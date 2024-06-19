@@ -13,16 +13,16 @@
     :autofocus="autofocus"
     :registry="registry"
     :placeholder="placeholder"
-    :raw-errors="errorsMessages"
-    :raw-error-infos="errors"
+    :error-schema="errorSchema"
+    :pointer="pointer"
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
-    @change="$emit('change', $event)"
+    @change="handleChange"
   />
 </template>
 
 <script>
-import { getWidget, getUiOptions, isSelect, optionsList, hasWidget } from '../../utils';
+import { getWidget, getUiOptions, isSelect, hasWidget } from '../../utils';
 
 const PROPS = {
   schema: Object,
@@ -31,9 +31,16 @@ const PROPS = {
   description: String,
   uiSchema: Object,
   id: String,
-  formData: [String, Number],
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: [String, Number],
+    default: undefined
+  },
   registry: { type: Object, required: true },
-  errors: { type: Array, default: () => [] },
+  errorSchema: { type: Array, default: () => [] },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
@@ -42,20 +49,17 @@ const PROPS = {
 
 export default {
   name: 'StringField',
-  inject: ['resolveSchemaShallowly'],
+  inject: ['resolveSchemaShallowly', 'setFormDataByPointer'],
   props: PROPS,
   emits: ['focus', 'blur', 'change'],
   computed: {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);
     },
-    enumOptions() {
-      return isSelect(this.resolvedSchema) && optionsList(this.resolvedSchema);
-    },
     widgetCls() {
       const { format } = this.resolvedSchema;
       const { widgets } = this.registry;
-      let defaultWidget = this.enumOptions ? 'select' : 'text';
+      let defaultWidget = this.resolvedSchema.enum ? 'select' : 'text';
       if (format && hasWidget(this.resolvedSchema, format, widgets)) {
         defaultWidget = format;
       }
@@ -70,14 +74,15 @@ export default {
         placeholder,
         ...options
       } = getUiOptions(this.uiSchema);
-      return { ...options, enumOptions: this.enumOptions };
+      return options;
     },
     placeholder() {
       return getUiOptions(this.uiSchema).placeholder || '';
-    },
-    errorsMessages() {
-      // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
-      return this.errors.map(({ message }) => message);
+    }
+  },
+  methods: {
+    handleChange(value) {
+      this.setFormDataByPointer(this.pointer, value);
     }
   }
 };

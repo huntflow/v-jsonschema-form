@@ -16,12 +16,11 @@
       {{ placeholder }}
     </option>
     <option
-      v-for="(enumOption, index) in enumOptions"
+      v-for="(option, index) in enumOptions"
       :key="index"
-      :disabled="isOptionDisabled(enumOption.value)"
-      :value="enumOption.value"
+      :value="option"
     >
-      {{ enumOption.label }}
+      {{ option }}
     </option>
   </select>
 </template>

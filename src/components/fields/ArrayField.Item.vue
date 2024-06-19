@@ -1,23 +1,28 @@
 <template>
-  <default-array-item
+  <component
+    :is="fieldTemplateCls"
     class="array-item"
     :index="index"
+    :total-count="totalCount"
     :has-move-up="has.moveUp"
     :has-move-down="has.moveDown"
     :has-remove="has.remove"
     :has-toolbar="has.toolbar"
     :disabled="disabled"
     :readonly="readonly"
+    :pointer="pointer"
     @drop="$emit('drop', $event)"
     @reorder="$emit('reorder', $event)"
   >
     <component
       :is="registry.fields.SchemaField"
       :id="id"
+      :name="`${index}`"
+      :pointer="pointer"
+      :form-data="itemData"
       :schema="resolvedSchema"
       :ui-schema="itemUiSchema"
-      :form-data="itemData"
-      :errors="errors"
+      :error-schema="errorSchema"
       :required="isRequired"
       :registry="registry"
       :disabled="disabled"
@@ -27,7 +32,7 @@
       @blur="$emit('blur', $event)"
       @change="handleChangeForIndex(index, ...arguments)"
     />
-  </default-array-item>
+  </component>
 </template>
 
 <script>
@@ -35,6 +40,7 @@ import DefaultArrayItem from './ArrayField.DefaultArrayItem';
 
 const PROPS = {
   index: Number,
+  totalCount: Number,
   canRemove: { default: true },
   canMoveUp: { default: true },
   canMoveDown: { default: true },
@@ -42,7 +48,11 @@ const PROPS = {
   itemData: {},
   itemUiSchema: Object,
   id: String,
-  errors: Object,
+  pointer: {
+    type: String,
+    required: true
+  },
+  errorSchema: Object,
   uiSchema: { type: Object },
   registry: { type: Object, required: true },
   autofocus: { type: Boolean, default: false },
@@ -59,6 +69,9 @@ export default {
   props: PROPS,
   emits: ['drop', 'reorder', 'focus', 'blur', 'change-for-index'],
   computed: {
+    fieldTemplateCls() {
+      return this.itemUiSchema?.['ui:ArrayItemFieldTemplate'] || DefaultArrayItem;
+    },
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.itemSchema, this.itemData);
     },
@@ -85,11 +98,6 @@ export default {
       result.toolbar = Object.keys(result).some((key) => result[key]);
 
       return result;
-    }
-  },
-  methods: {
-    handleChangeForIndex(index, ...args) {
-      this.$emit('change-for-index', index, ...args);
     }
   }
 };

@@ -10,22 +10,27 @@
     :readonly="isReadOnly"
     :required="required"
     :schema="resolvedSchema"
+    :ui-schema="uiSchema"
+    :form-data="formData"
+    :pointer="pointer"
+    :error-schema="errorSchema"
   >
     <component
       :is="fieldCls"
       :id="id"
+      :pointer="pointer"
+      :form-data="formData"
       :name="name"
       :label="title"
       :description="description"
       :autofocus="hasAutofocus"
       :disabled="isDisabled"
-      :errors="errors"
-      :form-data="formData"
+      :error-schema="errorSchema"
       :readonly="isReadOnly"
       :registry="registry"
       :required="required"
       :schema="resolvedSchema"
-      :ui-schema="{ ...uiSchema, class: undefined }"
+      :ui-schema="uiSchema"
       @focus="$emit('focus', $event)"
       @blur="$emit('blur', $event)"
       @change="$emit('change', $event)"
@@ -38,17 +43,27 @@ import { getSchemaType } from '../../utils';
 import DefaultTemplate from './SchemaField.DefaultTemplate.vue';
 
 const PROPS = {
-  name: String,
+  name: {
+    type: String,
+    default: null
+  },
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: [Number, String, Array, Object, Boolean],
+    default: undefined
+  },
   schema: Object,
   uiSchema: { type: Object, default: () => ({}) },
-  errors: { type: [Array, Object] },
-  formData: [String, Number, Boolean, Array, Object],
+  errorSchema: { type: [Array, Object] },
   registry: { type: Object, required: true },
-  disabled: { type: Boolean, default: false },
-  required: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: false },
-  autofocus: { type: Boolean, default: false }
+  disabled: Boolean,
+  required: Boolean,
+  readonly: Boolean,
+  autofocus: Boolean
 };
 
 export default {
@@ -82,7 +97,7 @@ export default {
       return getFieldComponent(this.resolvedSchema, this.uiSchema, this.registry.fields);
     },
     fieldTemplateCls() {
-      return this.uiSchema['ui:FieldTemplate'] || this.registry.FieldTemplate || DefaultTemplate;
+      return this.uiSchema['ui:FieldTemplate'] || DefaultTemplate;
     }
   }
 };

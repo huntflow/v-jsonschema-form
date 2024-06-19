@@ -7,9 +7,9 @@
     :required="required"
     :value="value"
     v-bind="options"
+    @input="handleChange"
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
-    @change="handleChange"
   />
 </template>
 

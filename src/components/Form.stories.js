@@ -1,4 +1,5 @@
 import JsonForm from './Form';
+import ErrorList from './ErrorList.vue';
 import simpleData from './Form.stories.data/simple';
 import ifThen from './Form.stories.data/if-then';
 import autofocus from './Form.stories.data/autofocus';

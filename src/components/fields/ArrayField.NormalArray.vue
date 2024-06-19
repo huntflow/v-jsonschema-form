@@ -1,18 +1,39 @@
 <template>
   <component
+    v-if="widgetCls"
+    :is="widgetCls"
+    :id="id"
+    :options="widgetWithOptions.options"
+    :schema="schema"
+    :ui-schema="uiSchema"
+    :form-data="formData"
+    :registry="registry"
+    :value="formData"
+    :disabled="disabled"
+    :readonly="readonly"
+    :required="required"
+    :label="label"
+    :description="description"
+    :autofocus="autofocus"
+    :error-schema="errorSchema"
+    :pointer="pointer"
+    v-on="$listeners"
+  />
+  <component
+    v-else
     :is="fieldTemplateCls"
     :id="id"
     :can-add="canAdd"
     class="field field-array"
-    :class="'field-array-of-' + itemsSchema.type"
     :disabled="disabled"
-    :ui-schema="uiSchema"
     :readonly="readonly"
     :required="required"
-    :schema="schema"
-    :form-data="formData"
     :registry="registry"
-    :raw-error-infos="errors"
+    :error-schema="errorSchema"
+    :pointer="pointer"
+    :schema="schema"
+    :ui-schema="uiSchema"
+    :form-data="formData"
     @add="$emit('add')"
     @change="$emit('change', $event)"
   >
@@ -37,14 +58,17 @@
       v-for="(keyedItem, index) in keyedFormData"
       :id="`${id}_${index}`"
       :key="keyedItem.key"
+      :pointer="`${pointer}/${index}`"
       :registry="registry"
       :index="index"
+      :total-count="formData.length"
       :can-remove="true"
       :can-move-up="index > 0"
       :can-move-down="index < formData.length - 1"
-      :item-schema="resolvedSchema.items"
+      :ui-schema="uiSchema"
+      :item-schema="schema.items"
       :item-ui-schema="uiSchema.items"
-      :errors="errors[index]"
+      :error-schema="(errorSchema || [])[index]"
       :item-data="keyedItem.item"
       :autofocus="autofocus && index === 0"
       @focus="$emit('focus', $event)"
@@ -57,6 +81,7 @@
 </template>
 
 <script>
+import { getWidget, getUiOptions } from '../../utils';
 import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultNormalArrayFieldTemplate from './ArrayField.NormalArray.DefaultTemplate';
@@ -66,11 +91,18 @@ const PROPS = {
   label: String,
   description: String,
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: Array,
+    required: true
+  },
   keyedFormData: Array,
   schema: Object,
   uiSchema: Object,
-  formData: Array,
-  errors: { type: Array, default: () => [] },
+  errorSchema: { type: Array, default: () => [] },
   registry: { type: Object, required: true },
   autofocus: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
@@ -87,17 +119,19 @@ export default {
   props: PROPS,
   emits: ['add', 'change', 'focus', 'blur', 'change-for-index', 'reorder', 'drop'],
   computed: {
-    resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formData);
+    widgetCls() {
+      const widgetCls = this.widgetWithOptions.widget && getWidget(this.schema, this.widgetWithOptions.widget, this.registry.widgets);
+      return widgetCls;
+    },
+    widgetWithOptions() {
+      const { widget, ...options } = getUiOptions(this.uiSchema);
+      return { widget, options };
     },
     canAdd() {
-      return canAddArrayItem(this.uiSchema, this.resolvedSchema, this.formData);
+      return canAddArrayItem(this.uiSchema, this.schema, this.formData);
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultNormalArrayFieldTemplate;
-    },
-    itemsSchema() {
-      return this.resolveSchemaShallowly(this.resolvedSchema.items, this.formData);
     }
   }
 };

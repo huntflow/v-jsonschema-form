@@ -2,11 +2,10 @@
   <component
     :is="fieldTemplateCls"
     :id="id"
-    :schema="resolvedSchema"
-    :ui-schema="uiSchema"
     :can-add="canAdd"
     :disabled="disabled"
     :readonly="readonly"
+    :pointer="pointer"
     class="field field-array field-array-fixed-items"
     @add="$emit('add')"
   >
@@ -31,6 +30,7 @@
       v-for="(keyedItem, index) in keyedFormData"
       :id="`${id}_${index}`"
       :key="keyedItem.key"
+      :pointer="`${pointer}/${index}`"
       :registry="registry"
       :index="index"
       :can-remove="index >= itemSchemas.length"
@@ -40,7 +40,7 @@
       :item-schema="getItemSchema(keyedItem.item, index)"
       :item-ui-schema="getItemUiSchema(index)"
       :item-data="keyedItem.item"
-      :errors="errors[index]"
+      :error-schema="(errorSchema || [])[index]"
       :autofocus="autofocus && index === 0"
       @focus="$emit('focus', $event)"
       @blur="$emit('blur', $event)"
@@ -61,9 +61,16 @@ const PROPS = {
   keyedFormData: Array,
   schema: Object,
   uiSchema: {},
-  formData: {},
-  errors: { type: Array, default: () => [] },
+  errorSchema: { type: Array, default: () => [] },
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
+  formData: {
+    type: Array,
+    required: true
+  },
   registry: { type: Object, required: true },
   autofocus: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
@@ -76,23 +83,20 @@ const PROPS = {
 export default {
   name: 'ArrayFieldFixedArray',
   components: {
-    'array-field-item': ArrayFieldItem
+    ArrayFieldItem
   },
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
   emits: ['add', 'focus', 'blur', 'change-for-index', 'reorder', 'drop'],
   computed: {
-    resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.formData);
-    },
     canAdd() {
-      return canAddArrayItem(this.uiSchema, this.resolvedSchema, this.formData);
+      return canAddArrayItem(this.uiSchema, this.schema, this.formData);
     },
     fieldTemplateCls() {
       return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultFixedArrayFieldTemplate;
     },
     itemSchemas() {
-      return this.resolvedSchema.items.map((item, index) =>
+      return this.schema.items.map((item, index) =>
         this.resolveSchemaShallowly(item, this.formData[index])
       );
     },
@@ -109,7 +113,7 @@ export default {
   methods: {
     getItemSchema(item, index) {
       const additional = index >= this.itemSchemas.length;
-      return additional ? this.resolvedSchema.additionalItems : this.itemSchemas[index];
+      return additional ? this.schema.additionalItems : this.itemSchemas[index];
     },
     getItemUiSchema(index) {
       const additional = index >= this.itemSchemas.length;

@@ -9,29 +9,30 @@
     :schema="resolvedSchema"
     :ui-schema="uiSchema"
     :ordered-properties="orderedProperties"
-    :form-data="innerFormData"
     :disabled="disabled"
     :readonly="readonly"
     :required="required"
+    :form-data="formData"
+    :pointer="pointer"
   >
     <template v-for="propName in orderedProperties" #[propName]="scopedProps">
       <component
         :is="schemaFieldCls"
         :id="`${id}_${propName}`"
         :key="propName"
+        :pointer="`${pointer}/${propName}`"
+        :form-data="formData[propName]"
         :name="propName"
         :required="isRequired(propName)"
         :schema="resolvedSchema.properties[propName]"
         :ui-schema="scopedProps.uiSchema || uiSchema[propName]"
-        :errors="errors[propName]"
-        :form-data="(innerFormData || {})[propName]"
+        :error-schema="(errorSchema || {})[propName]"
         :registry="registry"
         :disabled="disabled"
         :readonly="readonly"
         v-bind="scopedProps"
         @focus="$emit('focus', $event)"
         @blur="$emit('blur', $event)"
-        @change="handlePropertyChange(propName, $event)"
       />
     </template>
   </component>
@@ -47,11 +48,15 @@ const PROPS = {
   description: String,
   uiSchema: { type: Object, default: () => ({}) },
   id: String,
-  errors: { type: Object, default: () => ({}) },
-  formData: {
-    type: [String, Number, Boolean, Array, Object], // TODO: check if it's true
-    default: () => ({})
+  pointer: {
+    type: String,
+    required: true
   },
+  formData: {
+    type: Object,
+    required: true
+  },
+  errorSchema: { type: Object, default: () => ({}) },
   schema: Object,
   registry: { type: Object, required: true },
   disabled: { type: Boolean, default: false },
@@ -63,25 +68,16 @@ export default {
   name: 'ObjectField',
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
-  emits: ['focus', 'blur', 'change'],
-  data() {
-    return {
-      innerFormData: {} // TODO: используется для того чтобы можно было обновить несколько вложенных полей одновременно, допустим если в инпутах заполняются данные при mounted
-    };
-  },
+  emits: ['focus', 'blur'],
   computed: {
     resolvedSchema() {
-      return this.resolveSchemaShallowly(this.schema, this.innerFormData);
+      return this.resolveSchemaShallowly(this.schema, this.formData);
     },
     requiredFields() {
       return this.resolvedSchema.required || [];
     },
     objectFieldTemplateCls() {
-      return (
-        this.uiSchema['ui:ObjectFieldTemplate'] ||
-        this.registry.ObjectFieldTemplate ||
-        DefaultObjectFieldTemplate
-      );
+      return this.uiSchema['ui:ObjectFieldTemplate'] || DefaultObjectFieldTemplate;
     },
     schemaFieldCls() {
       return this.registry.fields.SchemaField;
@@ -91,21 +87,9 @@ export default {
       return orderProperties(properties, this.uiSchema['ui:order']);
     }
   },
-  watch: {
-    formData: {
-      immediate: true,
-      handler(formData) {
-        this.innerFormData = formData;
-      }
-    }
-  },
   methods: {
     isRequired(name) {
       return this.requiredFields.includes(name);
-    },
-    handlePropertyChange(name, value) {
-      this.innerFormData[name] = value;
-      this.$emit('change', { ...this.innerFormData });
     }
   }
 };

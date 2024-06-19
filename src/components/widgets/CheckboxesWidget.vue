@@ -12,6 +12,7 @@ function deselectValue(value, selected) {
 }
 
 const PROPS = {
+  schema: Object,
   id: String,
   autofocus: { default: false },
   options: { default: () => ({ inline: false }) },
@@ -23,28 +24,26 @@ export default {
   emits: ['change'],
   methods: {
     isDisabled(option) {
-      const itemDisabled =
-        this.options.enumDisabled && this.options.enumDisabled.indexOf(option.value) != -1;
-      return this.disabled || this.readonly || itemDisabled;
+      return this.disabled || this.readonly;
     },
     isChecked(option) {
-      return this.value.indexOf(option.value) !== -1;
+      return this.value.indexOf(option) !== -1;
     }
   },
 
   render(h) {
     const { id, options, value, autofocus } = this.$props;
-    const { enumOptions, inline } = options;
+    const { inline } = options;
 
     const makeCheckbox = ({ index, option }) =>
       h('span', {}, [
         h('input', {
           on: {
             change: (event) => {
-              const all = enumOptions.map(({ value }) => value);
+              const all = this.schema.enum;
               const changeValue = event.target.checked
-                ? selectValue(option.value, value, all)
-                : deselectValue(option.value, value);
+                ? selectValue(option, value, all)
+                : deselectValue(option, value);
 
               this.$emit('change', changeValue);
             }
@@ -61,13 +60,12 @@ export default {
       ]);
 
     return h('div', { attrs: { id } }, [
-      ...enumOptions.map((option, index) => {
-        const disabledCls = this.isDisabled(option) ? 'disabled' : '';
+      ...this.schema.enum.map((option, index) => {
 
         const checkbox = [makeCheckbox({ option, index })];
         const attrs = inline
-          ? { class: `checkbox-inline ${disabledCls}` }
-          : { class: `checkbox ${disabledCls}` };
+          ? { class: `checkbox-inline` }
+          : { class: `checkbox` };
 
         return inline
           ? h('label', { key: index, attrs }, checkbox)

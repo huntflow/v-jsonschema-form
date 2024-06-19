@@ -12,32 +12,29 @@
     :target="target"
     @submit="handleSubmit"
   >
+    <slot name="before-content" :error-schema="errorSchemaInternal" />
     <component
-      :is="ErrorList"
-      v-if="shouldShowErrorList"
-      :error-schema="errorSchema"
-      :errors="errors"
-      :schema="resolvedSchema"
-      :ui-schema="uiSchema"
-    />
-    <component
-      :is="getRegistry().fields.SchemaField"
+      :is="registry.fields.SchemaField"
       :id="idPrefix"
-      :disabled="disabled"
-      :errors="errorSchema"
+      pointer=""
       :form-data="formDataState"
-      :registry="getRegistry()"
+      :disabled="disabled"
+      :error-schema="errorSchemaInternal"
+      :registry="registry"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
       @focus="$emit('focus', $event)"
       @blur="$emit('blur', $event)"
       @change="handleChange"
     />
+    <slot name="after-content" :error-schema="errorSchemaInternal" />
   </form>
 </template>
 
 <script>
 import cloneDeep from 'lodash/cloneDeep';
+import jsonPointer from 'json-pointer';
+
 import { compileSchema } from '@/validate';
 import { getDefaultRegistry } from '@/utils';
 import { PROPS } from './form-props';
@@ -48,7 +45,8 @@ export default {
   name: 'VjsfForm',
   provide() {
     return {
-      resolveSchemaShallowly: this.resolveSchemaShallowly
+      resolveSchemaShallowly: this.resolveSchemaShallowly,
+      setFormDataByPointer: this.setFormDataByPointer
     };
   },
   props: PROPS,
@@ -56,8 +54,7 @@ export default {
   data() {
     return {
       formDataState: undefined,
-      errors: [],
-      errorSchema: {},
+      errorSchemaInternal: this.errorSchema || {},
       submitted: false
     };
   },
@@ -72,9 +69,6 @@ export default {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formDataState);
     },
-    shouldShowErrorList() {
-      return this.showErrorList !== false && this.errors && this.errors.length > 0;
-    },
     isStartValidateOnSubmit() {
       return this.startValidateMode === VALIDATION_MODE.onSubmit;
     },
@@ -86,23 +80,33 @@ export default {
     },
     mustValidate() {
       return this.canValidateByMode && !this.noValidate && this.liveValidate;
+    },
+    registry() {
+      // For BC, accept passed SchemaField and TitleField props and pass them to
+      // the "fields" registry one.
+      const { fields, widgets } = getDefaultRegistry();
+      return {
+        fields,
+        widgets: { ...widgets, ...this.widgets }
+      };
     }
   },
   watch: {
+    errorSchema(value) {
+      // ошибки от бэка считаем приоритетными,
+      // и в случае чего отображаем их
+      this.errorSchemaInternal = value || {};
+    },
     formData: {
       handler(formData) {
         this.formDataState = this.enrichFormData(formData);
 
         const mustValidate = typeof formData !== 'undefined' && this.mustValidate;
-        const { errors, errorSchema } = mustValidate
+        const { errorSchema } = mustValidate
           ? this.doValidate(this.formDataState)
-          : {
-              errors: this.errors || [],
-              errorSchema: this.errorSchema || {}
-            };
+          : { errorSchema: this.errorSchemaInternal || {} };
 
-        this.errors = errors;
-        this.errorSchema = errorSchema;
+        this.errorSchemaInternal = errorSchema;
       },
       immediate: true
     },
@@ -135,27 +139,27 @@ export default {
       if (!this.noValidate) {
         const { errors, errorSchema } = this.doValidate(newFormData);
         if (Object.keys(errors).length > 0) {
-          this.errors = errors;
-          this.errorSchema = errorSchema;
+          this.errorSchemaInternal = errorSchema;
 
           this.$emit('error', errors);
-          console.error('Form validation failed', errors);
+          console.warn('Form validation failed', errors);
           this.focusFirstFieldBySelector(this.invalidFieldsSelector);
           return;
         }
       }
 
       this.formDataState = newFormData;
-      this.errors = [];
-      this.errorSchema = {};
+      this.errorSchemaInternal = {};
 
       const submitPayload = {
+        // TODO: есть подозрение, что не все свойства используются
+        // напр. errors, errorSchema тут и пустые (и таковыми были)
         schema: this.resolvedSchema,
         uiSchema: this.uiSchema,
         formData: this.formDataState,
         edit: this.isEdit,
-        errors: this.errors,
-        errorSchema: this.errorSchema,
+        errors: [],
+        errorSchema: {},
         status: 'submitted'
       };
 
@@ -165,19 +169,9 @@ export default {
       this.formDataState = this.enrichFormData(formData);
 
       if (this.mustValidate) {
-        const { errors, errorSchema } = this.doValidate(this.formDataState);
-        this.errors = errors;
-        this.errorSchema = errorSchema;
+        const { errorSchema } = this.doValidate(this.formDataState);
+        this.errorSchemaInternal = errorSchema;
       }
-    },
-    getRegistry() {
-      // For BC, accept passed SchemaField and TitleField props and pass them to
-      // the "fields" registry one.
-      const { fields, widgets } = getDefaultRegistry();
-      return {
-        fields: { ...fields, ...this.fields },
-        widgets: { ...widgets, ...this.widgets }
-      };
     },
     enrichFormData(formData) {
       // непонятно нужно ли нам учитывать дефолтные значения с флагом omitMissingFields (режим просмотра)
@@ -198,6 +192,29 @@ export default {
       const { validate, getErrorData } = this.compiledSchemaData;
       validate(cloneDeep(formData));
       return getErrorData();
+    },
+    getFormDataByPath(path) {
+      if (jsonPointer.has(this.formDataState, path)) {
+        return jsonPointer.get(this.formDataState, path);
+      }
+      return undefined;
+    },
+    setFormDataByPointer(pointer, value) {
+      const paths = jsonPointer.parse(pointer);
+      const last = paths.pop();
+
+      const formData = this.getFormDataByPath(jsonPointer.compile(paths));
+      if (typeof value === 'function') {
+        // Для производительных действий над массивами: удаление/добавление/перемещение
+        value(this.getFormDataByPath(pointer));
+      } else {
+        this.$set(formData, last, value);
+      }
+      this.$emit('change', this.formDataState);
+      if (this.mustValidate) {
+        const { errorSchema } = this.doValidate(this.formDataState);
+        this.errorSchemaInternal = errorSchema;
+      }
     }
   }
 };

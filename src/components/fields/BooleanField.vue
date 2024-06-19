@@ -11,16 +11,16 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    :raw-errors="errorsMessages"
-    :raw-error-infos="errors"
+    :error-schema="errorSchema"
+    :pointer="pointer"
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
-    @change="$emit('change', $event)"
+    @change="handleChange"
   />
 </template>
 
 <script>
-import { getWidget, getUiOptions, optionsList } from '../../utils';
+import { getWidget, getUiOptions } from '../../utils';
 
 const PROPS = {
   name: String,
@@ -29,8 +29,12 @@ const PROPS = {
   schema: Object,
   uiSchema: Object,
   id: String,
+  pointer: {
+    type: String,
+    required: true
+  },
   formData: Boolean,
-  errors: {
+  errorSchema: {
     type: Array,
     default: () => []
   },
@@ -43,29 +47,23 @@ const PROPS = {
 
 export default {
   name: 'BooleanField',
+  inject: ['setFormDataByPointer'],
   props: PROPS,
   emits: ['focus', 'blur', 'change'],
   computed: {
-    enumOptions() {
-      return optionsList({
-        enum: this.schema.enum || [true, false],
-        enumNames:
-          this.schema.enumNames ||
-          (this.schema.enum && this.schema.enum[0] === false ? ['no', 'yes'] : ['yes', 'no'])
-      });
-    },
     widgetWithOptions() {
       const { widgets } = this.registry;
       // eslint-disable-next-line no-unused-vars
       const { widget = 'checkbox', placeholder, ...options } = getUiOptions(this.uiSchema);
       return {
         widget: getWidget(this.schema, widget, widgets),
-        options: { ...options, enumOptions: this.enumOptions }
+        options
       };
-    },
-    errorsMessages() {
-      // TODO: кажется что дропнуть, толку в этом мало, но мало ли где-то используются чисто текста, для мажорной версии
-      return this.errors.map(({ message }) => message);
+    }
+  },
+  methods: {
+    handleChange(value) {
+      this.setFormDataByPointer(this.pointer, value);
     }
   }
 };
