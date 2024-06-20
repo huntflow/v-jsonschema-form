@@ -1,8 +1,8 @@
 {
   "name": "vjsf",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Vue-component capable of building HTML forms out of a JSON schema. A port of react-jsonschema-form",
-  "main": "dist/vjsf.umd.min.js",
+  "main": "dist/vjsf.es.js",
   "scripts": {
     "eslint": "eslint --fix --ext .vue,.js src",
     "storybook": "storybook dev -p 6006",

@@ -82,10 +82,10 @@ export default {
     registry() {
       // For BC, accept passed SchemaField and TitleField props and pass them to
       // the "fields" registry one.
-      const { fields, widgets } = getDefaultRegistry();
+      const { fields } = getDefaultRegistry();
       return {
         fields,
-        widgets: { ...widgets, ...this.widgets }
+        widgets: this.widgets
       };
     }
   },
