@@ -1,12 +1,5 @@
 <template>
-  <component
-    :is="stringFieldCls"
-    v-bind="$props"
-    :raw-errors="errorsMessages"
-    :raw-error-infos="errors"
-    :form-data="formDataNumericValue"
-    @change="$emit('change', $event)"
-  />
+  <component :is="stringFieldCls" v-bind="$props" @change="$emit('change', $event)" />
 </template>
 
 <script>
