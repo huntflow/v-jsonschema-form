@@ -6,6 +6,7 @@
     @focus="$emit('focus', $event)"
     @blur="$emit('blur', $event)"
     @change="$emit('change', $event)"
+    @submit="handleSubmit"
   >
     <template #before-content="scopedProps">
       <slot name="before-content" v-bind="scopedProps" />
@@ -27,7 +28,7 @@ export default {
     BaseForm
   },
   props: PROPS,
-  emits: ['focus', 'blur', 'change'],
+  emits: ['focus', 'blur', 'change', 'submit'],
   computed: {
     enrichedSchema() {
       return getEnrichedSchema(this.schema);
@@ -36,6 +37,9 @@ export default {
   methods: {
     submit() {
       this.$refs.vjsf.submit();
+    },
+    handleSubmit(...payload) {
+      this.$emit('submit', ...payload);
     }
   }
 };
