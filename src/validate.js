@@ -65,7 +65,7 @@ export function compileSchema({
         isNotEmpty.errors = [];
       }
       const isValid =
-        (typeof data === 'string' && data.trim() !== '') ||
+        (typeof data === 'string' && data !== '') ||
         typeof data === 'number' ||
         (Array.isArray(data) && data.length > 0);
       !isValid &&
