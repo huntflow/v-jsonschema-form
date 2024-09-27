@@ -23,7 +23,6 @@
       :registry="registry"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
-      v-on="schemaFieldEventListeners"
       @change="handleChange"
     />
     <slot name="after-content" :error-schema="errorSchemaInternal" />
@@ -31,7 +30,6 @@
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import jsonPointer from 'json-pointer';
 
@@ -43,13 +41,14 @@ import { getDefaults, resolveSchemaShallowly, removeEmptySchemaFields } from '@/
 
 export default {
   name: 'VjsfForm',
-  props: PROPS,
   provide() {
     return {
       resolveSchemaShallowly: this.resolveSchemaShallowly,
       setFormDataByPointer: this.setFormDataByPointer
     };
   },
+  props: PROPS,
+  emits: ['change', 'submit'],
   data() {
     return {
       formDataState: undefined,
@@ -68,9 +67,6 @@ export default {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formDataState);
     },
-    schemaFieldEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur']);
-    },
     isStartValidateOnSubmit() {
       return this.startValidateMode === VALIDATION_MODE.onSubmit;
     },
@@ -86,10 +82,10 @@ export default {
     registry() {
       // For BC, accept passed SchemaField and TitleField props and pass them to
       // the "fields" registry one.
-      const { fields, widgets } = getDefaultRegistry();
+      const { fields } = getDefaultRegistry();
       return {
         fields,
-        widgets: { ...widgets, ...this.widgets }
+        widgets: this.widgets
       };
     }
   },
@@ -127,7 +123,7 @@ export default {
     },
     focusFirstFieldBySelector(selector) {
       this.$nextTick(() => {
-        const firstField = this.$el.querySelector(selector);
+        const firstField = this.$refs.form.querySelector(selector);
         if (firstField) {
           firstField.focus();
         }
@@ -210,7 +206,7 @@ export default {
         // Для производительных действий над массивами: удаление/добавление/перемещение
         value(this.getFormDataByPath(pointer));
       } else {
-        this.$set(formData, last, value);
+        formData[last] = value;
       }
       this.$emit('change', this.formDataState);
       if (this.mustValidate) {

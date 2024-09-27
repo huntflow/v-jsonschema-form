@@ -2,12 +2,10 @@
   <component
     :is="fieldTemplateCls"
     :id="id"
-    :can-add="canAdd"
     :disabled="disabled"
     :readonly="readonly"
     :pointer="pointer"
     class="field field-array field-array-fixed-items"
-    @add="$emit('add')"
   >
     <template v-if="label" #title>
       <component
@@ -33,24 +31,17 @@
       :pointer="`${pointer}/${index}`"
       :registry="registry"
       :index="index"
-      :can-remove="index >= itemSchemas.length"
-      :can-move-up="index >= itemSchemas.length + 1"
-      :can-move-down="index >= itemSchemas.length && index < formDataItems.length - 1"
       :ui-schema="uiSchema"
       :item-schema="getItemSchema(keyedItem.item, index)"
       :item-ui-schema="getItemUiSchema(index)"
       :item-data="keyedItem.item"
       :error-schema="(errorSchema || [])[index]"
       :autofocus="autofocus && index === 0"
-      v-on="arrayFieldItemEventListeners"
     />
   </component>
 </template>
 
 <script>
-import pick from 'lodash/pick';
-
-import { canAddArrayItem } from '../../helpers/can-add-array-item';
 import ArrayFieldItem from './ArrayField.Item';
 import DefaultFixedArrayFieldTemplate from './ArrayField.FixedArray.DefaultTemplate';
 
@@ -80,18 +71,12 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldFixedArray',
-  inject: ['resolveSchemaShallowly'],
   components: {
     ArrayFieldItem
   },
+  inject: ['resolveSchemaShallowly'],
   props: PROPS,
   computed: {
-    arrayFieldItemEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur', 'reorder', 'drop']);
-    },
-    canAdd() {
-      return canAddArrayItem(this.uiSchema, this.schema, this.formData);
-    },
     fieldTemplateCls() {
       return this.uiSchema['ui:ArrayFieldTemplate'] || DefaultFixedArrayFieldTemplate;
     },

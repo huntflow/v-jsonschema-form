@@ -3,15 +3,9 @@
     :is="fieldTemplateCls"
     class="array-item"
     :index="index"
-    :total-count="totalCount"
-    :has-move-up="has.moveUp"
-    :has-move-down="has.moveDown"
-    :has-remove="has.remove"
-    :has-toolbar="has.toolbar"
     :disabled="disabled"
     :readonly="readonly"
     :pointer="pointer"
-    v-on="arrayItemEventListeners"
   >
     <component
       :is="registry.fields.SchemaField"
@@ -27,21 +21,15 @@
       :disabled="disabled"
       :readonly="readonly"
       :autofocus="autofocus"
-      v-on="schemaFieldEventListeners"
     />
   </component>
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import DefaultArrayItem from './ArrayField.DefaultArrayItem';
 
 const PROPS = {
   index: Number,
-  totalCount: Number,
-  canRemove: { default: true },
-  canMoveUp: { default: true },
-  canMoveDown: { default: true },
   itemSchema: Object,
   itemData: {},
   itemUiSchema: Object,
@@ -72,12 +60,6 @@ export default {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.itemSchema, this.itemData);
     },
-    arrayItemEventListeners() {
-      return pick(this.$listeners, ['drop', 'reorder']);
-    },
-    schemaFieldEventListeners() {
-      return pick(this.$listeners, ['blur', 'focus']);
-    },
     isRequired() {
       if (Array.isArray(this.resolvedSchema.type)) {
         // While we don't yet support composite/nullable jsonschema types, it's
@@ -86,21 +68,6 @@ export default {
       }
       // All non-null array item types are inherently required by design
       return this.resolvedSchema.type !== 'null';
-    },
-    has() {
-      const { orderable, removable } = {
-        orderable: true,
-        removable: true,
-        ...(this.uiSchema || {})['ui:options']
-      };
-      const result = {
-        moveUp: orderable && this.canMoveUp,
-        moveDown: orderable && this.canMoveDown,
-        remove: removable && this.canRemove
-      };
-      result.toolbar = Object.keys(result).some((key) => result[key]);
-
-      return result;
     }
   }
 };

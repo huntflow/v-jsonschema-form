@@ -16,10 +16,6 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    v-on="fixedArrayEventListeners"
-    @add="handleAddClick"
-    @reorder="handleReorderClick"
-    @drop="handleDropIndexClick"
   />
 
   <normal-array
@@ -39,15 +35,10 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :registry="registry"
-    v-on="normalArrayEventListeners"
-    @add="handleAddClick"
-    @reorder="handleReorderClick"
-    @drop="handleDropIndexClick"
   />
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import shortid from 'shortid';
 
 import NormalArray from './ArrayField.NormalArray';
@@ -84,6 +75,7 @@ export default {
     NormalArray,
     FixedArray
   },
+  inject: ['resolveSchemaShallowly'],
   inheritAttrs: false,
   props: PROPS,
   data() {
@@ -92,12 +84,6 @@ export default {
     };
   },
   computed: {
-    fixedArrayEventListeners() {
-      return pick(this.$listeners, ['blur', 'focus']);
-    },
-    normalArrayEventListeners() {
-      return pick(this.$listeners, ['blur', 'focus']);
-    },
     resolvedSchema() {
       const schema = this.resolveSchemaShallowly(this.schema, this.formData);
       if (Array.isArray(schema.items)) {
@@ -136,32 +122,6 @@ export default {
         itemSchema = this.resolvedSchema.additionalItems;
       }
       return itemSchema.default;
-    },
-
-    handleAddClick() {
-      this.keys.push(generateRowId());
-      this.setFormDataByPointer(this.pointer, (state) => {
-        state.push(this.getNewFormDataRow());
-      });
-    },
-
-    handleDropIndexClick(index) {
-      this.keys.splice(index, 1);
-      this.setFormDataByPointer(this.pointer, (state) => {
-        state.splice(index, 1);
-      });
-    },
-
-    handleReorderClick(from, to) {
-      const tempKey = this.keys[from];
-      this.$set(this.keys, from, this.keys[to]);
-      this.$set(this.keys, to, tempKey);
-
-      this.setFormDataByPointer(this.pointer, (state) => {
-        const temp = state[from];
-        this.$set(state, from, state[to]);
-        this.$set(state, to, temp);
-      });
     }
   }
 };

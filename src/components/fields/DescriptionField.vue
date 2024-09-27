@@ -5,13 +5,11 @@
 </template>
 
 <script>
-const PROPS = {
-  id: String,
-  description: String
-};
-
 export default {
   name: 'DescriptionField',
-  props: PROPS
+  props: {
+    id: String,
+    description: String
+  }
 };
 </script>

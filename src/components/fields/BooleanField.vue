@@ -13,7 +13,6 @@
     :registry="registry"
     :error-schema="errorSchema"
     :pointer="pointer"
-    v-on="$listeners"
     @change="handleChange"
   />
 </template>
