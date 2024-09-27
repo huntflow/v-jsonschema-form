@@ -206,7 +206,7 @@ export default {
         // Для производительных действий над массивами: удаление/добавление/перемещение
         value(this.getFormDataByPath(pointer));
       } else {
-        this.$set(formData, last, value);
+        formData[last] = value;
       }
       this.$emit('change', this.formDataState);
       if (this.mustValidate) {
