@@ -7,14 +7,15 @@ export function compileSchema({
   schema,
   customFormats = {},
   transformErrors,
-  removeAdditional = false
+  removeAdditional = false,
+  useDefaults
 }) {
   const ajv = new Ajv({
     allErrors: true,
     verbose: true,
     removeAdditional,
     strictSchema: false, // т.к. мы валидируем вложенную структуру, то может ругаться на `default` свойство, если оно на корневом объекте
-    useDefaults: 'empty',
+    useDefaults,
     multipleOfPrecision: 8
   });
 

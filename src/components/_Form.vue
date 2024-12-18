@@ -61,7 +61,8 @@ export default {
       return compileSchema({
         schema: this.schema,
         customFormats: this.customFormats,
-        removeAdditional: this.omitExtraData
+        removeAdditional: this.omitExtraData,
+        useDefaults: this.useDefaults
       });
     },
     resolvedSchema() {
