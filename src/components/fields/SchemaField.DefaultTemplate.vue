@@ -10,6 +10,9 @@
 <script>
 export default {
   name: 'SchemaFieldDefaultTemplate',
+  compatConfig: {
+    MODE: 3
+  },
   inheritAttrs: false,
   props: {
     id: String,

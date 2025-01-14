@@ -45,6 +45,9 @@ const PROPS = {
 
 export default {
   name: 'BooleanField',
+  compatConfig: {
+    MODE: 3
+  },
   inject: ['setFormDataByPointer'],
   props: PROPS,
   computed: {

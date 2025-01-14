@@ -4,6 +4,9 @@
 
 <script>
 export default {
-  name: 'ArrayFieldDefaultArrayItem'
+  name: 'ArrayFieldDefaultArrayItem',
+  compatConfig: {
+    MODE: 3
+  }
 };
 </script>

@@ -24,6 +24,9 @@ import { PROPS } from './form-props';
 
 export default {
   name: 'VjsfFormWrapper',
+  compatConfig: {
+    MODE: 3
+  },
   components: {
     BaseForm
   },

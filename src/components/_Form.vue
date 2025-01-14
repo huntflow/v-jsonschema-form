@@ -41,6 +41,9 @@ import { getDefaults, resolveSchemaShallowly, removeEmptySchemaFields } from '@/
 
 export default {
   name: 'VjsfForm',
+  compatConfig: {
+    MODE: 3
+  },
   provide() {
     return {
       resolveSchemaShallowly: this.resolveSchemaShallowly,

@@ -47,6 +47,9 @@ const PROPS = {
 
 export default {
   name: 'StringField',
+  compatConfig: {
+    MODE: 3
+  },
   inject: ['resolveSchemaShallowly', 'setFormDataByPointer'],
   props: PROPS,
   emits: ['change'],

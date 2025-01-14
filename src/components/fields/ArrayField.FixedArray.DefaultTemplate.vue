@@ -6,6 +6,9 @@
 
 <script>
 export default {
-  name: 'ArrayFieldFixedArrayDefaultTemplate'
+  name: 'ArrayFieldFixedArrayDefaultTemplate',
+  compatConfig: {
+    MODE: 3
+  }
 };
 </script>

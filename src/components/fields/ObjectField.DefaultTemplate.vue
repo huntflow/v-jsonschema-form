@@ -20,6 +20,9 @@
 <script>
 export default {
   name: 'ObjectFieldDefaultTemplate',
+  compatConfig: {
+    MODE: 3
+  },
   inheritAttrs: false,
   props: {
     id: String,

@@ -1,7 +1,7 @@
 <template>
   <component
-    v-if="widgetCls"
     :is="widgetCls"
+    v-if="widgetCls"
     :id="id"
     :options="widgetWithOptions.options"
     :schema="schema"
@@ -20,8 +20,8 @@
     @change="$emit('change', $event)"
   />
   <component
-    v-else
     :is="fieldTemplateCls"
+    v-else
     :id="id"
     class="field field-array"
     :disabled="disabled"
@@ -101,6 +101,9 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldNormalArray',
+  compatConfig: {
+    MODE: 3
+  },
   components: {
     'array-field-item': ArrayFieldItem
   },
@@ -109,7 +112,9 @@ export default {
   emits: ['change'],
   computed: {
     widgetCls() {
-      const widgetCls = this.widgetWithOptions.widget && getWidget(this.schema, this.widgetWithOptions.widget, this.registry.widgets);
+      const widgetCls =
+        this.widgetWithOptions.widget &&
+        getWidget(this.schema, this.widgetWithOptions.widget, this.registry.widgets);
       return widgetCls;
     },
     widgetWithOptions() {

@@ -70,7 +70,9 @@ const PROPS = {
 
 export default {
   name: 'ArrayField',
-  inject: ['resolveSchemaShallowly', 'setFormDataByPointer'],
+  compatConfig: {
+    MODE: 3
+  },
   components: {
     NormalArray,
     FixedArray

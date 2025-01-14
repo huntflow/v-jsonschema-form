@@ -12,6 +12,9 @@ const PROPS = {
 
 export default {
   name: 'TitleField',
+  compatConfig: {
+    MODE: 3
+  },
   props: PROPS
 };
 </script>

@@ -28,6 +28,9 @@ const PROPS = {
 
 export default {
   name: 'NumberField',
+  compatConfig: {
+    MODE: 3
+  },
   props: PROPS,
   emits: ['change'],
   computed: {
