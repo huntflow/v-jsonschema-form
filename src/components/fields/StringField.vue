@@ -49,6 +49,7 @@ export default {
   name: 'StringField',
   inject: ['resolveSchemaShallowly', 'setFormDataByPointer'],
   props: PROPS,
+  emits: ['change'],
   computed: {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);

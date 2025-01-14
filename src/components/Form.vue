@@ -1,9 +1,16 @@
 <template>
-  <base-form ref="vjsf" v-bind="$props" :schema="enrichedSchema" v-on="$listeners">
+  <base-form
+    ref="vjsf"
+    v-bind="$props"
+    :schema="enrichedSchema"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
+    @change="$emit('change', $event)"
+    @submit="handleSubmit"
+  >
     <template #before-content="scopedProps">
       <slot name="before-content" v-bind="scopedProps" />
     </template>
-
     <template #after-content="scopedProps">
       <slot name="after-content" v-bind="scopedProps" />
     </template>
@@ -21,6 +28,7 @@ export default {
     BaseForm
   },
   props: PROPS,
+  emits: ['focus', 'blur', 'change', 'submit'],
   computed: {
     enrichedSchema() {
       return getEnrichedSchema(this.schema);
@@ -29,6 +37,9 @@ export default {
   methods: {
     submit() {
       this.$refs.vjsf.submit();
+    },
+    handleSubmit(...payload) {
+      this.$emit('submit', ...payload);
     }
   }
 };

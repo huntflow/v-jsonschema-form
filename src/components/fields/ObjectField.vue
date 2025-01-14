@@ -31,14 +31,12 @@
         :disabled="disabled"
         :readonly="readonly"
         v-bind="scopedProps"
-        v-on="schemaFieldEventListeners"
       />
     </template>
   </component>
 </template>
 
 <script>
-import pick from 'lodash/pick';
 import DefaultObjectFieldTemplate from './ObjectField.DefaultTemplate.vue';
 import { orderProperties } from '../../utils';
 
@@ -66,12 +64,9 @@ const PROPS = {
 
 export default {
   name: 'ObjectField',
-  props: PROPS,
   inject: ['resolveSchemaShallowly'],
+  props: PROPS,
   computed: {
-    schemaFieldEventListeners() {
-      return pick(this.$listeners, ['focus', 'blur']);
-    },
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);
     },

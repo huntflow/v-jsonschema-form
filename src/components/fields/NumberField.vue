@@ -1,10 +1,8 @@
 <template>
-  <component :is="stringFieldCls" v-bind="$props" v-on="eventListeners" />
+  <component :is="stringFieldCls" v-bind="$props" @change="$emit('change', $event)" />
 </template>
 
 <script>
-import pick from 'lodash/pick';
-
 const PROPS = {
   schema: Object,
   name: String,
@@ -31,10 +29,8 @@ const PROPS = {
 export default {
   name: 'NumberField',
   props: PROPS,
+  emits: ['change'],
   computed: {
-    eventListeners() {
-      return pick(this.$listeners, ['focus', 'blur']);
-    },
     stringFieldCls() {
       return this.registry.fields.StringField;
     }

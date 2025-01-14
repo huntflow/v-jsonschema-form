@@ -12,7 +12,6 @@ export const PROPS = {
   acceptcharset: String,
   formData: [String, Number, Boolean, Array, Object],
   schema: { type: Object, default: () => ({}) },
-  showErrorList: { type: Boolean, default: true },
   uiSchema: { type: Object, default: () => ({}) },
   noValidate: { type: Boolean, default: false },
   liveValidate: { type: Boolean, default: false },
@@ -29,5 +28,6 @@ export const PROPS = {
   customFormats: { type: Object, default: () => ({}) },
   fieldsSelector: { type: String, default: '[name]' },
   invalidFieldsSelector: { type: String, default: '[name][aria-invalid="true"]' },
-  errorSchema: { type: Object, default: undefined }
+  errorSchema: { type: Object, default: undefined },
+  useDefaults: { type: [String, Boolean], default: 'empty' }
 };

@@ -1,3 +1,5 @@
+import fields from './components/fields';
+
 const widgetMap = {
   boolean: {
     checkbox: 'CheckboxWidget',
@@ -52,10 +54,7 @@ const widgetMap = {
 
 export function getDefaultRegistry() {
   return {
-    // eslint-disable-next-line no-undef
-    fields: require('./components/fields').default,
-    // eslint-disable-next-line no-undef
-    widgets: require('./components/widgets').default
+    fields
   };
 }
 
