@@ -1,0 +1,6 @@
+.idea
+.storybook
+vite.config.js
+vitest.config.js
+tests
+*.tgz
