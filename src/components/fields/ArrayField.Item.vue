@@ -48,6 +48,9 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldItem',
+  compatConfig: {
+    MODE: 3
+  },
   components: {
     'default-array-item': DefaultArrayItem
   },

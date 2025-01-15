@@ -64,6 +64,9 @@ const PROPS = {
 
 export default {
   name: 'ObjectField',
+  compatConfig: {
+    MODE: 3
+  },
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
   computed: {

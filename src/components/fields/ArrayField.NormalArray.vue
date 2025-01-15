@@ -1,7 +1,7 @@
 <template>
   <component
-    v-if="widgetCls"
     :is="widgetCls"
+    v-if="widgetCls"
     :id="id"
     :options="widgetWithOptions.options"
     :schema="schema"
@@ -17,11 +17,10 @@
     :autofocus="autofocus"
     :error-schema="errorSchema"
     :pointer="pointer"
-    @change="$emit('change', $event)"
   />
   <component
-    v-else
     :is="fieldTemplateCls"
+    v-else
     :id="id"
     class="field field-array"
     :disabled="disabled"
@@ -33,7 +32,6 @@
     :schema="schema"
     :ui-schema="uiSchema"
     :form-data="formData"
-    @change="$emit('change', $event)"
   >
     <template v-if="label" #title>
       <component
@@ -101,15 +99,19 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldNormalArray',
+  compatConfig: {
+    MODE: 3
+  },
   components: {
     'array-field-item': ArrayFieldItem
   },
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
-  emits: ['change'],
   computed: {
     widgetCls() {
-      const widgetCls = this.widgetWithOptions.widget && getWidget(this.schema, this.widgetWithOptions.widget, this.registry.widgets);
+      const widgetCls =
+        this.widgetWithOptions.widget &&
+        getWidget(this.schema, this.widgetWithOptions.widget, this.registry.widgets);
       return widgetCls;
     },
     widgetWithOptions() {

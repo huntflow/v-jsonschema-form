@@ -231,10 +231,6 @@ export function toConstant(schema) {
   }
 }
 
-export function isSelect(schema) {
-  return !!Array.isArray(schema.enum);
-}
-
 export function isFixedItems(schema) {
   return (
     Array.isArray(schema.items) &&

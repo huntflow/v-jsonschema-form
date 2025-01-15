@@ -7,6 +7,9 @@
 <script>
 export default {
   name: 'DescriptionField',
+  compatConfig: {
+    MODE: 3
+  },
   props: {
     id: String,
     description: String

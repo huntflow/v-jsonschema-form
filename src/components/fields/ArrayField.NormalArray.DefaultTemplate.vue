@@ -7,6 +7,9 @@
 <script>
 export default {
   name: 'ArrayFieldNormalArrayDefaultTemplate',
+  compatConfig: {
+    MODE: 3
+  },
   props: {
     id: String
   }

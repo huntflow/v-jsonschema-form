@@ -71,6 +71,9 @@ const PROPS = {
 
 export default {
   name: 'ArrayFieldFixedArray',
+  compatConfig: {
+    MODE: 3
+  },
   components: {
     ArrayFieldItem
   },

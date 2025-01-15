@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { getWidget, getUiOptions, isSelect, hasWidget } from '../../utils';
+import { getWidget, getUiOptions, hasWidget } from '../../utils';
 
 const PROPS = {
   schema: Object,
@@ -47,9 +47,11 @@ const PROPS = {
 
 export default {
   name: 'StringField',
+  compatConfig: {
+    MODE: 3
+  },
   inject: ['resolveSchemaShallowly', 'setFormDataByPointer'],
   props: PROPS,
-  emits: ['change'],
   computed: {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);

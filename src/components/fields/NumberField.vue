@@ -1,5 +1,5 @@
 <template>
-  <component :is="stringFieldCls" v-bind="$props" @change="$emit('change', $event)" />
+  <component :is="stringFieldCls" v-bind="$props" />
 </template>
 
 <script>
@@ -28,8 +28,10 @@ const PROPS = {
 
 export default {
   name: 'NumberField',
+  compatConfig: {
+    MODE: 3
+  },
   props: PROPS,
-  emits: ['change'],
   computed: {
     stringFieldCls() {
       return this.registry.fields.StringField;
