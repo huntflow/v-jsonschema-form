@@ -23,7 +23,6 @@
       :registry="registry"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
-      @change="handleChange"
     />
     <slot name="after-content" :error-schema="errorSchemaInternal" />
   </form>
@@ -111,11 +110,6 @@ export default {
         this.errorSchemaInternal = errorSchema;
       },
       immediate: true
-    },
-    formDataState: {
-      handler(state) {
-        this.$emit('change', state);
-      }
     }
   },
   mounted() {
@@ -166,14 +160,6 @@ export default {
       };
 
       this.$emit('submit', submitPayload, event);
-    },
-    handleChange(formData) {
-      this.formDataState = this.enrichFormData(formData);
-
-      if (this.mustValidate) {
-        const { errorSchema } = this.doValidate(this.formDataState);
-        this.errorSchemaInternal = errorSchema;
-      }
     },
     enrichFormData(formData) {
       // непонятно нужно ли нам учитывать дефолтные значения с флагом omitMissingFields (режим просмотра)

@@ -17,7 +17,6 @@
     :autofocus="autofocus"
     :error-schema="errorSchema"
     :pointer="pointer"
-    @change="$emit('change', $event)"
   />
   <component
     :is="fieldTemplateCls"
@@ -33,7 +32,6 @@
     :schema="schema"
     :ui-schema="uiSchema"
     :form-data="formData"
-    @change="$emit('change', $event)"
   >
     <template v-if="label" #title>
       <component
@@ -109,7 +107,6 @@ export default {
   },
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
-  emits: ['change'],
   computed: {
     widgetCls() {
       const widgetCls =

@@ -31,7 +31,6 @@
       :required="required"
       :schema="resolvedSchema"
       :ui-schema="uiSchema"
-      @change="$emit('change', $event)"
     />
   </component>
 </template>
@@ -71,7 +70,6 @@ export default {
   },
   inject: ['resolveSchemaShallowly'],
   props: PROPS,
-  emits: ['change'],
   computed: {
     hasAutofocus() {
       return Boolean(this.autofocus || this.uiSchema['ui:autofocus']);

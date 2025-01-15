@@ -1,5 +1,5 @@
 <template>
-  <component :is="stringFieldCls" v-bind="$props" @change="$emit('change', $event)" />
+  <component :is="stringFieldCls" v-bind="$props" />
 </template>
 
 <script>
@@ -32,7 +32,6 @@ export default {
     MODE: 3
   },
   props: PROPS,
-  emits: ['change'],
   computed: {
     stringFieldCls() {
       return this.registry.fields.StringField;

@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { getWidget, getUiOptions, isSelect, hasWidget } from '../../utils';
+import { getWidget, getUiOptions, hasWidget } from '../../utils';
 
 const PROPS = {
   schema: Object,
@@ -52,7 +52,6 @@ export default {
   },
   inject: ['resolveSchemaShallowly', 'setFormDataByPointer'],
   props: PROPS,
-  emits: ['change'],
   computed: {
     resolvedSchema() {
       return this.resolveSchemaShallowly(this.schema, this.formData);
