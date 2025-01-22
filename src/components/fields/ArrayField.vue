@@ -78,7 +78,6 @@ export default {
     FixedArray
   },
   inject: ['resolveSchemaShallowly'],
-  inheritAttrs: false,
   props: PROPS,
   data() {
     return {

@@ -13,7 +13,6 @@ export default {
   compatConfig: {
     MODE: 3
   },
-  inheritAttrs: false,
   props: {
     id: String,
     label: String,
