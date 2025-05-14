@@ -187,16 +187,25 @@ export default {
       }
       return undefined;
     },
-    setFormDataByPointer(pointer, value) {
+    setFormDataByPointer(pointer, value, options) {
       const paths = jsonPointer.parse(pointer);
       const last = paths.pop();
 
       const formData = this.getFormDataByPath(jsonPointer.compile(paths));
+      const isPrimitive =
+        options?.schema.type === 'string' ||
+        options.schema.type === 'number' ||
+        options.schema.type === 'integer';
+      const shouldRemove = isPrimitive && options?.required === false && !value && value !== 0;
       if (typeof value === 'function') {
         // Для производительных действий над массивами: удаление/добавление/перемещение
         value(this.getFormDataByPath(pointer));
       } else {
-        formData[last] = value;
+        if (shouldRemove) {
+          delete formData[last];
+        } else {
+          formData[last] = value;
+        }
       }
       this.$emit('change', this.formDataState);
       if (this.mustValidate) {
