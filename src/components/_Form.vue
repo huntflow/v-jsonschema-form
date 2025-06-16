@@ -194,9 +194,9 @@ export default {
       const formData = this.getFormDataByPath(jsonPointer.compile(paths));
       const isPrimitive =
         options?.schema.type === 'string' ||
-        options.schema.type === 'number' ||
-        options.schema.type === 'integer';
-      const shouldRemove = isPrimitive && options?.required === false && !value && value !== 0;
+        options?.schema.type === 'number' ||
+        options?.schema.type === 'integer';
+      const shouldRemove = isPrimitive && options.required === false && !value && value !== 0;
       if (typeof value === 'function') {
         // Для производительных действий над массивами: удаление/добавление/перемещение
         value(this.getFormDataByPath(pointer));
