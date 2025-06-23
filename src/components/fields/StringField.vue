@@ -82,7 +82,10 @@ export default {
   },
   methods: {
     handleChange(value) {
-      this.setFormDataByPointer(this.pointer, value);
+      this.setFormDataByPointer(this.pointer, value, {
+        required: this.required,
+        schema: this.schema
+      });
     }
   }
 };
