@@ -14,8 +14,10 @@ export default defineConfig({
   build: {
     minify: 'terser',
     lib: {
-      entry: path.resolve(__dirname, 'src/components/Form.vue'),
-      name: 'Vjsf',
+      entry: {
+        vjsf: path.resolve(__dirname, 'src/components/Form.vue')
+      },
+      formats: ['es'],
       fileName: (format) => `vjsf.${format}.js`
     },
     rollupOptions: {
@@ -27,8 +29,14 @@ export default defineConfig({
         // for externalized deps
         globals: {
           vue: 'Vue'
-        }
+        },
+        entryFileNames: '[name].[format].js',
+      },
+      input: {
+        vjsf: path.resolve(__dirname, 'src/components/Form.vue'),
+        schema: path.resolve(__dirname, 'src/helpers/schema.js'),
+        validate: path.resolve(__dirname, 'src/validate.js')
       }
     }
-  }  
+  }
 });
