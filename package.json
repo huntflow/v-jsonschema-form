@@ -32,13 +32,9 @@
     "vue": "^3.2.47"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^7.0.4",
-    "@storybook/addon-interactions": "^7.0.4",
-    "@storybook/addon-links": "^7.0.4",
-    "@storybook/blocks": "^7.0.4",
-    "@storybook/vue3": "^7.0.4",
-    "@storybook/vue3-webpack5": "^7.0.4",
-    "@vitejs/plugin-vue": "^4.1.0",
+    "@storybook/addon-docs": "^9.1.8",
+    "@storybook/vue3-vite": "^9.1.8",
+    "@vitejs/plugin-vue": "^6.0.1",
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/test-utils": "^2.3.2",
     "babel-eslint": "^8.2.6",
@@ -47,10 +43,11 @@
     "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-prettier-vue": "^4.2.0",
+    "eslint-plugin-storybook": "^9.1.8",
     "eslint-plugin-vue": "^9.10.0",
     "happy-dom": "^9.5.0",
     "prettier": "^2.8.7",
-    "storybook": "^7.0.4",
+    "storybook": "^9.1.8",
     "vitest": "^0.30.1"
   }
 }

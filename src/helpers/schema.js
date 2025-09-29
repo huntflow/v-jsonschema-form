@@ -6,6 +6,7 @@ import shortid from 'shortid';
 import { getSchemaType } from '@/utils';
 
 jsonSchemaTraverse.keywords.if = true;
+jsonSchemaTraverse.keywords.then = true;
 jsonSchemaTraverse.keywords.additionalItems = true;
 jsonSchemaTraverse.keywords.prefixItems = true;
 jsonSchemaTraverse.arrayKeywords.prefixItems = true;
