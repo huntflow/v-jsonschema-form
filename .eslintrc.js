@@ -4,7 +4,7 @@ module.exports = {
   env: {
     node: true
   },
-  extends: ['eslint:recommended', 'plugin:vue/recommended', 'plugin:prettier-vue/recommended'],
+  extends: ['eslint:recommended', 'plugin:vue/recommended', 'plugin:prettier-vue/recommended', 'plugin:storybook/recommended'],
 
   rules: {
     'no-prototype-builtins': 0,

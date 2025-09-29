@@ -148,3 +148,6 @@ public/
 .dynamodb/
 
 # End of https://www.gitignore.io/api/node,emacs
+
+*storybook.log
+storybook-static
