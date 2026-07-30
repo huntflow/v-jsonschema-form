@@ -21,7 +21,7 @@
         :id="`${id}_${propName}`"
         :key="propName"
         :pointer="`${pointer}/${propName}`"
-        :form-data="formData[propName]"
+        :form-data="formData?.[propName]"
         :name="propName"
         :required="isRequired(propName)"
         :schema="resolvedSchema.properties[propName]"
